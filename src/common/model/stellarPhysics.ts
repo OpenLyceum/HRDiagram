@@ -206,6 +206,12 @@ export const TABLE_TEMPERATURE_RANGE = {
   max: 10 ** BC_V_OF_LOG_T.maxX,
 };
 
+/** Temperature range over which the dwarf table gives a BP−RP colour (K). */
+export const BP_RP_TEMPERATURE_RANGE = {
+  min: 10 ** BP_RP_OF_LOG_T.minX,
+  max: 10 ** BP_RP_OF_LOG_T.maxX,
+};
+
 // ── Temperature, colour and bolometric correction ─────────────────────────────
 
 /** V-band bolometric correction BC_V = M_bol − M_V at temperature T (K). */
@@ -216,6 +222,9 @@ export const colorIndexFromTemperature = (temperature: number): number => BV_OF_
 
 /** Temperature (K) of a dwarf with colour B−V. */
 export const temperatureFromColorIndex = (bv: number): number => 10 ** LOG_T_OF_BV.evaluate(bv);
+
+/** Temperature (K) of a dwarf with Gaia colour BP−RP. */
+export const temperatureFromBpRp = (bpRp: number): number => 10 ** LOG_T_OF_BP_RP.evaluate(bpRp);
 
 /** Gaia BP−RP colour of a dwarf at temperature T (K). */
 export const bpRpFromTemperature = (temperature: number): number => BP_RP_OF_LOG_T.evaluate(Math.log10(temperature));

@@ -1,21 +1,87 @@
 {
-  "title": "HR Diagram",
+  "title": "Diagrama HR",
   "screens": {
-    "explore": "Explore",
-    "radius": "Radius",
-    "starSamples": "StarSamples",
-    "gaiaCensus": "GaiaCensus"
+    "explore": "Explorar",
+    "radius": "Radio",
+    "starSamples": "Muestras de estrellas",
+    "gaiaCensus": "Censo de Gaia"
+  },
+  "common": {
+    "sun": "Sol",
+    "axes": {
+      "title": "Ejes",
+      "horizontal": "Eje horizontal",
+      "vertical": "Eje vertical",
+      "temperature": "Temperatura (K)",
+      "colorIndex": "Índice de color B − V",
+      "spectralType": "Tipo espectral",
+      "bpRp": "Color de Gaia BP − RP",
+      "luminosity": "Luminosidad (L<sub>☉</sub>)",
+      "absoluteMagnitude": "Magnitud absoluta M<sub>V</sub>",
+      "absoluteG": "Magnitud absoluta M<sub>G</sub>",
+      "hotter": "más caliente",
+      "brighter": "más luminosa"
+    },
+    "overlays": {
+      "title": "Mostrar",
+      "mainSequence": "Secuencia principal",
+      "luminosityClasses": "Clases de luminosidad",
+      "isoradius": "Líneas de igual radio",
+      "instabilityStrip": "Franja de inestabilidad"
+    },
+    "classLabels": {
+      "Ia": "Ia supergigantes luminosas",
+      "Ib": "Ib supergigantes",
+      "II": "II gigantes luminosas",
+      "III": "III gigantes",
+      "IV": "IV subgigantes",
+      "V": "V secuencia principal",
+      "D": "enanas blancas"
+    },
+    "instabilityStrip": "franja de inestabilidad",
+    "quantities": {
+      "temperature": "Temperatura",
+      "luminosity": "Luminosidad",
+      "radius": "Radio",
+      "absoluteMagnitude": "Magnitud absoluta",
+      "spectralType": "Tipo espectral"
+    },
+    "units": {
+      "kelvinPattern": "{{value}} K",
+      "solarLuminosityPattern": "{{value}} L<sub>☉</sub>",
+      "solarRadiusPattern": "{{value}} R<sub>☉</sub>"
+    },
+    "mainSequenceTypePattern": "{{type}} en la secuencia principal",
+    "size": {
+      "title": "Tamaño comparado con el Sol",
+      "star": "Estrella",
+      "toScale": "Dibujado a escala",
+      "tooSmall": "demasiado pequeño para verse a esta escala"
+    },
+    "keyboardHelp": {
+      "title": "Mover una estrella",
+      "move": "Mover la estrella en el diagrama",
+      "moveFine": "Moverla en pasos pequeños"
+    }
+  },
+  "explore": {
+    "starTitle": "Tu estrella",
+    "temperature": "Temperatura",
+    "luminosity": "Luminosidad"
   },
   "a11y": {
     "explore": {
       "screenSummary": {
-        "playArea": "El área de juego muestra el contenido principal de la simulación.",
-        "controlArea": "El área de control tiene un botón Restablecer todo que devuelve la simulación a su estado inicial.",
-        "interactionHint": "Explora la simulación interactuando con sus controles."
+        "playArea": "El área de juego es un diagrama de Hertzsprung-Russell: la temperatura va en el eje horizontal, las más calientes a la izquierda, y la luminosidad en el eje vertical. Hay un marcador de estrella, junto al Sol.",
+        "controlArea": "El área de control tiene deslizadores para la temperatura y la luminosidad de la estrella, su radio y magnitud, casillas para líneas de referencia, la elección de los ejes y una comparación de tamaño con el Sol.",
+        "interactionHint": "Mueve la estrella con las flechas o los deslizadores y observa cómo cambia su radio."
       },
-      "currentDetails": "La simulación está en su estado inicial.",
+      "currentDetailsPattern": "Tu estrella tiene una temperatura de {{temperature}} kelvin, una luminosidad de {{luminosity}} veces la del Sol y un radio de {{radius}} veces el del Sol.",
       "controls": {
-        "exampleControl": "Control de ejemplo"
+        "cursorStar": "Estrella en el diagrama",
+        "cursorStarHelp": "Las flechas izquierda y derecha cambian la temperatura; arriba y abajo, la luminosidad. Mantén Mayús para pasos pequeños.",
+        "temperatureValuePattern": "{{value}} kelvin",
+        "luminosityValuePattern": "{{value}} veces el Sol"
       }
     },
     "radius": {

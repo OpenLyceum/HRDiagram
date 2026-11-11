@@ -70,13 +70,16 @@ const DWARF_MV = new Interpolator(
 /** The classes the overlay draws, brightest first. */
 export const OVERLAY_CLASSES: readonly LuminosityClassName[] = ["Ia", "Ib", "II", "III", "IV", "V", "D"];
 
-/** Spectral-code span of each class curve. */
+/**
+ * Spectral-code span of each class curve. Giants and subgiants hotter than about B5 and A0 crowd onto the
+ * main sequence, so their curves start there.
+ */
 const CODE_SPAN: Record<Exclude<LuminosityClassName, "D" | "V" | "Iab">, [number, number]> = {
   Ia: [8, 63],
   Ib: [8, 63],
-  II: [10, 63],
-  III: [10, 65],
-  IV: [10, 51],
+  II: [15, 63],
+  III: [15, 65],
+  IV: [20, 51],
 };
 
 const absoluteVOf = (luminosityClass: LuminosityClassName, code: number): number => {

@@ -94,6 +94,70 @@ const HRDiagramColors = {
     default: "#1a1a1a",
     projector: "#1a1a1a",
   }),
+
+  // ── HR diagram ──────────────────────────────────────────────────────────────
+
+  /** Plotting area of the diagram: night-sky dark by default, white for projectors. */
+  chartBackgroundColorProperty: new ProfileColorProperty(HRDiagramNamespace, "chartBackground", {
+    default: "#05060f",
+    projector: "#ffffff",
+  }),
+
+  /** Frame, tick marks and tick labels. */
+  axisColorProperty: new ProfileColorProperty(HRDiagramNamespace, "axis", {
+    default: "#b8bcd0",
+    projector: "#333333",
+  }),
+
+  /** Major gridlines. */
+  gridColorProperty: new ProfileColorProperty(HRDiagramNamespace, "grid", {
+    default: "#262a44",
+    projector: "#dddddd",
+  }),
+
+  /** The main-sequence band. */
+  mainSequenceColorProperty: new ProfileColorProperty(HRDiagramNamespace, "mainSequence", {
+    default: "rgba(255,209,102,0.28)",
+    projector: "rgba(214,140,0,0.25)",
+  }),
+
+  /** Luminosity-class bands and their labels. */
+  luminosityClassColorProperty: new ProfileColorProperty(HRDiagramNamespace, "luminosityClass", {
+    default: "rgba(150,170,255,0.22)",
+    projector: "rgba(60,80,200,0.18)",
+  }),
+  luminosityClassLabelColorProperty: new ProfileColorProperty(HRDiagramNamespace, "luminosityClassLabel", {
+    default: "#9fb0ff",
+    projector: "#2c3e9e",
+  }),
+
+  /** Lines of equal radius and their labels. */
+  isoradiusColorProperty: new ProfileColorProperty(HRDiagramNamespace, "isoradius", {
+    default: "#5fd38d",
+    projector: "#1b7a3e",
+  }),
+
+  /** The instability strip. */
+  instabilityStripColorProperty: new ProfileColorProperty(HRDiagramNamespace, "instabilityStrip", {
+    default: "rgba(255,120,200,0.22)",
+    projector: "rgba(200,40,140,0.18)",
+  }),
+  instabilityStripLabelColorProperty: new ProfileColorProperty(HRDiagramNamespace, "instabilityStripLabel", {
+    default: "#ff8fd0",
+    projector: "#a0186e",
+  }),
+
+  /** The user's star marker (cross-hair ring). */
+  cursorColorProperty: new ProfileColorProperty(HRDiagramNamespace, "cursor", {
+    default: "#ff4d4d",
+    projector: "#d00000",
+  }),
+
+  /** The Sun's marker. */
+  sunColorProperty: new ProfileColorProperty(HRDiagramNamespace, "sun", {
+    default: "#ffd700",
+    projector: "#c98a00",
+  }),
 };
 
 export default HRDiagramColors;

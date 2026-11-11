@@ -11,15 +11,22 @@
  * Bright stars are always at the top: the magnitude axes run backwards.
  */
 
+import { assert } from "scenerystack/assert";
 import { Range } from "scenerystack/dot";
 import { Enumeration, EnumerationValue } from "scenerystack/phet-core";
-import { spectralCodeFromTemperature } from "./spectralTypes.js";
+import { dwarfTemperatureFromCode, spectralCodeFromTemperature } from "./spectralTypes.js";
 import {
   absoluteVisualMagnitude,
+  BP_RP_TEMPERATURE_RANGE,
   bolometricMagnitudeFromLuminosity,
   bpRpFromTemperature,
   colorIndexFromTemperature,
   gBolometricCorrection,
+  luminosityFromAbsoluteVisualMagnitude,
+  luminosityFromBolometricMagnitude,
+  TABLE_TEMPERATURE_RANGE,
+  temperatureFromBpRp,
+  temperatureFromColorIndex,
 } from "./stellarPhysics.js";
 
 /** What an axis needs from a real star. */
@@ -43,6 +50,12 @@ type AxisQuantityConfig = {
   readonly inverted: boolean;
   readonly fromTemperatureLuminosity: (temperature: number, luminosity: number) => number;
   readonly fromStar: (star: PlottableStar) => number;
+  /** Horizontal quantities: the (dwarf) temperature at an axis value. */
+  readonly toTemperature?: (value: number) => number;
+  /** Vertical quantities: the luminosity at an axis value, for a star of temperature T. */
+  readonly toLuminosity?: (value: number, temperature: number) => number;
+  /** Temperatures (K) this quantity can place; outside it the reference tables would only clamp. */
+  readonly temperatureRange?: { readonly min: number; readonly max: number };
 };
 
 export class AxisQuantity extends EnumerationValue {
@@ -54,6 +67,7 @@ export class AxisQuantity extends EnumerationValue {
     inverted: true,
     fromTemperatureLuminosity: (temperature) => temperature,
     fromStar: (star) => star.temperature,
+    toTemperature: (value) => value,
   });
 
   public static readonly COLOR_INDEX = new AxisQuantity({
@@ -64,6 +78,8 @@ export class AxisQuantity extends EnumerationValue {
     fromTemperatureLuminosity: (temperature) => colorIndexFromTemperature(temperature),
     fromStar: (star) =>
       Number.isFinite(star.colorIndex) ? star.colorIndex : colorIndexFromTemperature(star.temperature),
+    toTemperature: (value) => temperatureFromColorIndex(value),
+    temperatureRange: TABLE_TEMPERATURE_RANGE,
   });
 
   public static readonly SPECTRAL_TYPE = new AxisQuantity({
@@ -73,6 +89,8 @@ export class AxisQuantity extends EnumerationValue {
     inverted: false,
     fromTemperatureLuminosity: (temperature) => spectralCodeFromTemperature(temperature),
     fromStar: (star) => star.spectralCode,
+    toTemperature: (value) => dwarfTemperatureFromCode(value),
+    temperatureRange: TABLE_TEMPERATURE_RANGE,
   });
 
   public static readonly BP_RP = new AxisQuantity({
@@ -82,6 +100,8 @@ export class AxisQuantity extends EnumerationValue {
     inverted: false,
     fromTemperatureLuminosity: (temperature) => bpRpFromTemperature(temperature),
     fromStar: (star) => (Number.isFinite(star.bpRp) ? star.bpRp : bpRpFromTemperature(star.temperature)),
+    toTemperature: (value) => temperatureFromBpRp(value),
+    temperatureRange: BP_RP_TEMPERATURE_RANGE,
   });
 
   // Vertical quantities
@@ -92,6 +112,7 @@ export class AxisQuantity extends EnumerationValue {
     inverted: false,
     fromTemperatureLuminosity: (_temperature, luminosity) => luminosity,
     fromStar: (star) => star.luminosity,
+    toLuminosity: (value) => value,
   });
 
   public static readonly ABSOLUTE_MAGNITUDE = new AxisQuantity({
@@ -101,6 +122,8 @@ export class AxisQuantity extends EnumerationValue {
     inverted: true,
     fromTemperatureLuminosity: (temperature, luminosity) => absoluteVisualMagnitude(luminosity, temperature),
     fromStar: (star) => star.absoluteV,
+    toLuminosity: (value, temperature) => luminosityFromAbsoluteVisualMagnitude(value, temperature),
+    temperatureRange: TABLE_TEMPERATURE_RANGE,
   });
 
   public static readonly ABSOLUTE_G = new AxisQuantity({
@@ -114,6 +137,9 @@ export class AxisQuantity extends EnumerationValue {
       const bpRp = Number.isFinite(star.bpRp) ? star.bpRp : bpRpFromTemperature(star.temperature);
       return bolometricMagnitudeFromLuminosity(star.luminosity) - gBolometricCorrection(bpRp);
     },
+    toLuminosity: (value, temperature) =>
+      luminosityFromBolometricMagnitude(value + gBolometricCorrection(bpRpFromTemperature(temperature))),
+    temperatureRange: BP_RP_TEMPERATURE_RANGE,
   });
 
   public static readonly enumeration = new Enumeration(AxisQuantity);
@@ -164,6 +190,26 @@ export class AxisQuantity extends EnumerationValue {
   /** Chart coordinate of a temperature–luminosity pair. */
   public chartValueOf(temperature: number, luminosity: number): number {
     return this.toChart(this.config.fromTemperatureLuminosity(temperature, luminosity));
+  }
+
+  /** Whether this quantity can place a star of temperature T (K). */
+  public acceptsTemperature(temperature: number): boolean {
+    const range = this.config.temperatureRange;
+    return range === undefined || (temperature >= range.min * 0.999 && temperature <= range.max * 1.001);
+  }
+
+  /** Temperature (K) at a horizontal chart coordinate. */
+  public temperatureAt(coordinate: number): number {
+    const toTemperature = this.config.toTemperature;
+    assert?.(toTemperature, `${this.key} is not a horizontal quantity`);
+    return toTemperature ? toTemperature(this.fromChart(coordinate)) : Number.NaN;
+  }
+
+  /** Luminosity (L☉) at a vertical chart coordinate, for a star of temperature T. */
+  public luminosityAt(coordinate: number, temperature: number): number {
+    const toLuminosity = this.config.toLuminosity;
+    assert?.(toLuminosity, `${this.key} is not a vertical quantity`);
+    return toLuminosity ? toLuminosity(this.fromChart(coordinate), temperature) : Number.NaN;
   }
 
   /** Chart coordinate of a real star. */

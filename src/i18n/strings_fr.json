@@ -1,21 +1,87 @@
 {
-  "title": "HR Diagram",
+  "title": "Diagramme HR",
   "screens": {
-    "explore": "Explore",
-    "radius": "Radius",
-    "starSamples": "StarSamples",
-    "gaiaCensus": "GaiaCensus"
+    "explore": "Explorer",
+    "radius": "Rayon",
+    "starSamples": "Échantillons d'étoiles",
+    "gaiaCensus": "Recensement Gaia"
+  },
+  "common": {
+    "sun": "Soleil",
+    "axes": {
+      "title": "Axes",
+      "horizontal": "Axe horizontal",
+      "vertical": "Axe vertical",
+      "temperature": "Température (K)",
+      "colorIndex": "Indice de couleur B − V",
+      "spectralType": "Type spectral",
+      "bpRp": "Couleur Gaia BP − RP",
+      "luminosity": "Luminosité (L<sub>☉</sub>)",
+      "absoluteMagnitude": "Magnitude absolue M<sub>V</sub>",
+      "absoluteG": "Magnitude absolue M<sub>G</sub>",
+      "hotter": "plus chaude",
+      "brighter": "plus lumineuse"
+    },
+    "overlays": {
+      "title": "Afficher",
+      "mainSequence": "Séquence principale",
+      "luminosityClasses": "Classes de luminosité",
+      "isoradius": "Lignes de même rayon",
+      "instabilityStrip": "Bande d'instabilité"
+    },
+    "classLabels": {
+      "Ia": "Ia supergéantes lumineuses",
+      "Ib": "Ib supergéantes",
+      "II": "II géantes lumineuses",
+      "III": "III géantes",
+      "IV": "IV sous-géantes",
+      "V": "V séquence principale",
+      "D": "naines blanches"
+    },
+    "instabilityStrip": "bande d'instabilité",
+    "quantities": {
+      "temperature": "Température",
+      "luminosity": "Luminosité",
+      "radius": "Rayon",
+      "absoluteMagnitude": "Magnitude absolue",
+      "spectralType": "Type spectral"
+    },
+    "units": {
+      "kelvinPattern": "{{value}} K",
+      "solarLuminosityPattern": "{{value}} L<sub>☉</sub>",
+      "solarRadiusPattern": "{{value}} R<sub>☉</sub>"
+    },
+    "mainSequenceTypePattern": "{{type}} sur la séquence principale",
+    "size": {
+      "title": "Taille comparée au Soleil",
+      "star": "Étoile",
+      "toScale": "Dessiné à l'échelle",
+      "tooSmall": "trop petit pour être visible à cette échelle"
+    },
+    "keyboardHelp": {
+      "title": "Déplacer une étoile",
+      "move": "Déplacer l'étoile sur le diagramme",
+      "moveFine": "La déplacer par petits pas"
+    }
+  },
+  "explore": {
+    "starTitle": "Votre étoile",
+    "temperature": "Température",
+    "luminosity": "Luminosité"
   },
   "a11y": {
     "explore": {
       "screenSummary": {
-        "playArea": "La zone de jeu affiche le contenu principal de la simulation.",
-        "controlArea": "La zone de contrôle comporte un bouton Tout réinitialiser qui ramène la simulation à son état initial.",
-        "interactionHint": "Explorez la simulation en interagissant avec ses commandes."
+        "playArea": "La zone de jeu est un diagramme de Hertzsprung-Russell : la température est sur l'axe horizontal, les plus chaudes à gauche, et la luminosité sur l'axe vertical. Un marqueur d'étoile s'y trouve, à côté du Soleil.",
+        "controlArea": "La zone de contrôle contient des curseurs pour la température et la luminosité de l'étoile, son rayon et sa magnitude, des cases à cocher pour les lignes de repère, le choix des axes et une comparaison de taille avec le Soleil.",
+        "interactionHint": "Déplacez l'étoile avec les flèches ou les curseurs et observez son rayon changer."
       },
-      "currentDetails": "La simulation est dans son état initial.",
+      "currentDetailsPattern": "Votre étoile a une température de {{temperature}} kelvins, une luminosité de {{luminosity}} fois celle du Soleil et un rayon de {{radius}} fois celui du Soleil.",
       "controls": {
-        "exampleControl": "Contrôle d'exemple"
+        "cursorStar": "Étoile sur le diagramme",
+        "cursorStarHelp": "Les flèches gauche et droite changent la température, haut et bas la luminosité. Maintenez Maj pour de petits pas.",
+        "temperatureValuePattern": "{{value}} kelvins",
+        "luminosityValuePattern": "{{value}} fois le Soleil"
       }
     },
     "radius": {

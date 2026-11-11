@@ -3,19 +3,85 @@
   "screens": {
     "explore": "Explore",
     "radius": "Radius",
-    "starSamples": "StarSamples",
-    "gaiaCensus": "GaiaCensus"
+    "starSamples": "Star Samples",
+    "gaiaCensus": "Gaia Census"
+  },
+  "common": {
+    "sun": "Sun",
+    "axes": {
+      "title": "Axes",
+      "horizontal": "Horizontal axis",
+      "vertical": "Vertical axis",
+      "temperature": "Temperature (K)",
+      "colorIndex": "Color index B − V",
+      "spectralType": "Spectral type",
+      "bpRp": "Gaia color BP − RP",
+      "luminosity": "Luminosity (L<sub>☉</sub>)",
+      "absoluteMagnitude": "Absolute magnitude M<sub>V</sub>",
+      "absoluteG": "Absolute magnitude M<sub>G</sub>",
+      "hotter": "hotter",
+      "brighter": "more luminous"
+    },
+    "overlays": {
+      "title": "Show",
+      "mainSequence": "Main sequence",
+      "luminosityClasses": "Luminosity classes",
+      "isoradius": "Lines of equal radius",
+      "instabilityStrip": "Instability strip"
+    },
+    "classLabels": {
+      "Ia": "Ia bright supergiants",
+      "Ib": "Ib supergiants",
+      "II": "II bright giants",
+      "III": "III giants",
+      "IV": "IV subgiants",
+      "V": "V main sequence",
+      "D": "white dwarfs"
+    },
+    "instabilityStrip": "instability strip",
+    "quantities": {
+      "temperature": "Temperature",
+      "luminosity": "Luminosity",
+      "radius": "Radius",
+      "absoluteMagnitude": "Absolute magnitude",
+      "spectralType": "Spectral type"
+    },
+    "units": {
+      "kelvinPattern": "{{value}} K",
+      "solarLuminosityPattern": "{{value}} L<sub>☉</sub>",
+      "solarRadiusPattern": "{{value}} R<sub>☉</sub>"
+    },
+    "mainSequenceTypePattern": "{{type}} on the main sequence",
+    "size": {
+      "title": "Size compared to the Sun",
+      "star": "Star",
+      "toScale": "Drawn to scale",
+      "tooSmall": "too small to see at this scale"
+    },
+    "keyboardHelp": {
+      "title": "Move a Star",
+      "move": "Move the star on the diagram",
+      "moveFine": "Move it in small steps"
+    }
+  },
+  "explore": {
+    "starTitle": "Your star",
+    "temperature": "Temperature",
+    "luminosity": "Luminosity"
   },
   "a11y": {
     "explore": {
       "screenSummary": {
-        "playArea": "The play area shows the main simulation content.",
-        "controlArea": "The control area has a Reset All button that returns the simulation to its starting state.",
-        "interactionHint": "Explore the simulation by interacting with its controls."
+        "playArea": "The play area is a Hertzsprung–Russell diagram: temperature runs along the horizontal axis, hottest on the left, and luminosity up the vertical axis. A star marker sits on it, beside the Sun.",
+        "controlArea": "The control area has sliders for the star's temperature and luminosity, its radius and magnitude, checkboxes for guide lines, axis choices, and a size comparison with the Sun.",
+        "interactionHint": "Move the star with the arrow keys or the sliders and watch its radius change."
       },
-      "currentDetails": "The simulation is in its initial state.",
+      "currentDetailsPattern": "Your star has a temperature of {{temperature}} kelvin, a luminosity of {{luminosity}} times the Sun's and a radius of {{radius}} times the Sun's.",
       "controls": {
-        "exampleControl": "Example control"
+        "cursorStar": "Star on the diagram",
+        "cursorStarHelp": "Left and right arrows change the temperature, up and down arrows the luminosity. Hold Shift for small steps.",
+        "temperatureValuePattern": "{{value}} kelvin",
+        "luminosityValuePattern": "{{value}} times the Sun"
       }
     },
     "radius": {

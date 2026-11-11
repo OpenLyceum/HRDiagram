@@ -1,160 +1,212 @@
 /**
  * ExploreScreenView.ts
  *
- * The top-level view for the simulation screen.
- *
- * All visual nodes are added here. Follow these conventions:
- *   - Use this.layoutBounds for positioning (never magic pixel values)
- *   - Keep a ResetAllButton that calls model.reset() and this.reset()
- *   - Override step(dt) for frame-by-frame animation
- *
- * ── Adding content ────────────────────────────────────────────────────────────
- * 1. Create Node subclasses in separate files (e.g. HRDiagramControlPanel.ts)
- * 2. Instantiate them here and call this.addChild(...)
- * 3. Link them to model properties:
- *      model.isRunningProperty.link( isRunning => { ... } );
- *
- * ── Layout bounds ─────────────────────────────────────────────────────────────
- * SceneryStack uses a virtual 1024×618 coordinate space by default.
- * this.layoutBounds gives you the full rectangle; use it for alignment:
- *   center, minX, maxX, minY, maxY, width, height
+ * The Explore screen: an HR diagram with a star the user places anywhere (drag it, click the diagram,
+ * use the sliders or the arrow keys), the Sun for reference, optional guides (main sequence,
+ * luminosity classes, lines of equal radius, instability strip), a choice of axes, and the star's
+ * radius, magnitude and spectral type with a to-scale comparison with the Sun.
  */
 
+import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
-import { Node, Rectangle, Text } from "scenerystack/scenery";
+import { StringUtils } from "scenerystack/phetcommon";
+import { DragListener, GridBox, HBox, HSeparator, Node, Rectangle, RichText, Text, VBox } from "scenerystack/scenery";
 import { ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
+import { HSlider } from "scenerystack/sun";
 import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/HRDiagramButtonOptions.js";
+import { HR_DIAGRAM_SLIDER_OPTIONS } from "../../common/HRDiagramControlOptions.js";
+import { HRDiagramPanel } from "../../common/HRDiagramPanel.js";
+import { formatSpectralCode, spectralCodeFromTemperature } from "../../common/model/spectralTypes.js";
+import { absoluteVisualMagnitude } from "../../common/model/stellarPhysics.js";
+import { AxisControlsNode } from "../../common/view/AxisControlsNode.js";
+import { CursorStarNode } from "../../common/view/CursorStarNode.js";
+import { formatFixed, formatInteger, formatValue } from "../../common/view/format.js";
+import { HRChartNode } from "../../common/view/HRChartNode.js";
+import { HROverlayNode } from "../../common/view/HROverlayNode.js";
+import { OverlayCheckboxGroup } from "../../common/view/OverlayCheckboxGroup.js";
+import { chartAndPanelsLayout, placeInRegion } from "../../common/view/ScreenLayout.js";
+import { SizeComparisonNode } from "../../common/view/SizeComparisonNode.js";
+import { SunMarkerNode } from "../../common/view/SunMarkerNode.js";
 import HRDiagramColors from "../../HRDiagramColors.js";
-import { SCREEN_VIEW_MARGIN } from "../../HRDiagramConstants.js";
+import { FONTS } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { ExploreModel } from "../model/ExploreModel.js";
 import { ExploreScreenSummaryContent } from "./ExploreScreenSummaryContent.js";
 
 export type ExploreScreenViewOptions = ScreenViewOptions;
 
+const CHART_WIDTH = 560;
+const CHART_HEIGHT = 500;
+const PANEL_CONTENT_WIDTH = 300;
+const SLIDER_TRACK_WIDTH = 270;
+
+/** Slider steps in log₁₀ units. */
+const SLIDER_STEPS = { keyboardStep: 0.01, shiftKeyboardStep: 0.002, pageKeyboardStep: 0.1 };
+
 export class ExploreScreenView extends ScreenView {
   public constructor(model: ExploreModel, providedOptions?: ExploreScreenViewOptions) {
-    // ── Accessibility: screen summary ───────────────────────────────────────────
-    // The screen summary is the first thing a screen-reader user encounters. It
-    // is registered here, in the ScreenView's super() options, so every sim wires
-    // it the same way. See ExploreScreenSummaryContent for the four content regions.
     const options = optionize<ExploreScreenViewOptions, EmptySelfOptions, ScreenViewOptions>()(
-      {
-        screenSummaryContent: new ExploreScreenSummaryContent(model),
-      },
+      { screenSummaryContent: new ExploreScreenSummaryContent(model) },
       providedOptions,
     );
     super(options);
 
-    // ── Background ────────────────────────────────────────────────────────────
-    // A full-screen rectangle that follows the active color profile.
-    // Replace or remove once you add real content.
-    const backgroundRect = new Rectangle(0, 0, this.layoutBounds.width, this.layoutBounds.height, {
-      fill: HRDiagramColors.backgroundColorProperty,
+    const strings = StringManager.getInstance().getCommonStrings();
+    const exploreStrings = StringManager.getInstance().getExploreStrings();
+    const a11y = StringManager.getInstance().getExploreA11yStrings();
+    const settings = model.settings;
+    const layout = chartAndPanelsLayout(this.layoutBounds);
+    const listParent = new Node();
+
+    // ── Diagram ───────────────────────────────────────────────────────────────
+    const chart = new HRChartNode(settings.xQuantityProperty, settings.yQuantityProperty, CHART_WIDTH, CHART_HEIGHT);
+    const overlays = new HROverlayNode(chart, settings);
+    const cursorStar = new CursorStarNode(
+      chart,
+      model.temperatureProperty,
+      model.luminosityProperty,
+      (temperature, luminosity) => model.setTemperatureLuminosity(temperature, luminosity),
+      {
+        accessibleName: a11y.controls.cursorStarStringProperty,
+        accessibleHelpText: a11y.controls.cursorStarHelpStringProperty,
+      },
+    );
+    // Pressing anywhere on the diagram moves the star there, and keeps dragging it.
+    const hitArea = new Rectangle(0, 0, CHART_WIDTH, CHART_HEIGHT, { cursor: "pointer" });
+    hitArea.addInputListener(
+      new DragListener({
+        press: (event) => cursorStar.moveToViewPoint(chart.plotLayer.globalToLocalPoint(event.pointer.point)),
+        drag: (event) => cursorStar.moveToViewPoint(chart.plotLayer.globalToLocalPoint(event.pointer.point)),
+      }),
+    );
+    chart.plotLayer.children = [hitArea, overlays, new SunMarkerNode(chart), cursorStar];
+
+    // ── Your star: sliders, readouts, size comparison ─────────────────────────
+    const label = (text: TReadOnlyProperty<string>, maxWidth = 150): Text =>
+      new Text(text, { font: FONTS.LABEL, fill: HRDiagramColors.textColorProperty, maxWidth });
+    const readout = (text: TReadOnlyProperty<string>): RichText =>
+      new RichText(text, { font: FONTS.READOUT, fill: HRDiagramColors.textColorProperty, maxWidth: 160 });
+
+    const temperatureText = new DerivedProperty(
+      [strings.units.kelvinPatternStringProperty, model.temperatureProperty],
+      (pattern, temperature) =>
+        StringUtils.fillIn(pattern, { value: formatInteger(Number(temperature.toPrecision(3))) }),
+    );
+    const luminosityText = new DerivedProperty(
+      [strings.units.solarLuminosityPatternStringProperty, model.luminosityProperty],
+      (pattern, luminosity) => StringUtils.fillIn(pattern, { value: formatValue(luminosity, 3) }),
+    );
+    const radiusText = new DerivedProperty(
+      [strings.units.solarRadiusPatternStringProperty, model.radiusProperty],
+      (pattern, radius) => StringUtils.fillIn(pattern, { value: formatValue(radius, 3) }),
+    );
+    const magnitudeText = new DerivedProperty([model.luminosityProperty, model.temperatureProperty], (L, T) =>
+      formatFixed(absoluteVisualMagnitude(L, T), 1),
+    );
+    const spectralText = new DerivedProperty(
+      [strings.mainSequenceTypePatternStringProperty, model.temperatureProperty],
+      (pattern, temperature) =>
+        StringUtils.fillIn(pattern, { type: formatSpectralCode(spectralCodeFromTemperature(temperature)) }),
+    );
+
+    const slider = (
+      property: typeof model.logTemperatureProperty,
+      name: TReadOnlyProperty<string>,
+      valuePattern: TReadOnlyProperty<string>,
+      format: (value: number) => string,
+    ): HSlider =>
+      new HSlider(property, property.range, {
+        ...HR_DIAGRAM_SLIDER_OPTIONS,
+        ...SLIDER_STEPS,
+        trackSize: HR_DIAGRAM_SLIDER_OPTIONS.trackSize.copy().setWidth(SLIDER_TRACK_WIDTH),
+        accessibleName: name,
+        pdomCreateAriaValueText: (value: number | null) =>
+          StringUtils.fillIn(valuePattern.value, { value: value === null ? "" : format(10 ** value) }),
+        pdomDependencies: [valuePattern],
+      });
+    const temperatureSlider = slider(
+      model.logTemperatureProperty,
+      exploreStrings.temperatureStringProperty,
+      a11y.controls.temperatureValuePatternStringProperty,
+      (T) => formatInteger(Number(T.toPrecision(3))),
+    );
+    const luminositySlider = slider(
+      model.logLuminosityProperty,
+      exploreStrings.luminosityStringProperty,
+      a11y.controls.luminosityValuePatternStringProperty,
+      (L) => formatValue(L, 3),
+    );
+
+    const sliderBlock = (name: TReadOnlyProperty<string>, value: TReadOnlyProperty<string>, control: HSlider): VBox =>
+      new VBox({
+        spacing: 2,
+        align: "left",
+        children: [new HBox({ spacing: 10, children: [label(name), readout(value)] }), control],
+      });
+
+    const readouts = new GridBox({
+      xSpacing: 12,
+      ySpacing: 4,
+      xAlign: "left",
+      rows: [
+        [label(strings.quantities.radiusStringProperty), readout(radiusText)],
+        [label(strings.quantities.absoluteMagnitudeStringProperty), readout(magnitudeText)],
+        [label(strings.quantities.spectralTypeStringProperty), readout(spectralText)],
+      ],
     });
-    this.addChild(backgroundRect);
 
-    // ── Placeholder label ─────────────────────────────────────────────────────
-    // Replace this with your actual simulation content.
-    const placeholderText = new Text(StringManager.getInstance().getScreenNames().exploreStringProperty, {
-      font: "bold 36px sans-serif",
-      fill: HRDiagramColors.textColorProperty,
-      center: this.layoutBounds.center,
-    });
-    this.addChild(placeholderText);
+    const starPanel = new HRDiagramPanel(
+      new VBox({
+        spacing: 8,
+        align: "left",
+        children: [
+          new Text(exploreStrings.starTitleStringProperty, {
+            font: FONTS.TITLE,
+            fill: HRDiagramColors.textColorProperty,
+            maxWidth: PANEL_CONTENT_WIDTH,
+          }),
+          sliderBlock(exploreStrings.temperatureStringProperty, temperatureText, temperatureSlider),
+          sliderBlock(exploreStrings.luminosityStringProperty, luminosityText, luminositySlider),
+          readouts,
+          new HSeparator({ stroke: HRDiagramColors.panelBorderColorProperty }),
+          new Text(strings.size.titleStringProperty, {
+            font: FONTS.LABEL,
+            fill: HRDiagramColors.textColorProperty,
+            maxWidth: PANEL_CONTENT_WIDTH,
+          }),
+          new SizeComparisonNode(model.temperatureProperty, model.radiusProperty),
+        ],
+      }),
+      { minWidth: PANEL_CONTENT_WIDTH + 24 },
+    );
 
-    // ── Accessibility: per-control names ────────────────────────────────────────
-    // EVERY interactive node must carry an `accessibleName` (and an
-    // `accessibleHelpText` where useful), sourced from the StringManager `a11y`
-    // string group — never a hard-coded English literal. Sun/scenery-phet controls
-    // (NumberControl, Checkbox, ComboBox, AquaRadioButtonGroup, …) accept it as an
-    // option; a draggable plain Node needs `tagName: "div", focusable: true` too.
-    // Example (uncomment and adapt when you add a real control):
-    //
-    //   const a11y = StringManager.getInstance().getExploreA11yStrings();
-    //   const exampleButton = new RectangularPushButton({
-    //     ...FLAT_RECTANGULAR_BUTTON_OPTIONS, // flat appearance, not SceneryStack's default 3-D look
-    //     content: someIcon,
-    //     listener: () => model.doSomething(),
-    //     accessibleName: a11y.controls.exampleControlStringProperty,
-    //   });
-    //   this.addChild(exampleButton);
+    // ── Guides and axes ───────────────────────────────────────────────────────
+    const overlayCheckboxes = new OverlayCheckboxGroup(settings);
+    const axisControls = new AxisControlsNode(settings, listParent);
+    const settingsPanel = new HRDiagramPanel(
+      new VBox({ spacing: 10, align: "left", children: [overlayCheckboxes, axisControls] }),
+      { minWidth: PANEL_CONTENT_WIDTH + 24 },
+    );
 
-    // ── Reset All button ──────────────────────────────────────────────────────
-    // Always position at bottom-right (PhET convention).
     const resetAllButton = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
+        this.interruptSubtreeInput();
         model.reset();
-        this.reset();
       },
-      right: this.layoutBounds.maxX - SCREEN_VIEW_MARGIN,
-      bottom: this.layoutBounds.maxY - SCREEN_VIEW_MARGIN,
     });
-    this.addChild(resetAllButton);
 
-    // ── Accessibility: keyboard / reading traversal order ───────────────────────
-    // Make the parallel DOM (Tab order and screen-reader reading order)
-    // deterministic and independent of child z-order. ScreenView throws if you
-    // set pdomOrder on itself, so add a lightweight wrapper Node that "borrows"
-    // the interactive nodes in the order a user should reach them — Reset All
-    // last. Non-interactive decoration (background, placeholder) is omitted.
-    this.addChild(
-      new Node({
-        pdomOrder: [
-          // TODO: add the sim's interactive nodes here, in traversal order
-          resetAllButton,
-        ],
+    this.children = [
+      placeInRegion(chart, layout.chart),
+      placeInRegion(new VBox({ spacing: 10, children: [starPanel, settingsPanel] }), layout.panels, {
+        yAlign: "top",
       }),
-    );
-  }
+      placeInRegion(resetAllButton, layout.footer, { xAlign: "right", yAlign: "bottom" }),
+      listParent,
+    ];
 
-  /**
-   * Resets view-side state (animations, panel visibility, etc.).
-   * Called by the Reset All button listener.
-   */
-  public reset(): void {
-    // TODO: reset any view-side state here
+    this.pdomPlayAreaNode.pdomOrder = [cursorStar, temperatureSlider, luminositySlider];
+    this.pdomControlAreaNode.pdomOrder = [overlayCheckboxes, axisControls, resetAllButton];
   }
-
-  /**
-   * Steps the view forward by dt seconds for animation.
-   * @param _dt - elapsed time in seconds
-   */
-  public override step(_dt: number): void {
-    // TODO: implement animation updates here
-  }
-
-  // ── Accessibility / listeners: dispose ─────────────────────────────────────
-  // ScreenView is `isDisposable: false` and lives for the whole sim, so this
-  // class rarely needs dispose(). Child Nodes (and a live currentDetails
-  // DerivedProperty you own on a short-lived object) do. When you add
-  // DerivedProperty / Multilink / Property.link against model state, keep the
-  // references and tear them down — forks copy what they see. Pattern:
-  //
-  // private readonly disposeExploreScreenView: () => void;
-  //
-  // // in the constructor, after creating the listeners:
-  // const statusMultilink = Multilink.multilink(
-  //   [model.someProperty, model.otherProperty],
-  //   (a, b) => { /* update view from model */ },
-  // );
-  // const detailsProperty = new DerivedProperty(
-  //   [model.stateProperty],
-  //   (state) => `State: ${state}`,
-  // ); // → pass as currentDetailsContent in ExploreScreenSummaryContent
-  // const onExternal = (v: number) => { /* … */ };
-  // model.externalProperty.link(onExternal); // Property you do NOT own
-  //
-  // this.disposeExploreScreenView = () => {
-  //   statusMultilink.dispose();                 // Multilink you created
-  //   detailsProperty.dispose();                 // DerivedProperty you created
-  //   model.externalProperty.unlink(onExternal); // undo external link
-  // };
-  //
-  // public override dispose(): void {
-  //   this.disposeExploreScreenView();
-  //   super.dispose();
-  // }
 }

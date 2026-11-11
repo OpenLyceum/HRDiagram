@@ -14,9 +14,9 @@ import type { ScreenOptions } from "scenerystack/sim";
 import { Screen } from "scenerystack/sim";
 import type { Tandem } from "scenerystack/tandem";
 import { createExploreIcon } from "../common/HRDiagramScreenIcons.js";
+import { HRDiagramKeyboardHelpContent } from "../common/view/HRDiagramKeyboardHelpContent.js";
 import HRDiagramColors from "../HRDiagramColors.js";
 import { ExploreModel } from "./model/ExploreModel.js";
-import { ExploreKeyboardHelpContent } from "./view/ExploreKeyboardHelpContent.js";
 import { ExploreScreenView } from "./view/ExploreScreenView.js";
 
 // Require tandem to be explicit — accidental omission would break PhET-iO.
@@ -35,7 +35,7 @@ export class ExploreScreen extends Screen<ExploreModel, ExploreScreenView> {
       optionize<ExploreScreenOptions, EmptySelfOptions, ScreenOptions>()(
         {
           backgroundColorProperty: HRDiagramColors.backgroundColorProperty,
-          createKeyboardHelpNode: () => new ExploreKeyboardHelpContent(),
+          createKeyboardHelpNode: () => new HRDiagramKeyboardHelpContent(),
           homeScreenIcon: createExploreIcon(),
           navigationBarIcon: createExploreIcon(),
         },

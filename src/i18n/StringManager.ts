@@ -116,6 +116,16 @@ export class StringManager {
     };
   }
 
+  /** Strings shared by every screen: axes, overlays, units, the size comparison. */
+  public getCommonStrings() {
+    return stringProperties.common;
+  }
+
+  /** Strings for the Explore screen. */
+  public getExploreStrings() {
+    return stringProperties.explore;
+  }
+
   /** Accessibility strings for the Explore screen. */
   public getExploreA11yStrings() {
     return stringProperties.a11y.explore;
