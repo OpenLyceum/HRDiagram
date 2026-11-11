@@ -181,6 +181,16 @@ export class HRChartNode extends Node {
     return new Vector2(this.chartTransform.modelToViewX(x), this.chartTransform.modelToViewY(y));
   }
 
+  /** The quantity on the horizontal axis. */
+  public get xQuantity(): AxisQuantity {
+    return this.xQuantityProperty.value;
+  }
+
+  /** The quantity on the vertical axis. */
+  public get yQuantity(): AxisQuantity {
+    return this.yQuantityProperty.value;
+  }
+
   /** Whether both current axes can place a star of temperature T (K). */
   public acceptsTemperature(temperature: number): boolean {
     return (

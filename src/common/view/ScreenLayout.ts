@@ -41,6 +41,37 @@ export const chartAndPanelsLayout = (layoutBounds: Bounds2, panelWidth = PANEL_C
   };
 };
 
+export type ChartStripAndPanelsLayout = ChartAndPanelsLayout & {
+  /** Under the chart: the diagram's own settings (guides and axes). */
+  readonly strip: Bounds2;
+};
+
+/** Height of the settings strip under the chart. */
+const STRIP_HEIGHT = 96;
+
+/**
+ * The chart-and-panels layout with a settings strip under the chart, for screens whose panel column is
+ * full of other controls.
+ *
+ *   ┌───────────────────────┐ ┌──────────┐
+ *   │      HR diagram       │ │  panels  │
+ *   ├───────────────────────┤ ├──────────┤
+ *   │   guides  ·  axes     │ │  footer  │
+ *   └───────────────────────┘ └──────────┘
+ */
+export const chartStripAndPanelsLayout = (
+  layoutBounds: Bounds2,
+  panelWidth = PANEL_COLUMN_WIDTH,
+): ChartStripAndPanelsLayout => {
+  const base = chartAndPanelsLayout(layoutBounds, panelWidth);
+  const stripTop = base.chart.maxY - STRIP_HEIGHT;
+  return {
+    ...base,
+    chart: new Bounds2(base.chart.minX, base.chart.minY, base.chart.maxX, stripTop - REGION_GAP),
+    strip: new Bounds2(base.chart.minX, stripTop, base.chart.maxX, base.chart.maxY),
+  };
+};
+
 export type RegionAlign = {
   readonly xAlign?: "left" | "center" | "right";
   readonly yAlign?: "top" | "center" | "bottom";

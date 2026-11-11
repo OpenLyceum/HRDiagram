@@ -158,6 +158,49 @@ const HRDiagramColors = {
     default: "#ffd700",
     projector: "#c98a00",
   }),
+  // ── Real stars ──────────────────────────────────────────────────────────────
+  // Sample membership follows NAAP's HR Diagram Explorer: nearest red, brightest cyan, both purple.
+
+  nearestStarColorProperty: new ProfileColorProperty(HRDiagramNamespace, "nearestStar", {
+    default: "#ff5c5c",
+    projector: "#d11a1a",
+  }),
+  brightestStarColorProperty: new ProfileColorProperty(HRDiagramNamespace, "brightestStar", {
+    default: "#3fd6e6",
+    projector: "#007f8f",
+  }),
+  bothStarColorProperty: new ProfileColorProperty(HRDiagramNamespace, "bothStar", {
+    default: "#c88dff",
+    projector: "#7a1fc2",
+  }),
+
+  /** Ring around the selected star, and its hover label. */
+  selectionColorProperty: new ProfileColorProperty(HRDiagramNamespace, "selection", {
+    default: "#ffffff",
+    projector: "#000000",
+  }),
+
+  // Kinds of star (Gaia Census "colour by kind").
+  dwarfColorProperty: new ProfileColorProperty(HRDiagramNamespace, "dwarf", {
+    default: "#d9d4c7",
+    projector: "#6b6455",
+  }),
+  subgiantColorProperty: new ProfileColorProperty(HRDiagramNamespace, "subgiant", {
+    default: "#4fd1b5",
+    projector: "#14806a",
+  }),
+  giantColorProperty: new ProfileColorProperty(HRDiagramNamespace, "giant", {
+    default: "#ffad5c",
+    projector: "#c25e00",
+  }),
+  supergiantColorProperty: new ProfileColorProperty(HRDiagramNamespace, "supergiant", {
+    default: "#ff4f6d",
+    projector: "#b3001e",
+  }),
+  whiteDwarfColorProperty: new ProfileColorProperty(HRDiagramNamespace, "whiteDwarf", {
+    default: "#7fb3ff",
+    projector: "#1f5fbf",
+  }),
 };
 
 export default HRDiagramColors;

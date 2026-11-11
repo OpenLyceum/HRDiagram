@@ -1,40 +1,44 @@
 /**
  * GaiaCensusScreenSummaryContent.ts
  *
- * The accessible screen summary read by screen readers (SceneryStack's
- * Interactive Description). It appears at the top of the parallel DOM and gives
- * a non-visual user a way to orient themselves and to re-read the simulation's
- * current state at any time.
- *
- * A summary has four regions (all optional, but provide at least the first
- * three in every sim for consistency across OpenLyceum):
- *   - playAreaContent       — what the play area contains
- *   - controlAreaContent    — what the controls do
- *   - currentDetailsContent — a LIVE paragraph describing current state
- *   - interactionHintContent — a short hint on how to get started
- *
- * ── Making "current details" live ─────────────────────────────────────────────
- * The template has no model state, so currentDetails is a static string. In a
- * real sim, build a DerivedProperty over the relevant model Properties and pass
- * it as `currentDetailsContent` so the paragraph updates as the sim runs.
- * See LunarLander/src/.../LunarLanderScreenSummaryContent.ts for the pattern.
- * If that DerivedProperty (or any Multilink) is owned by a short-lived object,
- * dispose it on teardown — see the commented dispose() stub in GaiaCensusScreenView.
+ * The accessible screen summary: what the play area and controls are, how many stars are plotted and
+ * what share are dwarfs, giants and white dwarfs, and a question to start with.
  */
+
+import { DerivedProperty } from "scenerystack/axon";
+import { StringUtils } from "scenerystack/phetcommon";
 import { ScreenSummaryContent } from "scenerystack/sim";
+import { StarCategory } from "../../common/model/StarCategory.js";
+import { formatFixed, formatInteger } from "../../common/view/format.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { GaiaCensusModel } from "../model/GaiaCensusModel.js";
 
 export class GaiaCensusScreenSummaryContent extends ScreenSummaryContent {
-  // `model` is unused in the template but kept in the signature so real sims can
-  // derive a live currentDetailsContent from it without changing call sites.
-  public constructor(_model: GaiaCensusModel) {
+  public constructor(model: GaiaCensusModel) {
     const a11y = StringManager.getInstance().getGaiaCensusA11yStrings();
-
+    const currentDetails = new DerivedProperty(
+      [a11y.currentDetailsPatternStringProperty, model.selectionProperty],
+      (pattern, selection) => {
+        const share = (...categories: StarCategory[]): string =>
+          selection.count === 0
+            ? "0"
+            : formatFixed(
+                (100 * categories.reduce((sum, c) => sum + (selection.countsByCategory.get(c) ?? 0), 0)) /
+                  selection.count,
+                1,
+              );
+        return StringUtils.fillIn(pattern, {
+          count: formatInteger(selection.count),
+          dwarfs: share(StarCategory.DWARF),
+          giants: share(StarCategory.SUBGIANT, StarCategory.GIANT, StarCategory.SUPERGIANT),
+          whiteDwarfs: share(StarCategory.WHITE_DWARF),
+        });
+      },
+    );
     super({
       playAreaContent: a11y.screenSummary.playAreaStringProperty,
       controlAreaContent: a11y.screenSummary.controlAreaStringProperty,
-      currentDetailsContent: a11y.currentDetailsStringProperty,
+      currentDetailsContent: currentDetails,
       interactionHintContent: a11y.screenSummary.interactionHintStringProperty,
     });
   }

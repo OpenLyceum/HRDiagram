@@ -14,9 +14,9 @@ import type { ScreenOptions } from "scenerystack/sim";
 import { Screen } from "scenerystack/sim";
 import type { Tandem } from "scenerystack/tandem";
 import { createGaiaCensusIcon } from "../common/HRDiagramScreenIcons.js";
+import { HRDiagramKeyboardHelpContent } from "../common/view/HRDiagramKeyboardHelpContent.js";
 import HRDiagramColors from "../HRDiagramColors.js";
 import { GaiaCensusModel } from "./model/GaiaCensusModel.js";
-import { GaiaCensusKeyboardHelpContent } from "./view/GaiaCensusKeyboardHelpContent.js";
 import { GaiaCensusScreenView } from "./view/GaiaCensusScreenView.js";
 
 // Require tandem to be explicit — accidental omission would break PhET-iO.
@@ -35,7 +35,7 @@ export class GaiaCensusScreen extends Screen<GaiaCensusModel, GaiaCensusScreenVi
       optionize<GaiaCensusScreenOptions, EmptySelfOptions, ScreenOptions>()(
         {
           backgroundColorProperty: HRDiagramColors.backgroundColorProperty,
-          createKeyboardHelpNode: () => new GaiaCensusKeyboardHelpContent(),
+          createKeyboardHelpNode: () => new HRDiagramKeyboardHelpContent(),
           homeScreenIcon: createGaiaCensusIcon(),
           navigationBarIcon: createGaiaCensusIcon(),
         },

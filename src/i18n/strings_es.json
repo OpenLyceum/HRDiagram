@@ -62,12 +62,78 @@
       "title": "Mover una estrella",
       "move": "Mover la estrella en el diagrama",
       "moveFine": "Moverla en pasos pequeños"
-    }
+    },
+    "categories": {
+      "dwarf": "Enanas de la secuencia principal",
+      "subgiant": "Subgigantes",
+      "giant": "Gigantes",
+      "supergiant": "Supergigantes",
+      "whiteDwarf": "Enanas blancas"
+    },
+    "countPattern": "{{label}} ({{count}})"
   },
   "explore": {
     "starTitle": "Tu estrella",
     "temperature": "Temperatura",
     "luminosity": "Luminosidad"
+  },
+  "radius": {
+    "compareTitle": "Comparar la estrella B con la estrella A",
+    "starA": "A",
+    "starB": "B",
+    "ratioHeader": "B ÷ A",
+    "ratioPattern": "× {{value}}",
+    "rule": "R ∝ √L ÷ T²",
+    "equationPattern": "R<sub>B</sub> ÷ R<sub>A</sub> = √{{luminosity}} ÷ {{temperature}}² = {{radius}}",
+    "constraintTitle": "Cuando una estrella se mueve",
+    "free": "Mover libremente",
+    "holdLuminosity": "Mantener su luminosidad (mover en horizontal)",
+    "holdTemperature": "Mantener su temperatura (mover en vertical)",
+    "starALabel": "Estrella A",
+    "starBLabel": "Estrella B"
+  },
+  "starSamples": {
+    "sampleTitle": "Estrellas a mostrar",
+    "nearest": "Estrellas más cercanas (a menos de {{distance}} pc)",
+    "brightest": "Estrellas más brillantes (V < {{magnitude}})",
+    "both": "Las más cercanas y las más brillantes",
+    "overlap": "Estrellas de ambas listas",
+    "kindsTitle": "Tipos de estrella",
+    "shownPattern": "{{count}} estrellas mostradas",
+    "legendNearest": "cercanas",
+    "legendBrightest": "brillantes",
+    "legendBoth": "en ambas listas",
+    "findStar": "Buscar una estrella",
+    "chooseStar": "elegir…",
+    "clickHint": "Haz clic en una estrella para ver sus propiedades.",
+    "distance": "Distancia",
+    "distancePattern": "{{pc}} pc ({{ly}} años luz)",
+    "apparentMagnitude": "Magnitud aparente V",
+    "absoluteMagnitude": "Magnitud absoluta M<sub>V</sub>",
+    "spectralType": "Tipo espectral",
+    "notCatalogued": "no catalogado",
+    "kind": "Tipo",
+    "inferredPattern": "{{kind}} (según su lugar en el diagrama)",
+    "data": "Datos",
+    "gaia": "Gaia DR3",
+    "hipparcos": "Hipparcos"
+  },
+  "gaiaCensus": {
+    "selectionTitle": "¿Qué estrellas?",
+    "distanceLimit": "Distancia máxima",
+    "distancePattern": "a menos de {{value}} pc",
+    "brightnessLimit": "Solo estrellas más brillantes que",
+    "magnitudePattern": "V = {{value}}",
+    "nakedEye": "El límite a simple vista es de V = 6, aproximadamente.",
+    "kindsTitle": "¿Qué tipos de estrella?",
+    "plottedPattern": "{{count}} estrellas mostradas",
+    "standsForPattern": "cada una representa 10: ≈ {{count}} en total",
+    "percentPattern": "{{value}} %",
+    "colorByTitle": "Colorear las estrellas según",
+    "colorKind": "El tipo de estrella",
+    "colorDistance": "La distancia",
+    "distanceBinPattern": "{{min}}–{{max}} pc",
+    "saturationNote": "Gaia no puede medir estrellas más brillantes que la magnitud 3, aproximadamente, así que faltan algunas de las estrellas cercanas más brillantes."
   },
   "a11y": {
     "explore": {
@@ -86,35 +152,41 @@
     },
     "radius": {
       "screenSummary": {
-        "playArea": "El área de juego muestra el contenido principal de la simulación.",
-        "controlArea": "El área de control tiene un botón Restablecer todo que devuelve la simulación a su estado inicial.",
-        "interactionHint": "Explora la simulación interactuando con sus controles."
+        "playArea": "El área de juego es un diagrama HR con líneas de igual radio y dos estrellas, A y B, que puedes mover.",
+        "controlArea": "El área de control compara las temperaturas, luminosidades y radios de las dos estrellas, las muestra a escala y permite mantener fija la luminosidad o la temperatura de una estrella mientras se mueve.",
+        "interactionHint": "Mantén fija la luminosidad y haz más caliente la estrella B: su radio disminuye."
       },
-      "currentDetails": "La simulación está en su estado inicial.",
+      "currentDetailsPattern": "La estrella B es {{temperature}} veces más caliente que la A, {{luminosity}} veces más luminosa y {{radius}} veces más grande.",
       "controls": {
-        "exampleControl": "Control de ejemplo"
+        "starA": "Estrella A",
+        "starB": "Estrella B",
+        "starHelp": "Las flechas mueven la estrella por el diagrama. Mantén Mayús para pasos pequeños."
       }
     },
     "starSamples": {
       "screenSummary": {
-        "playArea": "El área de juego muestra el contenido principal de la simulación.",
-        "controlArea": "El área de control tiene un botón Restablecer todo que devuelve la simulación a su estado inicial.",
-        "interactionHint": "Explora la simulación interactuando con sus controles."
+        "playArea": "El área de juego es un diagrama HR de estrellas reales de los catálogos Gaia e Hipparcos: las estrellas más cercanas al Sol, las más brillantes del cielo, o ambas.",
+        "controlArea": "El área de control elige qué estrellas mostrar y qué tipos de estrella, busca una estrella por su nombre y muestra las propiedades de la estrella elegida. Bajo el diagrama están las líneas de referencia y la elección de los ejes.",
+        "interactionHint": "Compara las estrellas más cercanas con las más brillantes: ¿las estrellas brillantes están cerca, son luminosas, o ambas cosas?"
       },
-      "currentDetails": "La simulación está en su estado inicial.",
+      "currentDetailsPattern": "Se muestran {{count}} estrellas. Seleccionada: {{selected}}.",
+      "noneSelected": "ninguna",
       "controls": {
-        "exampleControl": "Control de ejemplo"
+        "stars": "Estrellas en el diagrama",
+        "starsHelp": "Las flechas izquierda y derecha eligen la siguiente estrella, más fría o más caliente.",
+        "selectedPattern": "{{name}}: {{temperature}} kelvin, {{luminosity}} veces la luminosidad del Sol, {{radius}} veces su radio."
       }
     },
     "gaiaCensus": {
       "screenSummary": {
-        "playArea": "El área de juego muestra el contenido principal de la simulación.",
-        "controlArea": "El área de control tiene un botón Restablecer todo que devuelve la simulación a su estado inicial.",
-        "interactionHint": "Explora la simulación interactuando con sus controles."
+        "playArea": "El área de juego es un diagrama HR de unas 44 000 estrellas reales: una de cada diez, al azar, de todas las estrellas que Gaia encontró a menos de 100 pársecs del Sol.",
+        "controlArea": "El área de control fija una distancia máxima y un límite de brillo opcional, muestra qué parte de las estrellas mostradas son enanas, subgigantes, gigantes, supergigantes y enanas blancas, y colorea las estrellas por tipo o por distancia. Bajo el diagrama están las líneas de referencia y la elección de los ejes.",
+        "interactionHint": "Activa el límite de brillo en V = 6: ¿qué tipos de estrella ve el ojo humano, comparados con todas las estrellas cercanas?"
       },
-      "currentDetails": "La simulación está en su estado inicial.",
+      "currentDetailsPattern": "Se muestran {{count}} estrellas: {{dwarfs}} por ciento enanas de la secuencia principal, {{giants}} por ciento gigantes y subgigantes, {{whiteDwarfs}} por ciento enanas blancas.",
       "controls": {
-        "exampleControl": "Control de ejemplo"
+        "distanceValuePattern": "{{value}} pársecs",
+        "magnitudeValuePattern": "magnitud {{value}}"
       }
     }
   },

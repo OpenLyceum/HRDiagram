@@ -62,12 +62,78 @@
       "title": "Move a Star",
       "move": "Move the star on the diagram",
       "moveFine": "Move it in small steps"
-    }
+    },
+    "categories": {
+      "dwarf": "Main-sequence dwarfs",
+      "subgiant": "Subgiants",
+      "giant": "Giants",
+      "supergiant": "Supergiants",
+      "whiteDwarf": "White dwarfs"
+    },
+    "countPattern": "{{label}} ({{count}})"
   },
   "explore": {
     "starTitle": "Your star",
     "temperature": "Temperature",
     "luminosity": "Luminosity"
+  },
+  "radius": {
+    "compareTitle": "Compare star B with star A",
+    "starA": "A",
+    "starB": "B",
+    "ratioHeader": "B ÷ A",
+    "ratioPattern": "× {{value}}",
+    "rule": "R ∝ √L ÷ T²",
+    "equationPattern": "R<sub>B</sub> ÷ R<sub>A</sub> = √{{luminosity}} ÷ {{temperature}}² = {{radius}}",
+    "constraintTitle": "When a star moves",
+    "free": "Move freely",
+    "holdLuminosity": "Keep its luminosity (move sideways)",
+    "holdTemperature": "Keep its temperature (move up or down)",
+    "starALabel": "Star A",
+    "starBLabel": "Star B"
+  },
+  "starSamples": {
+    "sampleTitle": "Stars to plot",
+    "nearest": "Nearest stars (within {{distance}} pc)",
+    "brightest": "Brightest stars (V < {{magnitude}})",
+    "both": "Nearest and brightest",
+    "overlap": "Stars on both lists",
+    "kindsTitle": "Kinds of star",
+    "shownPattern": "{{count}} stars shown",
+    "legendNearest": "nearest",
+    "legendBrightest": "brightest",
+    "legendBoth": "on both lists",
+    "findStar": "Find a star",
+    "chooseStar": "choose…",
+    "clickHint": "Click a star to see its properties.",
+    "distance": "Distance",
+    "distancePattern": "{{pc}} pc ({{ly}} light-years)",
+    "apparentMagnitude": "Apparent magnitude V",
+    "absoluteMagnitude": "Absolute magnitude M<sub>V</sub>",
+    "spectralType": "Spectral type",
+    "notCatalogued": "not catalogued",
+    "kind": "Kind",
+    "inferredPattern": "{{kind}} (from its place on the diagram)",
+    "data": "Data",
+    "gaia": "Gaia DR3",
+    "hipparcos": "Hipparcos"
+  },
+  "gaiaCensus": {
+    "selectionTitle": "Which stars?",
+    "distanceLimit": "Distance limit",
+    "distancePattern": "within {{value}} pc",
+    "brightnessLimit": "Only stars brighter than",
+    "magnitudePattern": "V = {{value}}",
+    "nakedEye": "The naked-eye limit is about V = 6.",
+    "kindsTitle": "What kinds of star?",
+    "plottedPattern": "{{count}} stars plotted",
+    "standsForPattern": "each stands for 10 stars: ≈ {{count}} in all",
+    "percentPattern": "{{value}} %",
+    "colorByTitle": "Color stars by",
+    "colorKind": "Kind of star",
+    "colorDistance": "Distance",
+    "distanceBinPattern": "{{min}}–{{max}} pc",
+    "saturationNote": "Gaia cannot measure stars brighter than about magnitude 3, so a few of the brightest nearby stars are missing."
   },
   "a11y": {
     "explore": {
@@ -86,35 +152,41 @@
     },
     "radius": {
       "screenSummary": {
-        "playArea": "The play area shows the main simulation content.",
-        "controlArea": "The control area has a Reset All button that returns the simulation to its starting state.",
-        "interactionHint": "Explore the simulation by interacting with its controls."
+        "playArea": "The play area is an HR diagram with lines of equal radius and two stars, A and B, that you can move.",
+        "controlArea": "The control area compares the two stars' temperatures, luminosities and radii, shows them to scale, and lets you keep a star's luminosity or temperature fixed while it moves.",
+        "interactionHint": "Keep the luminosity fixed and make star B hotter: watch its radius shrink."
       },
-      "currentDetails": "The simulation is in its initial state.",
+      "currentDetailsPattern": "Star B is {{temperature}} times as hot as star A, {{luminosity}} times as luminous, and {{radius}} times as large.",
       "controls": {
-        "exampleControl": "Example control"
+        "starA": "Star A",
+        "starB": "Star B",
+        "starHelp": "Arrow keys move the star across the diagram. Hold Shift for small steps."
       }
     },
     "starSamples": {
       "screenSummary": {
-        "playArea": "The play area shows the main simulation content.",
-        "controlArea": "The control area has a Reset All button that returns the simulation to its starting state.",
-        "interactionHint": "Explore the simulation by interacting with its controls."
+        "playArea": "The play area is an HR diagram of real stars from the Gaia and Hipparcos catalogues: the stars nearest the Sun, the brightest stars in the sky, or both.",
+        "controlArea": "The control area chooses which stars to plot and which kinds of star to show, finds a star by name, and shows the selected star's properties. Under the diagram are guide lines and axis choices.",
+        "interactionHint": "Compare the nearest stars with the brightest: are bright stars close, luminous, or both?"
       },
-      "currentDetails": "The simulation is in its initial state.",
+      "currentDetailsPattern": "{{count}} stars are shown. Selected: {{selected}}.",
+      "noneSelected": "none",
       "controls": {
-        "exampleControl": "Example control"
+        "stars": "Stars on the diagram",
+        "starsHelp": "Left and right arrows select the next cooler or hotter star.",
+        "selectedPattern": "{{name}}: {{temperature}} kelvin, {{luminosity}} times the Sun's luminosity, {{radius}} times its radius."
       }
     },
     "gaiaCensus": {
       "screenSummary": {
-        "playArea": "The play area shows the main simulation content.",
-        "controlArea": "The control area has a Reset All button that returns the simulation to its starting state.",
-        "interactionHint": "Explore the simulation by interacting with its controls."
+        "playArea": "The play area is an HR diagram of about 44 000 real stars: a random one in ten of all the stars Gaia found within 100 parsecs of the Sun.",
+        "controlArea": "The control area sets a distance limit and an optional brightness limit, shows what share of the plotted stars are dwarfs, subgiants, giants, supergiants and white dwarfs, and colours the stars by kind or by distance. Under the diagram are guide lines and axis choices.",
+        "interactionHint": "Turn on the brightness limit at V = 6: which kinds of star does the naked eye see, compared with all the stars nearby?"
       },
-      "currentDetails": "The simulation is in its initial state.",
+      "currentDetailsPattern": "{{count}} stars are plotted: {{dwarfs}} percent main-sequence dwarfs, {{giants}} percent giants and subgiants, {{whiteDwarfs}} percent white dwarfs.",
       "controls": {
-        "exampleControl": "Example control"
+        "distanceValuePattern": "{{value}} parsecs",
+        "magnitudeValuePattern": "magnitude {{value}}"
       }
     }
   },

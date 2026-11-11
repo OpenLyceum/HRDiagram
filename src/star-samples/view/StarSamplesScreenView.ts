@@ -1,160 +1,255 @@
 /**
  * StarSamplesScreenView.ts
  *
- * The top-level view for the simulation screen.
- *
- * All visual nodes are added here. Follow these conventions:
- *   - Use this.layoutBounds for positioning (never magic pixel values)
- *   - Keep a ResetAllButton that calls model.reset() and this.reset()
- *   - Override step(dt) for frame-by-frame animation
- *
- * ── Adding content ────────────────────────────────────────────────────────────
- * 1. Create Node subclasses in separate files (e.g. HRDiagramControlPanel.ts)
- * 2. Instantiate them here and call this.addChild(...)
- * 3. Link them to model properties:
- *      model.isRunningProperty.link( isRunning => { ... } );
- *
- * ── Layout bounds ─────────────────────────────────────────────────────────────
- * SceneryStack uses a virtual 1024×618 coordinate space by default.
- * this.layoutBounds gives you the full rectangle; use it for alignment:
- *   center, minX, maxX, minY, maxY, width, height
+ * The Star Samples screen: real stars on the HR diagram. Choose the nearest stars, the brightest stars,
+ * both lists or only the stars on both; filter by kind of star; click a star (or find one by name) to
+ * see its properties. Guides and axis choices sit under the diagram.
  */
 
+import { DerivedProperty, Property, type TReadOnlyProperty } from "scenerystack/axon";
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
-import { Node, Rectangle, Text } from "scenerystack/scenery";
+import { StringUtils } from "scenerystack/phetcommon";
+import { Circle, HBox, Node, Text, VBox } from "scenerystack/scenery";
 import { ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
-import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/HRDiagramButtonOptions.js";
+import { AquaRadioButtonGroup, Checkbox, ComboBox } from "scenerystack/sun";
+import {
+  FLAT_RESET_ALL_BUTTON_OPTIONS,
+  HR_DIAGRAM_COMBO_BOX_OPTIONS,
+  LIGHT_SURFACE_TEXT_FILL,
+} from "../../common/HRDiagramButtonOptions.js";
+import { HR_DIAGRAM_CHECKBOX_OPTIONS } from "../../common/HRDiagramControlOptions.js";
+import { HRDiagramPanel } from "../../common/HRDiagramPanel.js";
+import { BRIGHTEST_LIMIT_V, NAMED_STARS, NEAREST_LIMIT_PC, type Star } from "../../common/model/StarCatalog.js";
+import { StarCategory } from "../../common/model/StarCategory.js";
+import { AxisControlsNode } from "../../common/view/AxisControlsNode.js";
+import { formatInteger } from "../../common/view/format.js";
+import { HRChartNode } from "../../common/view/HRChartNode.js";
+import { HROverlayNode } from "../../common/view/HROverlayNode.js";
+import { OverlayCheckboxGroup } from "../../common/view/OverlayCheckboxGroup.js";
+import { chartStripAndPanelsLayout, placeInRegion } from "../../common/view/ScreenLayout.js";
+import { SunMarkerNode } from "../../common/view/SunMarkerNode.js";
 import HRDiagramColors from "../../HRDiagramColors.js";
-import { SCREEN_VIEW_MARGIN } from "../../HRDiagramConstants.js";
+import { FONTS } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
+import { StarSample } from "../model/StarSample.js";
 import type { StarSamplesModel } from "../model/StarSamplesModel.js";
+import { StarCardNode } from "./StarCardNode.js";
+import { StarPlotNode } from "./StarPlotNode.js";
 import { StarSamplesScreenSummaryContent } from "./StarSamplesScreenSummaryContent.js";
 
 export type StarSamplesScreenViewOptions = ScreenViewOptions;
 
+const CHART_WIDTH = 560;
+const CHART_HEIGHT = 420;
+const PANEL_CONTENT_WIDTH = 300;
+
+/**
+ * Stars offered by "Find a star": NAAP's background table (Betelgeuse, Arcturus, Procyon A, Sirius A,
+ * Rigel A, δ Orionis = Mintaka) plus other well-known stars across the diagram.
+ */
+const FAMOUS_STAR_NAMES = [
+  "Sirius",
+  "Canopus",
+  "Rigil Kentaurus",
+  "Arcturus",
+  "Vega",
+  "Capella",
+  "Rigel",
+  "Procyon",
+  "Betelgeuse",
+  "Altair",
+  "Aldebaran",
+  "Antares",
+  "Spica",
+  "Pollux",
+  "Deneb",
+  "Polaris",
+  "Mintaka",
+  "Proxima Centauri",
+  "Barnard's Star",
+  "Van Maanen's Star",
+];
+
 export class StarSamplesScreenView extends ScreenView {
   public constructor(model: StarSamplesModel, providedOptions?: StarSamplesScreenViewOptions) {
-    // ── Accessibility: screen summary ───────────────────────────────────────────
-    // The screen summary is the first thing a screen-reader user encounters. It
-    // is registered here, in the ScreenView's super() options, so every sim wires
-    // it the same way. See StarSamplesScreenSummaryContent for the four content regions.
     const options = optionize<StarSamplesScreenViewOptions, EmptySelfOptions, ScreenViewOptions>()(
-      {
-        screenSummaryContent: new StarSamplesScreenSummaryContent(model),
-      },
+      { screenSummaryContent: new StarSamplesScreenSummaryContent(model) },
       providedOptions,
     );
     super(options);
 
-    // ── Background ────────────────────────────────────────────────────────────
-    // A full-screen rectangle that follows the active color profile.
-    // Replace or remove once you add real content.
-    const backgroundRect = new Rectangle(0, 0, this.layoutBounds.width, this.layoutBounds.height, {
-      fill: HRDiagramColors.backgroundColorProperty,
+    const common = StringManager.getInstance().getCommonStrings();
+    const strings = StringManager.getInstance().getStarSamplesStrings();
+    const layout = chartStripAndPanelsLayout(this.layoutBounds);
+    const listParent = new Node();
+    const textNode = (value: TReadOnlyProperty<string>, maxWidth = PANEL_CONTENT_WIDTH, font = FONTS.LABEL): Text =>
+      new Text(value, { font, fill: HRDiagramColors.textColorProperty, maxWidth });
+
+    // ── Diagram ───────────────────────────────────────────────────────────────
+    const chart = new HRChartNode(
+      model.settings.xQuantityProperty,
+      model.settings.yQuantityProperty,
+      CHART_WIDTH,
+      CHART_HEIGHT,
+    );
+    const starPlot = new StarPlotNode(chart, model.visibleStarsProperty, model.selectedStarProperty, (direction) =>
+      model.stepSelection(direction),
+    );
+    chart.plotLayer.children = [new HROverlayNode(chart, model.settings), new SunMarkerNode(chart), starPlot];
+
+    // ── Stars to plot ─────────────────────────────────────────────────────────
+    const sampleNames = strings as unknown as Readonly<Record<string, TReadOnlyProperty<string>>>;
+    const sampleLabel = (sample: StarSample): TReadOnlyProperty<string> =>
+      new DerivedProperty([sampleNames[`${sample.key}StringProperty`] as TReadOnlyProperty<string>], (pattern) =>
+        StringUtils.fillIn(pattern, { distance: NEAREST_LIMIT_PC, magnitude: BRIGHTEST_LIMIT_V }),
+      );
+    const sampleGroup = new AquaRadioButtonGroup(
+      model.sampleProperty,
+      StarSample.enumeration.values.map((sample) => {
+        const label = sampleLabel(sample);
+        return {
+          value: sample,
+          createNode: () => textNode(label, PANEL_CONTENT_WIDTH - 30),
+          options: { accessibleName: label },
+        };
+      }),
+      { spacing: 6, radioButtonOptions: { radius: 7 }, accessibleName: strings.sampleTitleStringProperty },
+    );
+    const shownText = new DerivedProperty(
+      [strings.shownPatternStringProperty, model.visibleStarsProperty],
+      (pattern, stars) => StringUtils.fillIn(pattern, { count: formatInteger(stars.length) }),
+    );
+    const legendEntry = (
+      color: typeof HRDiagramColors.nearestStarColorProperty,
+      label: TReadOnlyProperty<string>,
+    ): HBox =>
+      new HBox({
+        spacing: 4,
+        children: [new Circle(4, { fill: color, stroke: "black", lineWidth: 0.5 }), textNode(label, 90, FONTS.SMALL)],
+      });
+    const legend = new HBox({
+      spacing: 12,
+      children: [
+        legendEntry(HRDiagramColors.nearestStarColorProperty, strings.legendNearestStringProperty),
+        legendEntry(HRDiagramColors.brightestStarColorProperty, strings.legendBrightestStringProperty),
+        legendEntry(HRDiagramColors.bothStarColorProperty, strings.legendBothStringProperty),
+      ],
     });
-    this.addChild(backgroundRect);
+    const samplePanel = new HRDiagramPanel(
+      new VBox({
+        spacing: 7,
+        align: "left",
+        children: [
+          textNode(strings.sampleTitleStringProperty, PANEL_CONTENT_WIDTH, FONTS.TITLE),
+          sampleGroup,
+          legend,
+          textNode(shownText),
+        ],
+      }),
+      { minWidth: PANEL_CONTENT_WIDTH + 24 },
+    );
 
-    // ── Placeholder label ─────────────────────────────────────────────────────
-    // Replace this with your actual simulation content.
-    const placeholderText = new Text(StringManager.getInstance().getScreenNames().starSamplesStringProperty, {
-      font: "bold 36px sans-serif",
-      fill: HRDiagramColors.textColorProperty,
-      center: this.layoutBounds.center,
+    // ── Kinds of star ─────────────────────────────────────────────────────────
+    const categoryNames = common.categories as unknown as Readonly<Record<string, TReadOnlyProperty<string>>>;
+    const categoryCheckboxes = StarCategory.enumeration.values.map((category) => {
+      const name = categoryNames[`${category.key}StringProperty`] as TReadOnlyProperty<string>;
+      const label = new DerivedProperty(
+        [common.countPatternStringProperty, name, model.categoryCountsProperty],
+        (pattern, kind, counts) => StringUtils.fillIn(pattern, { label: kind, count: counts.get(category) ?? 0 }),
+      );
+      const visibleProperty = model.categoryVisibleProperties.get(category);
+      if (!visibleProperty) {
+        throw new Error(`no visibility for ${category.key}`);
+      }
+      return new Checkbox(visibleProperty, textNode(label, PANEL_CONTENT_WIDTH - 30), {
+        ...HR_DIAGRAM_CHECKBOX_OPTIONS,
+        accessibleName: label,
+      });
     });
-    this.addChild(placeholderText);
+    const kindsPanel = new HRDiagramPanel(
+      new VBox({
+        spacing: 5,
+        align: "left",
+        children: [textNode(strings.kindsTitleStringProperty, PANEL_CONTENT_WIDTH, FONTS.TITLE), ...categoryCheckboxes],
+      }),
+      { minWidth: PANEL_CONTENT_WIDTH + 24 },
+    );
 
-    // ── Accessibility: per-control names ────────────────────────────────────────
-    // EVERY interactive node must carry an `accessibleName` (and an
-    // `accessibleHelpText` where useful), sourced from the StringManager `a11y`
-    // string group — never a hard-coded English literal. Sun/scenery-phet controls
-    // (NumberControl, Checkbox, ComboBox, AquaRadioButtonGroup, …) accept it as an
-    // option; a draggable plain Node needs `tagName: "div", focusable: true` too.
-    // Example (uncomment and adapt when you add a real control):
-    //
-    //   const a11y = StringManager.getInstance().getStarSamplesA11yStrings();
-    //   const exampleButton = new RectangularPushButton({
-    //     ...FLAT_RECTANGULAR_BUTTON_OPTIONS, // flat appearance, not SceneryStack's default 3-D look
-    //     content: someIcon,
-    //     listener: () => model.doSomething(),
-    //     accessibleName: a11y.controls.exampleControlStringProperty,
-    //   });
-    //   this.addChild(exampleButton);
+    // ── Find a star and its card ──────────────────────────────────────────────
+    const famousStars = FAMOUS_STAR_NAMES.flatMap((name) => {
+      const star = NAMED_STARS.find((s) => s.name === name);
+      return star ? [star] : [];
+    }).sort((a, b) => a.name.localeCompare(b.name, "en"));
+    const findProperty = new Property<Star | null>(null);
+    findProperty.lazyLink((star) => {
+      if (star !== null) {
+        model.selectedStarProperty.value = star;
+      }
+    });
+    model.selectedStarProperty.link((star) => {
+      findProperty.value = star !== null && famousStars.includes(star) ? star : null;
+    });
+    const findComboBox = new ComboBox(
+      findProperty,
+      [
+        {
+          value: null,
+          createNode: () =>
+            new Text(strings.chooseStarStringProperty, {
+              font: FONTS.LABEL,
+              fill: LIGHT_SURFACE_TEXT_FILL,
+              maxWidth: 150,
+            }),
+          accessibleName: strings.chooseStarStringProperty,
+        },
+        ...famousStars.map((star) => ({
+          value: star,
+          createNode: () => new Text(star.name, { font: FONTS.LABEL, fill: LIGHT_SURFACE_TEXT_FILL, maxWidth: 150 }),
+          accessibleName: star.name,
+        })),
+      ],
+      listParent,
+      { ...HR_DIAGRAM_COMBO_BOX_OPTIONS, accessibleName: strings.findStarStringProperty, listPosition: "above" },
+    );
+    const cardPanel = new HRDiagramPanel(
+      new VBox({
+        spacing: 8,
+        align: "left",
+        children: [
+          new HBox({ spacing: 8, children: [textNode(strings.findStarStringProperty, 120), findComboBox] }),
+          new StarCardNode(model.selectedStarProperty, PANEL_CONTENT_WIDTH),
+        ],
+      }),
+      { minWidth: PANEL_CONTENT_WIDTH + 24 },
+    );
 
-    // ── Reset All button ──────────────────────────────────────────────────────
-    // Always position at bottom-right (PhET convention).
+    // ── Guides and axes, under the diagram ────────────────────────────────────
+    const overlayCheckboxes = new OverlayCheckboxGroup(model.settings, 2);
+    const axisControls = new AxisControlsNode(model.settings, listParent);
+    const strip = new HRDiagramPanel(
+      new HBox({ spacing: 24, align: "center", children: [overlayCheckboxes, axisControls] }),
+    );
+
     const resetAllButton = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
+        this.interruptSubtreeInput();
         model.reset();
-        this.reset();
       },
-      right: this.layoutBounds.maxX - SCREEN_VIEW_MARGIN,
-      bottom: this.layoutBounds.maxY - SCREEN_VIEW_MARGIN,
     });
-    this.addChild(resetAllButton);
 
-    // ── Accessibility: keyboard / reading traversal order ───────────────────────
-    // Make the parallel DOM (Tab order and screen-reader reading order)
-    // deterministic and independent of child z-order. ScreenView throws if you
-    // set pdomOrder on itself, so add a lightweight wrapper Node that "borrows"
-    // the interactive nodes in the order a user should reach them — Reset All
-    // last. Non-interactive decoration (background, placeholder) is omitted.
-    this.addChild(
-      new Node({
-        pdomOrder: [
-          // TODO: add the sim's interactive nodes here, in traversal order
-          resetAllButton,
-        ],
+    this.children = [
+      placeInRegion(chart, layout.chart),
+      placeInRegion(strip, layout.strip),
+      placeInRegion(new VBox({ spacing: 8, children: [samplePanel, kindsPanel, cardPanel] }), layout.panels, {
+        yAlign: "top",
       }),
-    );
-  }
+      placeInRegion(resetAllButton, layout.footer, { xAlign: "right", yAlign: "bottom" }),
+      listParent,
+    ];
 
-  /**
-   * Resets view-side state (animations, panel visibility, etc.).
-   * Called by the Reset All button listener.
-   */
-  public reset(): void {
-    // TODO: reset any view-side state here
+    this.pdomPlayAreaNode.pdomOrder = [starPlot, sampleGroup, ...categoryCheckboxes, findComboBox];
+    this.pdomControlAreaNode.pdomOrder = [overlayCheckboxes, axisControls, resetAllButton];
   }
-
-  /**
-   * Steps the view forward by dt seconds for animation.
-   * @param _dt - elapsed time in seconds
-   */
-  public override step(_dt: number): void {
-    // TODO: implement animation updates here
-  }
-
-  // ── Accessibility / listeners: dispose ─────────────────────────────────────
-  // ScreenView is `isDisposable: false` and lives for the whole sim, so this
-  // class rarely needs dispose(). Child Nodes (and a live currentDetails
-  // DerivedProperty you own on a short-lived object) do. When you add
-  // DerivedProperty / Multilink / Property.link against model state, keep the
-  // references and tear them down — forks copy what they see. Pattern:
-  //
-  // private readonly disposeStarSamplesScreenView: () => void;
-  //
-  // // in the constructor, after creating the listeners:
-  // const statusMultilink = Multilink.multilink(
-  //   [model.someProperty, model.otherProperty],
-  //   (a, b) => { /* update view from model */ },
-  // );
-  // const detailsProperty = new DerivedProperty(
-  //   [model.stateProperty],
-  //   (state) => `State: ${state}`,
-  // ); // → pass as currentDetailsContent in StarSamplesScreenSummaryContent
-  // const onExternal = (v: number) => { /* … */ };
-  // model.externalProperty.link(onExternal); // Property you do NOT own
-  //
-  // this.disposeStarSamplesScreenView = () => {
-  //   statusMultilink.dispose();                 // Multilink you created
-  //   detailsProperty.dispose();                 // DerivedProperty you created
-  //   model.externalProperty.unlink(onExternal); // undo external link
-  // };
-  //
-  // public override dispose(): void {
-  //   this.disposeStarSamplesScreenView();
-  //   super.dispose();
-  // }
 }

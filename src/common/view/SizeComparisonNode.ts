@@ -1,12 +1,14 @@
 /**
  * SizeComparisonNode.ts
  *
- * A star and the Sun side by side, drawn to the same scale and in their blackbody colours. The larger of
- * the two always fills the frame, so the smaller can shrink to a dot: a red supergiant makes the Sun
- * invisible, and a white dwarf is a speck beside it. That is the point.
+ * Two stars side by side, drawn to the same scale and in their blackbody colours. The larger of the two
+ * always fills the frame, so the smaller can shrink to a dot: a red supergiant makes the Sun invisible,
+ * and a white dwarf is a speck beside it. That is the point.
+ *
+ * {@link SizeComparisonNode.withSun} compares one star with the Sun.
  */
 
-import { Multilink, type TReadOnlyProperty } from "scenerystack/axon";
+import { Multilink, TinyProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { Circle, Node, type NodeOptions, RadialGradient, Text, VBox } from "scenerystack/scenery";
 import HRDiagramColors from "../../HRDiagramColors.js";
 import { FONTS } from "../../HRDiagramConstants.js";
@@ -23,26 +25,23 @@ const DOT_RADIUS = 1.5;
 
 const DISC_SPACING = 2 * MAX_DISC_RADIUS + 36;
 
-export type SizeComparisonNodeOptions = NodeOptions & {
-  /** Label under the star's disc. */
-  starLabelProperty?: TReadOnlyProperty<string>;
+/** One of the two stars compared. */
+export type ComparedStar = {
+  readonly temperatureProperty: TReadOnlyProperty<number>; // K
+  readonly radiusProperty: TReadOnlyProperty<number>; // R☉
+  readonly labelProperty: TReadOnlyProperty<string>;
 };
 
 export class SizeComparisonNode extends Node {
-  public constructor(
-    temperatureProperty: TReadOnlyProperty<number>,
-    radiusProperty: TReadOnlyProperty<number>,
-    providedOptions?: SizeComparisonNodeOptions,
-  ) {
+  public constructor(left: ComparedStar, right: ComparedStar, options?: NodeOptions) {
     super();
-    const { starLabelProperty, ...nodeOptions } = providedOptions ?? {};
     const strings = StringManager.getInstance().getCommonStrings();
 
-    const sunDisc = new Circle(1, { centerX: MAX_DISC_RADIUS, centerY: MAX_DISC_RADIUS });
-    const starDisc = new Circle(1, { centerX: MAX_DISC_RADIUS + DISC_SPACING, centerY: MAX_DISC_RADIUS });
-    sunDisc.fill = gradientFor(SUN_TEMPERATURE);
+    const leftDisc = new Circle(1, { centerX: MAX_DISC_RADIUS, centerY: MAX_DISC_RADIUS });
+    const rightDisc = new Circle(1, { centerX: MAX_DISC_RADIUS + DISC_SPACING, centerY: MAX_DISC_RADIUS });
 
-    const caption = (label: TReadOnlyProperty<string>, centerX: number): VBox => {
+    /** A label under a disc, with a "too small to see" note that shows when the disc is a dot. */
+    const caption = (label: TReadOnlyProperty<string>, centerX: number): { box: VBox; tooSmall: Node } => {
       const tooSmall = new Text(strings.size.tooSmallStringProperty, {
         font: FONTS.SMALL,
         fill: HRDiagramColors.textColorProperty,
@@ -61,32 +60,52 @@ export class SizeComparisonNode extends Node {
         box.centerX = centerX;
         box.top = 2 * MAX_DISC_RADIUS + 6;
       });
-      return box;
+      return { box, tooSmall };
     };
-    const sunCaption = caption(strings.sunStringProperty, sunDisc.centerX);
-    const starCaption = caption(starLabelProperty ?? strings.size.starStringProperty, starDisc.centerX);
-    const sunTooSmall = sunCaption.children[1] as Node;
-    const starTooSmall = starCaption.children[1] as Node;
+    const leftCaption = caption(left.labelProperty, leftDisc.centerX);
+    const rightCaption = caption(right.labelProperty, rightDisc.centerX);
 
-    Multilink.multilink([temperatureProperty, radiusProperty], (temperature, radius) => {
-      const scale = MAX_DISC_RADIUS / Math.max(1, radius);
-      const sunRadius = scale;
-      const starRadius = radius * scale;
-      sunDisc.radius = Math.max(sunRadius, sunRadius < MIN_VISIBLE_RADIUS ? DOT_RADIUS : 0);
-      starDisc.radius = Math.max(starRadius, starRadius < MIN_VISIBLE_RADIUS ? DOT_RADIUS : 0);
-      sunTooSmall.visible = sunRadius < MIN_VISIBLE_RADIUS;
-      starTooSmall.visible = starRadius < MIN_VISIBLE_RADIUS;
-      starDisc.fill = gradientFor(temperature, starDisc.radius);
-      sunDisc.fill = gradientFor(SUN_TEMPERATURE, sunDisc.radius);
-    });
+    Multilink.multilink(
+      [left.temperatureProperty, left.radiusProperty, right.temperatureProperty, right.radiusProperty],
+      (leftTemperature, leftRadius, rightTemperature, rightRadius) => {
+        const scale = MAX_DISC_RADIUS / Math.max(leftRadius, rightRadius);
+        const draw = (disc: Circle, tooSmall: Node, temperature: number, radius: number): void => {
+          const r = radius * scale;
+          disc.radius = r < MIN_VISIBLE_RADIUS ? DOT_RADIUS : r;
+          tooSmall.visible = r < MIN_VISIBLE_RADIUS;
+          disc.fill = gradientFor(temperature, disc.radius);
+        };
+        draw(leftDisc, leftCaption.tooSmall, leftTemperature, leftRadius);
+        draw(rightDisc, rightCaption.tooSmall, rightTemperature, rightRadius);
+      },
+    );
 
-    this.children = [sunDisc, starDisc, sunCaption, starCaption];
-    this.mutate(nodeOptions);
+    this.children = [leftDisc, rightDisc, leftCaption.box, rightCaption.box];
+    this.mutate(options);
+  }
+
+  /** The Sun on the left, a star on the right. */
+  public static withSun(
+    temperatureProperty: TReadOnlyProperty<number>,
+    radiusProperty: TReadOnlyProperty<number>,
+    labelProperty: TReadOnlyProperty<string>,
+    options?: NodeOptions,
+  ): SizeComparisonNode {
+    const strings = StringManager.getInstance().getCommonStrings();
+    return new SizeComparisonNode(
+      {
+        temperatureProperty: new TinyProperty(SUN_TEMPERATURE),
+        radiusProperty: new TinyProperty(1),
+        labelProperty: strings.sunStringProperty,
+      },
+      { temperatureProperty, radiusProperty, labelProperty },
+      options,
+    );
   }
 }
 
 /** A disc fill in the star's colour, slightly darker at the limb. */
-const gradientFor = (temperature: number, radius = 1): RadialGradient => {
+const gradientFor = (temperature: number, radius: number): RadialGradient => {
   const color = blackbodyColor(temperature);
   return new RadialGradient(-0.3 * radius, -0.3 * radius, 0, 0, 0, radius)
     .addColorStop(0, color.colorUtilsBrighter(0.35))

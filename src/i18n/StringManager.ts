@@ -126,6 +126,21 @@ export class StringManager {
     return stringProperties.explore;
   }
 
+  /** Strings for the Radius screen. */
+  public getRadiusStrings() {
+    return stringProperties.radius;
+  }
+
+  /** Strings for the Star Samples screen. */
+  public getStarSamplesStrings() {
+    return stringProperties.starSamples;
+  }
+
+  /** Strings for the Gaia Census screen. */
+  public getGaiaCensusStrings() {
+    return stringProperties.gaiaCensus;
+  }
+
   /** Accessibility strings for the Explore screen. */
   public getExploreA11yStrings() {
     return stringProperties.a11y.explore;

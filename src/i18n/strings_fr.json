@@ -62,12 +62,78 @@
       "title": "Déplacer une étoile",
       "move": "Déplacer l'étoile sur le diagramme",
       "moveFine": "La déplacer par petits pas"
-    }
+    },
+    "categories": {
+      "dwarf": "Naines de la séquence principale",
+      "subgiant": "Sous-géantes",
+      "giant": "Géantes",
+      "supergiant": "Supergéantes",
+      "whiteDwarf": "Naines blanches"
+    },
+    "countPattern": "{{label}} ({{count}})"
   },
   "explore": {
     "starTitle": "Votre étoile",
     "temperature": "Température",
     "luminosity": "Luminosité"
+  },
+  "radius": {
+    "compareTitle": "Comparer l'étoile B à l'étoile A",
+    "starA": "A",
+    "starB": "B",
+    "ratioHeader": "B ÷ A",
+    "ratioPattern": "× {{value}}",
+    "rule": "R ∝ √L ÷ T²",
+    "equationPattern": "R<sub>B</sub> ÷ R<sub>A</sub> = √{{luminosity}} ÷ {{temperature}}² = {{radius}}",
+    "constraintTitle": "Quand une étoile bouge",
+    "free": "Déplacement libre",
+    "holdLuminosity": "Garder sa luminosité (déplacement horizontal)",
+    "holdTemperature": "Garder sa température (déplacement vertical)",
+    "starALabel": "Étoile A",
+    "starBLabel": "Étoile B"
+  },
+  "starSamples": {
+    "sampleTitle": "Étoiles à afficher",
+    "nearest": "Étoiles les plus proches (à moins de {{distance}} pc)",
+    "brightest": "Étoiles les plus brillantes (V < {{magnitude}})",
+    "both": "Les plus proches et les plus brillantes",
+    "overlap": "Étoiles des deux listes",
+    "kindsTitle": "Types d'étoiles",
+    "shownPattern": "{{count}} étoiles affichées",
+    "legendNearest": "proches",
+    "legendBrightest": "brillantes",
+    "legendBoth": "dans les deux listes",
+    "findStar": "Trouver une étoile",
+    "chooseStar": "choisir…",
+    "clickHint": "Cliquez sur une étoile pour voir ses propriétés.",
+    "distance": "Distance",
+    "distancePattern": "{{pc}} pc ({{ly}} années-lumière)",
+    "apparentMagnitude": "Magnitude apparente V",
+    "absoluteMagnitude": "Magnitude absolue M<sub>V</sub>",
+    "spectralType": "Type spectral",
+    "notCatalogued": "non catalogué",
+    "kind": "Type",
+    "inferredPattern": "{{kind}} (d'après sa place sur le diagramme)",
+    "data": "Données",
+    "gaia": "Gaia DR3",
+    "hipparcos": "Hipparcos"
+  },
+  "gaiaCensus": {
+    "selectionTitle": "Quelles étoiles ?",
+    "distanceLimit": "Distance maximale",
+    "distancePattern": "à moins de {{value}} pc",
+    "brightnessLimit": "Seulement les étoiles plus brillantes que",
+    "magnitudePattern": "V = {{value}}",
+    "nakedEye": "La limite à l'œil nu est d'environ V = 6.",
+    "kindsTitle": "Quels types d'étoiles ?",
+    "plottedPattern": "{{count}} étoiles affichées",
+    "standsForPattern": "chacune en représente 10 : ≈ {{count}} en tout",
+    "percentPattern": "{{value}} %",
+    "colorByTitle": "Colorer les étoiles selon",
+    "colorKind": "Le type d'étoile",
+    "colorDistance": "La distance",
+    "distanceBinPattern": "{{min}}–{{max}} pc",
+    "saturationNote": "Gaia ne peut pas mesurer les étoiles plus brillantes qu'environ la magnitude 3 ; quelques-unes des étoiles proches les plus brillantes manquent donc."
   },
   "a11y": {
     "explore": {
@@ -86,35 +152,41 @@
     },
     "radius": {
       "screenSummary": {
-        "playArea": "La zone de jeu affiche le contenu principal de la simulation.",
-        "controlArea": "La zone de contrôle comporte un bouton Tout réinitialiser qui ramène la simulation à son état initial.",
-        "interactionHint": "Explorez la simulation en interagissant avec ses commandes."
+        "playArea": "La zone de jeu est un diagramme HR avec des lignes de même rayon et deux étoiles, A et B, que vous pouvez déplacer.",
+        "controlArea": "La zone de contrôle compare les températures, luminosités et rayons des deux étoiles, les montre à l'échelle et permet de garder fixe la luminosité ou la température d'une étoile pendant qu'elle bouge.",
+        "interactionHint": "Gardez la luminosité fixe et rendez l'étoile B plus chaude : son rayon diminue."
       },
-      "currentDetails": "La simulation est dans son état initial.",
+      "currentDetailsPattern": "L'étoile B est {{temperature}} fois plus chaude que l'étoile A, {{luminosity}} fois plus lumineuse et {{radius}} fois plus grande.",
       "controls": {
-        "exampleControl": "Contrôle d'exemple"
+        "starA": "Étoile A",
+        "starB": "Étoile B",
+        "starHelp": "Les flèches déplacent l'étoile sur le diagramme. Maintenez Maj pour de petits pas."
       }
     },
     "starSamples": {
       "screenSummary": {
-        "playArea": "La zone de jeu affiche le contenu principal de la simulation.",
-        "controlArea": "La zone de contrôle comporte un bouton Tout réinitialiser qui ramène la simulation à son état initial.",
-        "interactionHint": "Explorez la simulation en interagissant avec ses commandes."
+        "playArea": "La zone de jeu est un diagramme HR d'étoiles réelles des catalogues Gaia et Hipparcos : les étoiles les plus proches du Soleil, les plus brillantes du ciel, ou les deux.",
+        "controlArea": "La zone de contrôle choisit les étoiles à afficher et les types d'étoiles, trouve une étoile par son nom et montre les propriétés de l'étoile choisie. Sous le diagramme se trouvent les lignes de repère et le choix des axes.",
+        "interactionHint": "Comparez les étoiles les plus proches aux plus brillantes : les étoiles brillantes sont-elles proches, lumineuses, ou les deux ?"
       },
-      "currentDetails": "La simulation est dans son état initial.",
+      "currentDetailsPattern": "{{count}} étoiles sont affichées. Étoile choisie : {{selected}}.",
+      "noneSelected": "aucune",
       "controls": {
-        "exampleControl": "Contrôle d'exemple"
+        "stars": "Étoiles sur le diagramme",
+        "starsHelp": "Les flèches gauche et droite choisissent l'étoile suivante, plus froide ou plus chaude.",
+        "selectedPattern": "{{name}} : {{temperature}} kelvins, {{luminosity}} fois la luminosité du Soleil, {{radius}} fois son rayon."
       }
     },
     "gaiaCensus": {
       "screenSummary": {
-        "playArea": "La zone de jeu affiche le contenu principal de la simulation.",
-        "controlArea": "La zone de contrôle comporte un bouton Tout réinitialiser qui ramène la simulation à son état initial.",
-        "interactionHint": "Explorez la simulation en interagissant avec ses commandes."
+        "playArea": "La zone de jeu est un diagramme HR d'environ 44 000 étoiles réelles : une sur dix, au hasard, de toutes les étoiles trouvées par Gaia à moins de 100 parsecs du Soleil.",
+        "controlArea": "La zone de contrôle fixe une distance maximale et une limite de brillance facultative, montre la part de naines, sous-géantes, géantes, supergéantes et naines blanches parmi les étoiles affichées, et colore les étoiles selon leur type ou leur distance. Sous le diagramme se trouvent les lignes de repère et le choix des axes.",
+        "interactionHint": "Activez la limite de brillance à V = 6 : quels types d'étoiles l'œil nu voit-il, comparés à toutes les étoiles proches ?"
       },
-      "currentDetails": "La simulation est dans son état initial.",
+      "currentDetailsPattern": "{{count}} étoiles sont affichées : {{dwarfs}} pour cent de naines de la séquence principale, {{giants}} pour cent de géantes et sous-géantes, {{whiteDwarfs}} pour cent de naines blanches.",
       "controls": {
-        "exampleControl": "Contrôle d'exemple"
+        "distanceValuePattern": "{{value}} parsecs",
+        "magnitudeValuePattern": "magnitude {{value}}"
       }
     }
   },

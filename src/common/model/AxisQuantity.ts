@@ -39,6 +39,8 @@ export type PlottableStar = {
   /** Gaia BP−RP, or NaN to derive it from the temperature. */
   readonly bpRp: number;
   readonly spectralCode: number;
+  /** Measured absolute G magnitude, when the star has Gaia photometry. */
+  readonly absoluteG?: number;
 };
 
 type AxisQuantityConfig = {
@@ -134,6 +136,9 @@ export class AxisQuantity extends EnumerationValue {
     fromTemperatureLuminosity: (temperature, luminosity) =>
       bolometricMagnitudeFromLuminosity(luminosity) - gBolometricCorrection(bpRpFromTemperature(temperature)),
     fromStar: (star) => {
+      if (star.absoluteG !== undefined && Number.isFinite(star.absoluteG)) {
+        return star.absoluteG;
+      }
       const bpRp = Number.isFinite(star.bpRp) ? star.bpRp : bpRpFromTemperature(star.temperature);
       return bolometricMagnitudeFromLuminosity(star.luminosity) - gBolometricCorrection(bpRp);
     },

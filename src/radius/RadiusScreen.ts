@@ -14,9 +14,9 @@ import type { ScreenOptions } from "scenerystack/sim";
 import { Screen } from "scenerystack/sim";
 import type { Tandem } from "scenerystack/tandem";
 import { createRadiusIcon } from "../common/HRDiagramScreenIcons.js";
+import { HRDiagramKeyboardHelpContent } from "../common/view/HRDiagramKeyboardHelpContent.js";
 import HRDiagramColors from "../HRDiagramColors.js";
 import { RadiusModel } from "./model/RadiusModel.js";
-import { RadiusKeyboardHelpContent } from "./view/RadiusKeyboardHelpContent.js";
 import { RadiusScreenView } from "./view/RadiusScreenView.js";
 
 // Require tandem to be explicit — accidental omission would break PhET-iO.
@@ -35,7 +35,7 @@ export class RadiusScreen extends Screen<RadiusModel, RadiusScreenView> {
       optionize<RadiusScreenOptions, EmptySelfOptions, ScreenOptions>()(
         {
           backgroundColorProperty: HRDiagramColors.backgroundColorProperty,
-          createKeyboardHelpNode: () => new RadiusKeyboardHelpContent(),
+          createKeyboardHelpNode: () => new HRDiagramKeyboardHelpContent(),
           homeScreenIcon: createRadiusIcon(),
           navigationBarIcon: createRadiusIcon(),
         },

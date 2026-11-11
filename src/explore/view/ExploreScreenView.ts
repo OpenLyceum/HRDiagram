@@ -64,9 +64,9 @@ export class ExploreScreenView extends ScreenView {
     const overlays = new HROverlayNode(chart, settings);
     const cursorStar = new CursorStarNode(
       chart,
-      model.temperatureProperty,
-      model.luminosityProperty,
-      (temperature, luminosity) => model.setTemperatureLuminosity(temperature, luminosity),
+      model.star.temperatureProperty,
+      model.star.luminosityProperty,
+      (temperature, luminosity) => model.star.setTemperatureLuminosity(temperature, luminosity),
       {
         accessibleName: a11y.controls.cursorStarStringProperty,
         accessibleHelpText: a11y.controls.cursorStarHelpStringProperty,
@@ -89,29 +89,29 @@ export class ExploreScreenView extends ScreenView {
       new RichText(text, { font: FONTS.READOUT, fill: HRDiagramColors.textColorProperty, maxWidth: 160 });
 
     const temperatureText = new DerivedProperty(
-      [strings.units.kelvinPatternStringProperty, model.temperatureProperty],
+      [strings.units.kelvinPatternStringProperty, model.star.temperatureProperty],
       (pattern, temperature) =>
         StringUtils.fillIn(pattern, { value: formatInteger(Number(temperature.toPrecision(3))) }),
     );
     const luminosityText = new DerivedProperty(
-      [strings.units.solarLuminosityPatternStringProperty, model.luminosityProperty],
+      [strings.units.solarLuminosityPatternStringProperty, model.star.luminosityProperty],
       (pattern, luminosity) => StringUtils.fillIn(pattern, { value: formatValue(luminosity, 3) }),
     );
     const radiusText = new DerivedProperty(
-      [strings.units.solarRadiusPatternStringProperty, model.radiusProperty],
+      [strings.units.solarRadiusPatternStringProperty, model.star.radiusProperty],
       (pattern, radius) => StringUtils.fillIn(pattern, { value: formatValue(radius, 3) }),
     );
-    const magnitudeText = new DerivedProperty([model.luminosityProperty, model.temperatureProperty], (L, T) =>
+    const magnitudeText = new DerivedProperty([model.star.luminosityProperty, model.star.temperatureProperty], (L, T) =>
       formatFixed(absoluteVisualMagnitude(L, T), 1),
     );
     const spectralText = new DerivedProperty(
-      [strings.mainSequenceTypePatternStringProperty, model.temperatureProperty],
+      [strings.mainSequenceTypePatternStringProperty, model.star.temperatureProperty],
       (pattern, temperature) =>
         StringUtils.fillIn(pattern, { type: formatSpectralCode(spectralCodeFromTemperature(temperature)) }),
     );
 
     const slider = (
-      property: typeof model.logTemperatureProperty,
+      property: typeof model.star.logTemperatureProperty,
       name: TReadOnlyProperty<string>,
       valuePattern: TReadOnlyProperty<string>,
       format: (value: number) => string,
@@ -126,13 +126,13 @@ export class ExploreScreenView extends ScreenView {
         pdomDependencies: [valuePattern],
       });
     const temperatureSlider = slider(
-      model.logTemperatureProperty,
+      model.star.logTemperatureProperty,
       exploreStrings.temperatureStringProperty,
       a11y.controls.temperatureValuePatternStringProperty,
       (T) => formatInteger(Number(T.toPrecision(3))),
     );
     const luminositySlider = slider(
-      model.logLuminosityProperty,
+      model.star.logLuminosityProperty,
       exploreStrings.luminosityStringProperty,
       a11y.controls.luminosityValuePatternStringProperty,
       (L) => formatValue(L, 3),
@@ -175,7 +175,11 @@ export class ExploreScreenView extends ScreenView {
             fill: HRDiagramColors.textColorProperty,
             maxWidth: PANEL_CONTENT_WIDTH,
           }),
-          new SizeComparisonNode(model.temperatureProperty, model.radiusProperty),
+          SizeComparisonNode.withSun(
+            model.star.temperatureProperty,
+            model.star.radiusProperty,
+            strings.size.starStringProperty,
+          ),
         ],
       }),
       { minWidth: PANEL_CONTENT_WIDTH + 24 },

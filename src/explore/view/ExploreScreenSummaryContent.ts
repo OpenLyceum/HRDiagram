@@ -18,9 +18,9 @@ export class ExploreScreenSummaryContent extends ScreenSummaryContent {
     const currentDetails = new DerivedProperty(
       [
         a11y.currentDetailsPatternStringProperty,
-        model.temperatureProperty,
-        model.luminosityProperty,
-        model.radiusProperty,
+        model.star.temperatureProperty,
+        model.star.luminosityProperty,
+        model.star.radiusProperty,
       ],
       (pattern, temperature, luminosity, radius) =>
         StringUtils.fillIn(pattern, {
