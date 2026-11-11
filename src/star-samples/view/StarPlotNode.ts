@@ -27,24 +27,28 @@ const NEAREST_GROUP = 0;
 const BRIGHTEST_GROUP = 1;
 const BOTH_GROUP = 2;
 
-const STYLES: PointStyle[] = [
+/** Nearest stars are circles, brightest diamonds, both squares: shape repeats what colour says. */
+export const SAMPLE_STYLES: PointStyle[] = [
   {
     css: () => HRDiagramColors.nearestStarColorProperty.value.toCSS(),
     radius: DOT_RADIUS,
     alpha: 0.9,
     stroke: () => "rgba(0,0,0,0.6)",
+    shape: "circle",
   },
   {
     css: () => HRDiagramColors.brightestStarColorProperty.value.toCSS(),
     radius: DOT_RADIUS,
     alpha: 0.9,
     stroke: () => "rgba(0,0,0,0.6)",
+    shape: "diamond",
   },
   {
     css: () => HRDiagramColors.bothStarColorProperty.value.toCSS(),
     radius: DOT_RADIUS + 1,
     alpha: 1,
     stroke: () => "rgba(0,0,0,0.6)",
+    shape: "square",
   },
 ];
 
@@ -118,7 +122,7 @@ export class StarPlotNode extends Node {
         ys[i] = y.chartValueOfStar(star);
         groups[i] = groupOf(star);
       });
-      cloud.setPoints({ xs, ys, groups }, STYLES);
+      cloud.setPoints({ xs, ys, groups }, SAMPLE_STYLES);
       if (selected === null) {
         ring.visible = false;
         selectedLabel.visible = false;

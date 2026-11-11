@@ -75,7 +75,8 @@
   "explore": {
     "starTitle": "Votre étoile",
     "temperature": "Température",
-    "luminosity": "Luminosité"
+    "luminosity": "Luminosité",
+    "radiusEquation": "R = √L ÷ (T / 5772 K)<sup>2</sup>   (L en L<sub>☉</sub>, R en R<sub>☉</sub>)"
   },
   "radius": {
     "compareTitle": "Comparer l'étoile B à l'étoile A",
@@ -192,6 +193,6 @@
   },
   "preferences": {
     "title": "Simulation",
-    "exampleToggle": "Exemple de bascule"
+    "showEquations": "Afficher les équations"
   }
 }

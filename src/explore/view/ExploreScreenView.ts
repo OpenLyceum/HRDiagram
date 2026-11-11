@@ -31,6 +31,7 @@ import { SunMarkerNode } from "../../common/view/SunMarkerNode.js";
 import HRDiagramColors from "../../HRDiagramColors.js";
 import { FONTS } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
+import type { HRDiagramPreferencesModel } from "../../preferences/HRDiagramPreferencesModel.js";
 import type { ExploreModel } from "../model/ExploreModel.js";
 import { ExploreScreenSummaryContent } from "./ExploreScreenSummaryContent.js";
 
@@ -45,7 +46,11 @@ const SLIDER_TRACK_WIDTH = 270;
 const SLIDER_STEPS = { keyboardStep: 0.01, shiftKeyboardStep: 0.002, pageKeyboardStep: 0.1 };
 
 export class ExploreScreenView extends ScreenView {
-  public constructor(model: ExploreModel, providedOptions?: ExploreScreenViewOptions) {
+  public constructor(
+    model: ExploreModel,
+    preferences: HRDiagramPreferencesModel,
+    providedOptions?: ExploreScreenViewOptions,
+  ) {
     const options = optionize<ExploreScreenViewOptions, EmptySelfOptions, ScreenViewOptions>()(
       { screenSummaryContent: new ExploreScreenSummaryContent(model) },
       providedOptions,
@@ -169,6 +174,12 @@ export class ExploreScreenView extends ScreenView {
           sliderBlock(exploreStrings.temperatureStringProperty, temperatureText, temperatureSlider),
           sliderBlock(exploreStrings.luminosityStringProperty, luminosityText, luminositySlider),
           readouts,
+          new RichText(exploreStrings.radiusEquationStringProperty, {
+            font: FONTS.SMALL,
+            fill: HRDiagramColors.textColorProperty,
+            maxWidth: PANEL_CONTENT_WIDTH,
+            visibleProperty: preferences.showEquationsProperty,
+          }),
           new HSeparator({ stroke: HRDiagramColors.panelBorderColorProperty }),
           new Text(strings.size.titleStringProperty, {
             font: FONTS.LABEL,

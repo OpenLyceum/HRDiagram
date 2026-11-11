@@ -121,7 +121,7 @@ export class GaiaCensusScreenView extends ScreenView {
     const kindStyles: PointStyle[] = DRAW_ORDER.map((category) => ({
       css: () => (CATEGORY_COLORS.get(category) ?? HRDiagramColors.textColorProperty).value.toCSS(),
       radius: category === StarCategory.DWARF ? POINT_RADIUS : POINT_RADIUS + 0.4,
-      alpha: category === StarCategory.DWARF ? 0.45 : 0.85,
+      alpha: category === StarCategory.DWARF ? 0.6 : 0.85,
     }));
     const distanceStyles: PointStyle[] = DISTANCE_COLORS.map((color) => ({
       css: () => color,

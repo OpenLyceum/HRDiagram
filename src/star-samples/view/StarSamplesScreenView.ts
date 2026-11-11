@@ -9,7 +9,7 @@
 import { DerivedProperty, Property, type TReadOnlyProperty } from "scenerystack/axon";
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import { StringUtils } from "scenerystack/phetcommon";
-import { Circle, HBox, Node, Text, VBox } from "scenerystack/scenery";
+import { HBox, Node, Text, VBox } from "scenerystack/scenery";
 import { ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
 import { AquaRadioButtonGroup, Checkbox, ComboBox } from "scenerystack/sun";
@@ -26,7 +26,9 @@ import { AxisControlsNode } from "../../common/view/AxisControlsNode.js";
 import { formatInteger } from "../../common/view/format.js";
 import { HRChartNode } from "../../common/view/HRChartNode.js";
 import { HROverlayNode } from "../../common/view/HROverlayNode.js";
+import { MarkerIconNode } from "../../common/view/MarkerIconNode.js";
 import { OverlayCheckboxGroup } from "../../common/view/OverlayCheckboxGroup.js";
+import type { PointStyle } from "../../common/view/PointCloudNode.js";
 import { chartStripAndPanelsLayout, placeInRegion } from "../../common/view/ScreenLayout.js";
 import { SunMarkerNode } from "../../common/view/SunMarkerNode.js";
 import HRDiagramColors from "../../HRDiagramColors.js";
@@ -35,7 +37,7 @@ import { StringManager } from "../../i18n/StringManager.js";
 import { StarSample } from "../model/StarSample.js";
 import type { StarSamplesModel } from "../model/StarSamplesModel.js";
 import { StarCardNode } from "./StarCardNode.js";
-import { StarPlotNode } from "./StarPlotNode.js";
+import { SAMPLE_STYLES, StarPlotNode } from "./StarPlotNode.js";
 import { StarSamplesScreenSummaryContent } from "./StarSamplesScreenSummaryContent.js";
 
 export type StarSamplesScreenViewOptions = ScreenViewOptions;
@@ -120,20 +122,15 @@ export class StarSamplesScreenView extends ScreenView {
       [strings.shownPatternStringProperty, model.visibleStarsProperty],
       (pattern, stars) => StringUtils.fillIn(pattern, { count: formatInteger(stars.length) }),
     );
-    const legendEntry = (
-      color: typeof HRDiagramColors.nearestStarColorProperty,
-      label: TReadOnlyProperty<string>,
-    ): HBox =>
-      new HBox({
-        spacing: 4,
-        children: [new Circle(4, { fill: color, stroke: "black", lineWidth: 0.5 }), textNode(label, 90, FONTS.SMALL)],
-      });
+    const legendEntry = (style: PointStyle, label: TReadOnlyProperty<string>): HBox =>
+      new HBox({ spacing: 4, children: [new MarkerIconNode(style), textNode(label, 90, FONTS.SMALL)] });
+    const [nearestStyle, brightestStyle, bothStyle] = SAMPLE_STYLES as [PointStyle, PointStyle, PointStyle];
     const legend = new HBox({
       spacing: 12,
       children: [
-        legendEntry(HRDiagramColors.nearestStarColorProperty, strings.legendNearestStringProperty),
-        legendEntry(HRDiagramColors.brightestStarColorProperty, strings.legendBrightestStringProperty),
-        legendEntry(HRDiagramColors.bothStarColorProperty, strings.legendBothStringProperty),
+        legendEntry(nearestStyle, strings.legendNearestStringProperty),
+        legendEntry(brightestStyle, strings.legendBrightestStringProperty),
+        legendEntry(bothStyle, strings.legendBothStringProperty),
       ],
     });
     const samplePanel = new HRDiagramPanel(

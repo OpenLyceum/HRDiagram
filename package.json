@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "A SceneryStack simulation: HR Diagram.",
+  "description": "An interactive Hertzsprung–Russell diagram with real Gaia and Hipparcos stars: place a star by temperature and luminosity, see its radius, and compare the nearest stars, the brightest stars and a census of everything within 100 parsecs.",
   "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
@@ -12,8 +12,15 @@
   "keywords": [
     "simulation",
     "SceneryStack",
-    "interactive",
     "physics",
+    "interactive",
+    "astronomy",
+    "hr-diagram",
+    "hertzsprung-russell",
+    "stars",
+    "gaia",
+    "hipparcos",
+    "stellar-radius",
     "education",
     "pwa"
   ],
@@ -35,9 +42,9 @@
     "test:fuzz:quick": "node scripts/test-fuzz.ts 10",
     "test:fuzz:long": "node scripts/test-fuzz.ts 300",
     "icons": "node scripts/generate-icons.ts",
-    "fetch-data": "node scripts/catalog/fetch-catalog.ts",
     "clean": "rm -rf dist",
-    "prepare": "git rev-parse --is-inside-work-tree >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
+    "prepare": "git rev-parse --is-inside-work-tree >/dev/null 2>&1 && git config core.hooksPath .githooks || true",
+    "fetch-data": "node scripts/catalog/fetch-catalog.ts"
   },
   "dependencies": {
     "scenerystack": "^3.0.0"

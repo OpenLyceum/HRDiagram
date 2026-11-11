@@ -27,6 +27,7 @@ import { SunMarkerNode } from "../../common/view/SunMarkerNode.js";
 import HRDiagramColors from "../../HRDiagramColors.js";
 import { FONTS } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
+import type { HRDiagramPreferencesModel } from "../../preferences/HRDiagramPreferencesModel.js";
 import type { RadiusModel } from "../model/RadiusModel.js";
 import { StarConstraint } from "../model/StarConstraint.js";
 import { RadiusScreenSummaryContent } from "./RadiusScreenSummaryContent.js";
@@ -38,7 +39,11 @@ const CHART_HEIGHT = 500;
 const PANEL_CONTENT_WIDTH = 300;
 
 export class RadiusScreenView extends ScreenView {
-  public constructor(model: RadiusModel, providedOptions?: RadiusScreenViewOptions) {
+  public constructor(
+    model: RadiusModel,
+    preferences: HRDiagramPreferencesModel,
+    providedOptions?: RadiusScreenViewOptions,
+  ) {
     const options = optionize<RadiusScreenViewOptions, EmptySelfOptions, ScreenViewOptions>()(
       { screenSummaryContent: new RadiusScreenSummaryContent(model) },
       providedOptions,
@@ -156,8 +161,15 @@ export class RadiusScreenView extends ScreenView {
             maxWidth: PANEL_CONTENT_WIDTH,
           }),
           table,
-          text(strings.ruleStringProperty, FONTS.READOUT, PANEL_CONTENT_WIDTH),
-          text(equation, FONTS.READOUT, PANEL_CONTENT_WIDTH),
+          new VBox({
+            spacing: 4,
+            align: "left",
+            visibleProperty: preferences.showEquationsProperty,
+            children: [
+              text(strings.ruleStringProperty, FONTS.READOUT, PANEL_CONTENT_WIDTH),
+              text(equation, FONTS.READOUT, PANEL_CONTENT_WIDTH),
+            ],
+          }),
           new HSeparator({ stroke: HRDiagramColors.panelBorderColorProperty }),
           new SizeComparisonNode(
             {

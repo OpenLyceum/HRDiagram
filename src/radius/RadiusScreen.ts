@@ -1,13 +1,10 @@
 /**
  * RadiusScreen.ts
  *
- * The top-level Screen component. It wires together the model and view
- * factories and passes screen-level options (name, background color, tandem)
- * to the parent Screen class.
- *
- * Registered in the screens array in src/main.ts. Its home-screen and navigation-bar
- * icons come from createRadiusIcon() in src/common/HRDiagramScreenIcons.ts
- * (see doc/multi-screen.md).
+ * The Radius screen: two stars on a temperature–luminosity diagram, and how temperature and luminosity
+ * set a star's radius.
+ * Wires the model and view factories, the keyboard-help dialog and the screen icons
+ * (createRadiusIcon() in src/common/HRDiagramScreenIcons.ts). Registered in src/main.ts.
  */
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import type { ScreenOptions } from "scenerystack/sim";
@@ -16,6 +13,7 @@ import type { Tandem } from "scenerystack/tandem";
 import { createRadiusIcon } from "../common/HRDiagramScreenIcons.js";
 import { HRDiagramKeyboardHelpContent } from "../common/view/HRDiagramKeyboardHelpContent.js";
 import HRDiagramColors from "../HRDiagramColors.js";
+import type { HRDiagramPreferencesModel } from "../preferences/HRDiagramPreferencesModel.js";
 import { RadiusModel } from "./model/RadiusModel.js";
 import { RadiusScreenView } from "./view/RadiusScreenView.js";
 
@@ -23,13 +21,13 @@ import { RadiusScreenView } from "./view/RadiusScreenView.js";
 type RadiusScreenOptions = ScreenOptions & { tandem: Tandem };
 
 export class RadiusScreen extends Screen<RadiusModel, RadiusScreenView> {
-  public constructor(options: RadiusScreenOptions) {
+  public constructor(preferences: HRDiagramPreferencesModel, options: RadiusScreenOptions) {
     super(
       // Model factory — called once when the screen is first shown
       () => new RadiusModel(),
       // View factory — receives the model instance
       (model) =>
-        new RadiusScreenView(model, {
+        new RadiusScreenView(model, preferences, {
           tandem: options.tandem.createTandem("view"),
         }),
       optionize<RadiusScreenOptions, EmptySelfOptions, ScreenOptions>()(

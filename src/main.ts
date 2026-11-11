@@ -37,12 +37,12 @@ onReadyToLaunch(() => {
   const simPreferences = new HRDiagramPreferencesModel(Tandem.ROOT.createTandem("preferences"));
 
   const screens = [
-    new ExploreScreen({
+    new ExploreScreen(simPreferences, {
       name: stringManager.getScreenNames().exploreStringProperty,
       tandem: Tandem.ROOT.createTandem("exploreScreen"),
       backgroundColorProperty: HRDiagramColors.backgroundColorProperty,
     }),
-    new RadiusScreen({
+    new RadiusScreen(simPreferences, {
       name: stringManager.getScreenNames().radiusStringProperty,
       tandem: Tandem.ROOT.createTandem("radiusScreen"),
       backgroundColorProperty: HRDiagramColors.backgroundColorProperty,
@@ -80,12 +80,13 @@ onReadyToLaunch(() => {
       },
     }),
 
-    // Optional: fill in credits shown in Help → About
     credits: {
-      leadDesign: "",
-      softwareDevelopment: "",
-      team: "",
-      qualityAssurance: "",
+      leadDesign: "Martin Veillette",
+      softwareDevelopment: "OpenLyceum",
+      team: "Inspired by the NAAP HR Diagram Explorer (University of Nebraska–Lincoln)",
+      thanks:
+        "Star data: ESA Gaia (Gaia Catalogue of Nearby Stars), ESA Hipparcos, IAU WGSN star names, HYG database; " +
+        "reference sequences by Pecaut & Mamajek and the Montreal white dwarf group.",
     },
   });
 

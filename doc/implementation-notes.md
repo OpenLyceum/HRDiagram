@@ -1,135 +1,92 @@
 # Implementation Notes - HR Diagram
 
-Developer-facing notes on the **SceneryStackTemplate** scaffold. **Replace and expand this file when
-forking** to describe your sim's real architecture (see Stern Gerlach or Light Propagation for
-target quality). Until then, this documents what the template provides out of the box.
+Developer-facing notes. The physics and the data are described in [model.md](./model.md).
 
-## Architecture Overview
-
-SceneryStackTemplate is the fleet-canonical starting point for new SceneryStack sims (one or N screens).
-It demonstrates Model–View separation, color profiles, localization, reset behavior, accessibility
-reference wiring, and reusable common components — **without** domain physics.
+## Architecture
 
 ```
 main.ts
-  └─ ExploreScreen             (Screen<ExploreModel, ExploreScreenView>)
-       ├─ ExploreModel          state + logic  (src/explore/model/)  ← stub: add physics here
-       └─ ExploreScreenView     visuals        (src/explore/view/)
-            ├─ ExploreScreenSummaryContent     (PDOM overview — reference a11y pattern)
-            └─ ExploreKeyboardHelpContent      (keyboard help dialog)
+  ├─ ExploreScreen      ExploreModel { settings: DiagramSettings, star: MovableStar }
+  ├─ RadiusScreen       RadiusModel  { settings, starA, starB, constraintProperty, B ÷ A ratios }
+  ├─ StarSamplesScreen  StarSamplesModel { settings, sampleProperty, category filters, selectedStarProperty }
+  └─ GaiaCensusScreen   GaiaCensusModel  { settings, distance/brightness limits, colorBy, selectionProperty }
 
-src/common/
-  ├─ HRDiagramPanel.ts           pre-themed panel (uses HRDiagramColors)
-  ├─ HRDiagramButtonOptions.ts   flat button / combo-box option bundles
-  └─ TimeModel.ts          composable play/pause + elapsed time
+src/common/model/
+  stellarPhysics.ts     pure functions + Interpolator over the bundled reference tables
+  spectralTypes.ts      spectral codes, MK parser, temperature scales by class
+  luminosityClasses.ts  class curves and the instability strip, as (T, L) lists
+  StarCatalog.ts        snapshot → NAMED_STARS (Star objects) and GAIA_CENSUS (typed columns)
+  AxisQuantity.ts       what an axis shows, how to place (T, L) or a star, and the inverse
+  DiagramSettings.ts    axes + guide visibility, one per screen
+  MovableStar.ts        log T / log L Properties, derived T, L, R
 
-src/preferences/
-  ├─ HRDiagramPreferencesModel   sim-specific pref state
-  ├─ HRDiagramPreferencesNode    pref UI in Preferences → Simulation
-  └─ hRDiagramQueryParameters    QueryStringMachine declarations
+src/common/view/
+  HRChartNode           frame, ticks (axisTicks.ts), titles; plotLayer (clipped) + overlayLayer
+  HROverlayNode         guides, redrawn on axis change and toggles
+  CursorStarNode        draggable / keyboard star, optional constraint
+  PointCloudNode        canvas markers by group (Star Samples, Gaia Census)
+  SizeComparisonNode    two stars to scale
+  SunMarkerNode, AxisControlsNode, OverlayCheckboxGroup, MarkerIconNode
+  ScreenLayout          chartAndPanelsLayout / chartStripAndPanelsLayout + placeInRegion
 ```
 
-Data flows Model → View through AXON `Property` objects (`.link()` / `.lazyLink()`). The view never
-integrates physics; the model never imports scenery.
+No screen has a clock; `step(dt)` is empty everywhere.
 
-## Forking checklist
+## Decisions
 
-### Automated rename + scaffold (recommended)
+- **Snapshot, not API.** The Gaia TAP server sends no CORS header, the same situation as the NASA
+  Exoplanet Archive in ExoplanetsDatabase. The fetch script takes the snapshot instead.
+  - It stores only observables, column-oriented for the census.
+  - The data files are statically imported, so Vite bundles them (about 1 MB raw).
+- **Derivation in the sim, not in the script.** One tested code path (`stellarPhysics.ts`) places
+  every star, the guides and the cursor. That keeps the curves and the data consistent, and it makes
+  the conversions visible to anyone reading the source.
+- **Log T and log L as the state.** Sliders, keyboard steps and dragging all move in ratios, and the
+  diagram is logarithmic.
+- **Inverse mappings.** Dragging on a B − V, spectral-type or magnitude axis needs (T, L) back.
+  - `AxisQuantity.temperatureAt` inverts the dwarf relations.
+  - `luminosityAt` inverts M_V or M_G at that temperature.
+  - The round trip is exact because the forward and inverse maps use the same interpolators.
+- **Keyboard moves in view space.** `CursorStarNode` steps the marker 8 px (1.5 px with Shift) and
+  converts back to (T, L). Arrow keys therefore always move the marker the way they point, whichever
+  axes are shown.
+- **Custom ticks.** The temperature axis spans only 1.4 decades, so decade ticks would label nothing
+  useful. `axisTicks.ts` lists round temperatures instead, letters for spectral types, and decades
+  for luminosity.
+- **Point clouds on canvas.** 44 000 census stars are painted by `PointCloudNode`, one path per
+  group. Picking uses the view positions cached at paint time.
+- **Layout regions never overlap.** Every view places its content through `placeInRegion`
+  (PlanetaryConfigurations pattern). `tests/browser/layout.spec.ts` checks all screens in en/fr/es.
 
-```sh
-npm run rename -- --id my-sim --name "My Simulation"
-npm run scaffold-screens -- --screens Intro,Lab   # or omit --screens for one screen
-npm run check
-```
+## Data pipeline (`scripts/catalog/fetch-catalog.ts`)
 
-Or from the workspace: `Baton/scripts/create-sim.sh --repo MySim --name "My Simulation"`.
+1. Downloads the Mamajek dwarf table and the Montreal 0.6 M☉ DA table, and writes the trimmed
+   reference JSON.
+2. Queries the GCNS for a `MOD(source_id, 10) = 0` sample within 100 pc, with quality cuts:
+   - BP/RP S/N > 10;
+   - RUWE < 1.4;
+   - the Babusiaux et al. (2018) BP/RP excess-factor cut.
+3. Queries the GCNS within 10.5 pc with no quality cut. The cut is applied locally, so stars with poor
+   photometry can still be matched to Hipparcos.
+4. Queries Hipparcos (V, B − V, spectral type) joined with the new reduction (parallax), the
+   Hipparcos–Gaia best-neighbour table and the DR3 parallax. It keeps stars with V < 3 or plx > 95 mas.
+5. Names the stars with `StarNamer`:
+   - IAU-CSN proper names by HIP;
+   - HYG designations by HIP, or by position plus magnitude for Gaia-only stars;
+   - each HYG star is used at most once.
+6. Merges the sets: Gaia photometry where good and unsaturated, otherwise Hipparcos. It de-duplicates
+   by HIP and Gaia source id.
 
-`scripts/rename-sim.ts` updates sim-level identifiers (package id, Colors, Preferences).
-`scripts/scaffold-screens.ts` emits fleet-named screen folders and wires main/strings/icons.
+To refresh, run `npm run fetch-data`, check the printed summary, run `npm test`, and commit
+`src/common/model/data/`.
 
-### Manual steps (after rename/scaffold or if skipping the scripts)
+## Testing
 
-1. **`doc/model.md`** — educator physics (equations, ranges, simplifications).
-2. **`doc/implementation-notes.md`** — this file, rewritten for your architecture.
-3. **Screen model(s)** — real Properties, `step(dt)`, `reset()`; compose `TimeModel` if animated.
-4. **Screen view(s)** — play area + controls; wire `ResetAllButton` to `model.reset()`.
-5. **`*Colors.ts`** — sim palette (default + projector profiles).
-6. **Locale JSON** — title, strings, `a11y` keys; register locales in `init.ts`.
-7. **`public/icons/icon.svg`** → `npm run icons`; align theme color in `index.html` / vite config.
-8. **`tests/setup.ts`** — `init({ name: … })` must match `package.json` name after rename.
-9. **`AGENTS.md`** — sim-specific file map and pitfalls for AI assistants.
-
-## Common components (keep when forking)
-
-### HRDiagramPanel
-
-Every control panel should use `HRDiagramPanel` so projector-mode switching is automatic:
-
-```typescript
-import { HRDiagramPanel } from "../../common/HRDiagramPanel.js";
-const panel = new HRDiagramPanel(content);
-const panelWide = new HRDiagramPanel(content, { xMargin: 20 });
-```
-
-### TimeModel
-
-Compose into your screen model for animation (do not subclass `TimeModel`):
-
-```typescript
-export class MyModel implements TModel {
-  public readonly timer = new TimeModel();  // pass true to auto-play on startup
-
-  public step(dt: number): void {
-    this.timer.step(dt);
-    // physics uses this.timer.timeProperty.value
-  }
-  public reset(): void { this.timer.reset(); /* restore initial state */ }
-}
-```
-
-Wire `TimeControlNode` to `model.timer.isPlayingProperty` in the view.
-
-### HRDiagramButtonOptions
-
-Spread flat button options into every push/round button and `TimeControlNode` (see `AGENTS.md`).
-Use `HR_DIAGRAM_COMBO_BOX_OPTIONS` + `LIGHT_SURFACE_TEXT_FILL` for light control surfaces on dark panels.
-
-## Accessibility (reference implementation)
-
-The template is the **canonical OpenLyceum a11y reference**:
-
-- PDOM `accessibleName` on interactive nodes (prefer live `StringProperty`s).
-- `ExploreScreenSummaryContent` with a live `currentDetailsContent` `DerivedProperty` over model state.
-- Explicit `pdomOrder` + `ExploreKeyboardHelpContent`.
-- Strings under `a11y` in locale JSON → `StringManager.getExploreA11yStrings()`.
-
-Full checklist: [Baton/ACCESSIBILITY.md](https://github.com/OpenLyceum/Baton/blob/main/ACCESSIBILITY.md).
-
-## Testing (fleet layout — keep when forking)
-
-| Path | Purpose |
-|---|---|
-| `vitest.config.ts` | `happy-dom`; `setupFiles: ["./tests/setup.ts"]`; `execArgv: ["--expose-gc"]` |
-| `tests/setup.ts` | Canvas/AudioContext mocks + `init()` before SceneryStack imports |
-| `tests/TimeModel.test.ts` | **Replace** with real model/physics tests mirroring `src/` |
-| `tests/memory-leak.test.ts` | WeakRef + `forceGC` dispose regression |
-| `tests/fuzz/fuzz.spec.ts` | Optional Playwright smoke via `?fuzz` |
-
-Run `npm test`. Expand `memory-leak.test.ts` when adding runtime-created nodes or Property links.
-
-## Multi-screen simulations
-
-Default is single-screen. To add screens, see **`doc/multi-screen.md`**: per-screen folders mirroring
-`src/explore/`, `StringManager` screen-name getters, optional shared root model, a shared
-`src/common/HRDiagramScreenIcons.ts` module (`create{Screen}Icon()` factories wired as
-`homeScreenIcon` / `navigationBarIcon`), and register all screens in `main.ts`.
-
-## PWA
-
-After `npm run build`, the sim is installable offline via Workbox (`dist/manifest.webmanifest`).
-
-## Known template stubs (remove when forking)
-
-- `ExploreModel.step()` / `reset()` — empty placeholders until you add physics.
-- Placeholder play-area content in `ExploreScreenView` — replace with real UI.
-- `tests/TimeModel.test.ts` — sample only; add tests for your model under `tests/`.
+- `tests/model/` covers the conversions (Sun, isoradius lines, magnitudes, colours, white dwarf size),
+  the spectral-type parser, and the decoded catalogue: Sirius, Arcturus, Betelgeuse and Proxima land
+  at their literature values, and the census mix is checked.
+- `tests/memory-leak.test.ts`:
+  - `PointCloudNode` disposal;
+  - guide redraws and axis switches must not add listeners to global string Properties.
+- `tests/browser/layout.spec.ts` checks region overlap in every screen and locale.
+- `npm run test:fuzz` runs the pointer and keyboard fuzz.

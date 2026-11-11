@@ -1,13 +1,9 @@
 /**
  * StarSamplesScreen.ts
  *
- * The top-level Screen component. It wires together the model and view
- * factories and passes screen-level options (name, background color, tandem)
- * to the parent Screen class.
- *
- * Registered in the screens array in src/main.ts. Its home-screen and navigation-bar
- * icons come from createStarSamplesIcon() in src/common/HRDiagramScreenIcons.ts
- * (see doc/multi-screen.md).
+ * The Star Samples screen: the nearest and the brightest real stars on the HR diagram.
+ * Wires the model and view factories, the keyboard-help dialog and the screen icons
+ * (createStarSamplesIcon() in src/common/HRDiagramScreenIcons.ts). Registered in src/main.ts.
  */
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import type { ScreenOptions } from "scenerystack/sim";

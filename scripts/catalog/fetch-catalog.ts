@@ -406,61 +406,49 @@ type NamedStar = {
   brightest: boolean;
 };
 
-async function main(): Promise<void> {
-  const retrieved = new Date().toISOString().slice(0, 10);
+/** Looks up names: IAU proper names by HIP, HYG designations by HIP or by position. */
+class StarNamer {
+  private readonly iau: Map<number, string>;
+  private readonly hygByHip = new Map<number, HygStar>();
+  private readonly hygNear: HygStar[] = [];
+  private readonly reserved: Set<HygStar>;
+  private readonly claimed = new Set<HygStar>();
 
-  console.log("Reference tables…");
-  const dwarfs = parseMamajek(await fetchText(MAMAJEK_URL));
-  const whiteDwarfs = parseWhiteDwarfTable(await fetchText(WD_URL));
-  console.log(`  ${dwarfs.length} dwarf types, ${whiteDwarfs.length} white dwarf temperatures`);
-
-  console.log("Gaia census sample (GCNS, 1 in 10 within 100 pc)…");
-  const census = await gaiaQuery(CENSUS_QUERY);
-  census.sort((a, b) => num(a["dist_50"]) - num(b["dist_50"]));
-  console.log(`  ${census.length} stars`);
-
-  console.log("Nearest stars (GCNS within 10 pc)…");
-  const near = (await gaiaQuery(NEAREST_QUERY)).filter((r) => num(r["dist_50"]) * 1000 <= NEAREST_LIMIT_PC);
-  console.log(`  ${near.length} stars`);
-
-  console.log("Hipparcos (V < 3 or within 10 pc)…");
-  const hipparcos = await gaiaQuery(HIPPARCOS_QUERY);
-  console.log(`  ${hipparcos.length} stars`);
-
-  console.log("Names (IAU-CSN, HYG)…");
-  const iau = parseIauNames(await fetchText(IAU_CSN_URL));
-  const hygRows = parseCsv(await fetchText(HYG_URL));
-  const hygByHip = new Map<number, HygStar>();
-  const hygNear: HygStar[] = [];
-  for (const row of hygRows) {
-    const star: HygStar = {
-      designation: hygDesignation(row),
-      proper: row["proper"] || null,
-      ra: num(row["ra"]) * 15,
-      dec: num(row["dec"]),
-      mag: num(row["mag"]),
-    };
-    const hip = num(row["hip"]);
-    if (Number.isInteger(hip)) {
-      hygByHip.set(hip, star);
+  public constructor(iau: Map<number, string>, hygRows: Row[], hipparcos: Row[]) {
+    this.iau = iau;
+    for (const row of hygRows) {
+      const star: HygStar = {
+        designation: hygDesignation(row),
+        proper: row["proper"] || null,
+        ra: num(row["ra"]) * 15,
+        dec: num(row["dec"]),
+        mag: num(row["mag"]),
+      };
+      const hip = num(row["hip"]);
+      if (Number.isInteger(hip)) {
+        this.hygByHip.set(hip, star);
+      }
+      const dist = num(row["dist"]);
+      if (dist > 0 && dist < NEAREST_LIMIT_PC * 1.3) {
+        this.hygNear.push(star);
+      }
     }
-    const dist = num(row["dist"]);
-    if (dist > 0 && dist < NEAREST_LIMIT_PC * 1.3) {
-      hygNear.push(star);
-    }
+    // Stars with a Hipparcos entry here are reserved for the HIP link.
+    this.reserved = new Set(
+      hipparcos.map((r) => this.hygByHip.get(num(r["hip"]))).filter((star): star is HygStar => star !== undefined),
+    );
+  }
+
+  public byHip(hip: number): HygStar | null {
+    return this.hygByHip.get(hip) ?? null;
   }
 
   /**
    * HYG positions are J2000; move a Gaia J2016 position back with its proper motion and match within 15″.
-   * HYG's V must also fit the Gaia G (V − G runs from about 0 for blue stars to about 2.5 for M dwarfs), so a
-   * faint companion is never given its bright primary's name. Each HYG star is used at most once, and stars
-   * with a Hipparcos entry here are reserved for the HIP link.
+   * HYG's V must also fit the Gaia G (V − G runs from about 0 for blue stars to about 2.5 for M dwarfs), so
+   * a faint companion is never given its bright primary's name. Each HYG star is used at most once.
    */
-  const reservedHyg = new Set(
-    hipparcos.map((r) => hygByHip.get(num(r["hip"]))).filter((star): star is HygStar => star !== undefined),
-  );
-  const claimedHyg = new Set<HygStar>();
-  const hygMatch = (row: Row): HygStar | null => {
+  public byPosition(row: Row): HygStar | null {
     const years = 16;
     const decRad = (num(row["dec"]) * Math.PI) / 180;
     const ra = num(row["ra"]) - (num(row["pmra"]) * years) / 3.6e6 / Math.cos(decRad);
@@ -468,49 +456,47 @@ async function main(): Promise<void> {
     const g = num(row["phot_g_mean_mag"]);
     let best: HygStar | null = null;
     let bestSep = 15 / 3600;
-    for (const star of hygNear) {
-      if (!(star.mag > g - 0.7 && star.mag < g + 3.5) || reservedHyg.has(star) || claimedHyg.has(star)) {
-        continue;
-      }
-      const dRa = (star.ra - ra) * Math.cos(decRad);
-      const sep = Math.hypot(dRa, star.dec - dec);
-      if (sep < bestSep) {
+    for (const star of this.hygNear) {
+      const usable = star.mag > g - 0.7 && star.mag < g + 3.5 && !this.reserved.has(star) && !this.claimed.has(star);
+      const sep = Math.hypot((star.ra - ra) * Math.cos(decRad), star.dec - dec);
+      if (usable && sep < bestSep) {
         bestSep = sep;
         best = star;
       }
     }
     if (best) {
-      claimedHyg.add(best);
+      this.claimed.add(best);
     }
     return best;
-  };
+  }
 
-  const nameFor = (hip: number | null, gaia: string | null, hyg: HygStar | null): [string, string] => {
-    const designation =
-      hyg?.designation ?? (hip !== null ? `HIP ${hip}` : gaia !== null ? `Gaia DR3 ${gaia}` : "unknown");
-    const name = (hip !== null ? iau.get(hip) : undefined) ?? hyg?.proper ?? designation;
+  /** [name, designation]: IAU name, else HYG proper name, else the designation. */
+  public nameFor(hip: number | null, gaia: string | null, hyg: HygStar | null): [string, string] {
+    const fallback = hip !== null ? `HIP ${hip}` : gaia !== null ? `Gaia DR3 ${gaia}` : "unknown";
+    const designation = hyg?.designation ?? fallback;
+    const name = (hip !== null ? this.iau.get(hip) : undefined) ?? hyg?.proper ?? designation;
     return [name, designation];
-  };
+  }
+}
 
-  const spectralTypeOf = (hip: number, catalogued: string | undefined): string | null =>
-    SPECTRAL_TYPE_OVERRIDES[hip]?.type ?? (catalogued?.trim() || null);
+const spectralTypeOf = (hip: number, catalogued: string | undefined): string | null =>
+  SPECTRAL_TYPE_OVERRIDES[hip]?.type ?? (catalogued?.trim() || null);
 
-  const stars: NamedStar[] = [];
+/** Gaia stars within 10 pc with good, unsaturated photometry. Adds the HIP numbers it uses to `usedHip`. */
+function gaiaNearestStars(near: Row[], hipparcos: Row[], namer: StarNamer, usedHip: Set<number>): NamedStar[] {
   const hipRows = new Map(hipparcos.map((r) => [num(r["hip"]), r]));
   const hipBySource = new Map(hipparcos.filter((r) => r["source_id"]).map((r) => [r["source_id"], r]));
-  const usedHip = new Set<number>();
-
-  // Gaia stars within 10 pc with good, unsaturated photometry.
+  const stars: NamedStar[] = [];
   for (const row of near) {
     const g = num(row["phot_g_mean_mag"]);
     if (g < GAIA_BRIGHT_LIMIT_G || !goodPhotometry(row)) {
-      continue; // saturated or poorly measured: a Hipparcos counterpart (below) may still supply the star
+      continue; // saturated or poorly measured: a Hipparcos counterpart may still supply the star
     }
     const sourceId = row["source_id"] ?? "";
     const hipRow = hipBySource.get(sourceId) ?? hipRows.get(num(row["hip"]));
     const hip = hipRow ? num(hipRow["hip"]) : null;
-    const hyg = (hip !== null ? hygByHip.get(hip) : undefined) ?? hygMatch(row);
-    const [name, designation] = nameFor(hip, sourceId, hyg);
+    const hyg = (hip !== null ? namer.byHip(hip) : null) ?? namer.byPosition(row);
+    const [name, designation] = namer.nameFor(hip, sourceId, hyg);
     if (hip !== null) {
       usedHip.add(hip);
     }
@@ -532,15 +518,18 @@ async function main(): Promise<void> {
       brightest: v < BRIGHTEST_LIMIT_V,
     });
   }
+  return stars;
+}
 
-  // Hipparcos stars: the brightest, plus nearby stars Gaia couldn't measure well.
-  // Distance comes from the Gaia DR3 parallax when it is good, otherwise from Hipparcos;
-  // either must have parallax / error ≥ 10 for the star to count as nearest.
+/**
+ * Hipparcos stars: the brightest, plus nearby stars Gaia couldn't measure well. Distance comes from the
+ * Gaia DR3 parallax when it is good, otherwise from Hipparcos; either must have parallax / error ≥ 10 for
+ * the star to count as nearest.
+ */
+function hipparcosStars(hipparcos: Row[], namer: StarNamer, usedHip: Set<number>): NamedStar[] {
+  const stars: NamedStar[] = [];
   for (const row of hipparcos) {
     const hip = num(row["hip"]);
-    if (usedHip.has(hip)) {
-      continue;
-    }
     const gaiaGood = num(row["gaia_plx_snr"]) >= MIN_PARALLAX_OVER_ERROR;
     const hipGood = num(row["plx"]) / num(row["e_plx"]) >= MIN_PARALLAX_OVER_ERROR;
     const plx = gaiaGood ? num(row["gaia_plx"]) : num(row["plx"]);
@@ -548,10 +537,10 @@ async function main(): Promise<void> {
     const distance = plx > 0 ? 1000 / plx : Number.NaN;
     const nearest = (gaiaGood || hipGood) && distance <= NEAREST_LIMIT_PC;
     const brightest = v < BRIGHTEST_LIMIT_V;
-    if (!(nearest || brightest)) {
+    if (usedHip.has(hip) || !(nearest || brightest)) {
       continue;
     }
-    const [name, designation] = nameFor(hip, row["source_id"] || null, hygByHip.get(hip) ?? null);
+    const [name, designation] = namer.nameFor(hip, row["source_id"] || null, namer.byHip(hip));
     const spType = spectralTypeOf(hip, row["sptype"]);
     stars.push({
       name,
@@ -570,21 +559,26 @@ async function main(): Promise<void> {
       brightest,
     });
   }
-  stars.sort((a, b) => (a.distance ?? 1e9) - (b.distance ?? 1e9));
+  return stars;
+}
 
-  const credit = {
-    retrieved,
-    sources: [
-      "Gaia Catalogue of Nearby Stars (Gaia Collaboration, Smart et al. 2021), ESA/Gaia/DPAC",
-      "Hipparcos catalogue (ESA 1997) and new reduction (van Leeuwen 2007), via the ESA Gaia archive",
-      "IAU Catalog of Star Names (WGSN)",
-      "HYG database v4.1 (astronexus, CC BY-SA 4.0)",
-    ],
-  };
+const SOURCES = [
+  "Gaia Catalogue of Nearby Stars (Gaia Collaboration, Smart et al. 2021), ESA/Gaia/DPAC",
+  "Hipparcos catalogue (ESA 1997) and new reduction (van Leeuwen 2007), via the ESA Gaia archive",
+  "IAU Catalog of Star Names (WGSN)",
+  "HYG database v4.1 (astronexus, CC BY-SA 4.0)",
+];
 
+function writeOutputs(
+  retrieved: string,
+  census: Row[],
+  stars: NamedStar[],
+  dwarfs: ReturnType<typeof parseMamajek>,
+  whiteDwarfs: ReturnType<typeof parseWhiteDwarfTable>,
+): void {
   write("gaiaCensus.json", {
-    ...credit,
-    sources: [credit.sources[0]],
+    retrieved,
+    sources: SOURCES.slice(0, 1),
     query: CENSUS_QUERY,
     sampling: `random 1 in ${SAMPLE_MODULUS} (source_id mod ${SAMPLE_MODULUS} = 0)`,
     sampleFraction: 1 / SAMPLE_MODULUS,
@@ -597,7 +591,8 @@ async function main(): Promise<void> {
   write(
     "namedStars.json",
     {
-      ...credit,
+      retrieved,
+      sources: SOURCES,
       queries: [NEAREST_QUERY, HIPPARCOS_QUERY],
       spectralTypeOverrides: Object.values(SPECTRAL_TYPE_OVERRIDES).map((o) => o.reason),
       nearestLimitPc: NEAREST_LIMIT_PC,
@@ -626,21 +621,49 @@ async function main(): Promise<void> {
     },
     true,
   );
+}
 
-  const nearest = stars.filter((s) => s.nearest);
-  const brightest = stars.filter((s) => s.brightest);
+async function main(): Promise<void> {
+  const retrieved = new Date().toISOString().slice(0, 10);
+
+  console.log("Reference tables…");
+  const dwarfs = parseMamajek(await fetchText(MAMAJEK_URL));
+  const whiteDwarfs = parseWhiteDwarfTable(await fetchText(WD_URL));
+  console.log(`  ${dwarfs.length} dwarf types, ${whiteDwarfs.length} white dwarf temperatures`);
+
+  console.log("Gaia census sample (GCNS, 1 in 10 within 100 pc)…");
+  const census = await gaiaQuery(CENSUS_QUERY);
+  census.sort((a, b) => num(a["dist_50"]) - num(b["dist_50"]));
+  console.log(`  ${census.length} stars`);
+
+  console.log("Nearest stars (GCNS within 10 pc)…");
+  const near = (await gaiaQuery(NEAREST_QUERY)).filter((r) => num(r["dist_50"]) * 1000 <= NEAREST_LIMIT_PC);
+  console.log(`  ${near.length} stars`);
+
+  console.log("Hipparcos (V < 3 or within 10 pc)…");
+  const hipparcos = await gaiaQuery(HIPPARCOS_QUERY);
+  console.log(`  ${hipparcos.length} stars`);
+
+  console.log("Names (IAU-CSN, HYG)…");
+  const namer = new StarNamer(
+    parseIauNames(await fetchText(IAU_CSN_URL)),
+    parseCsv(await fetchText(HYG_URL)),
+    hipparcos,
+  );
+
+  const usedHip = new Set<number>();
+  const stars = [...gaiaNearestStars(near, hipparcos, namer, usedHip), ...hipparcosStars(hipparcos, namer, usedHip)];
+  stars.sort((a, b) => (a.distance ?? 1e9) - (b.distance ?? 1e9));
+
+  writeOutputs(retrieved, census, stars, dwarfs, whiteDwarfs);
+
   console.log("\nSummary");
-  console.log(
-    `  census sample: ${census.length} (white dwarfs ${census.filter((r) => num(r["wd_prob"]) > 0.5).length})`,
-  );
-  console.log(`  nearest (≤ ${NEAREST_LIMIT_PC} pc): ${nearest.length}`);
-  console.log(`  brightest (V < ${BRIGHTEST_LIMIT_V}): ${brightest.length}`);
-  console.log(
-    `  both: ${stars
-      .filter((s) => s.nearest && s.brightest)
-      .map((s) => s.name)
-      .join(", ")}`,
-  );
+  const whiteDwarfCount = census.filter((r) => num(r["wd_prob"]) > 0.5).length;
+  console.log(`  census sample: ${census.length} (white dwarfs ${whiteDwarfCount})`);
+  console.log(`  nearest (≤ ${NEAREST_LIMIT_PC} pc): ${stars.filter((s) => s.nearest).length}`);
+  console.log(`  brightest (V < ${BRIGHTEST_LIMIT_V}): ${stars.filter((s) => s.brightest).length}`);
+  const both = stars.filter((s) => s.nearest && s.brightest).map((s) => s.name);
+  console.log(`  both: ${both.join(", ")}`);
 }
 
 /** Writes JSON with one top-level key per line (and one row per line when rowsPerLine), so diffs stay readable. */

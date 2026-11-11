@@ -27,9 +27,9 @@ export class HRDiagramPreferencesNode extends VBox {
       fill: HRDiagramColors.controlSurfaceTextColorProperty,
     });
 
-    const exampleToggleCheckbox = new Checkbox(
-      preferencesModel.exampleToggleProperty,
-      new Text(prefStrings.exampleToggleStringProperty, {
+    const showEquationsCheckbox = new Checkbox(
+      preferencesModel.showEquationsProperty,
+      new Text(prefStrings.showEquationsStringProperty, {
         font: new PhetFont(14),
         fill: HRDiagramColors.controlSurfaceTextColorProperty,
       }),
@@ -37,14 +37,14 @@ export class HRDiagramPreferencesNode extends VBox {
         checkboxColor: HRDiagramColors.controlSurfaceTextColorProperty,
         checkboxColorBackground: HRDiagramColors.controlSurfaceColorProperty,
         spacing: 8,
-        ...(tandem && { tandem: tandem.createTandem("exampleToggleCheckbox") }),
+        ...(tandem && { tandem: tandem.createTandem("showEquationsCheckbox") }),
       },
     );
 
     super({
       align: "left",
       spacing: 12,
-      children: [header, exampleToggleCheckbox],
+      children: [header, showEquationsCheckbox],
     });
   }
 }

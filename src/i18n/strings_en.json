@@ -75,7 +75,8 @@
   "explore": {
     "starTitle": "Your star",
     "temperature": "Temperature",
-    "luminosity": "Luminosity"
+    "luminosity": "Luminosity",
+    "radiusEquation": "R = √L ÷ (T / 5772 K)<sup>2</sup>   (L in L<sub>☉</sub>, R in R<sub>☉</sub>)"
   },
   "radius": {
     "compareTitle": "Compare star B with star A",
@@ -192,6 +193,6 @@
   },
   "preferences": {
     "title": "Simulation",
-    "exampleToggle": "Example Toggle"
+    "showEquations": "Show equations"
   }
 }

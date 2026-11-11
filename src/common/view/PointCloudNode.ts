@@ -34,6 +34,34 @@ export type PointStyle = {
   readonly alpha: number;
   /** Optional outline colour. */
   readonly stroke?: () => string;
+  /** Marker shape (circle by default), so colour is never the only cue. */
+  readonly shape?: MarkerShape;
+};
+
+export type MarkerShape = "circle" | "diamond" | "square";
+
+/** Adds one marker of the given shape and radius to the current canvas path. */
+export const traceMarker = (
+  context: CanvasRenderingContext2D,
+  shape: MarkerShape,
+  x: number,
+  y: number,
+  r: number,
+): void => {
+  if (shape === "diamond") {
+    const d = r * 1.3;
+    context.moveTo(x, y - d);
+    context.lineTo(x + d, y);
+    context.lineTo(x, y + d);
+    context.lineTo(x - d, y);
+    context.closePath();
+  } else if (shape === "square") {
+    const d = r * 0.95;
+    context.rect(x - d, y - d, 2 * d, 2 * d);
+  } else {
+    context.moveTo(x + r, y);
+    context.arc(x, y, r, 0, 2 * Math.PI);
+  }
 };
 
 export class PointCloudNode extends CanvasNode {
@@ -101,8 +129,7 @@ export class PointCloudNode extends CanvasNode {
         const x = this.viewXs[k] ?? Number.NaN;
         const y = this.viewYs[k] ?? Number.NaN;
         if (groups[k] === group && Number.isFinite(x) && Number.isFinite(y)) {
-          context.moveTo(x + style.radius, y);
-          context.arc(x, y, style.radius, 0, 2 * Math.PI);
+          traceMarker(context, style.shape ?? "circle", x, y, style.radius);
         }
       }
       context.globalAlpha = style.alpha;

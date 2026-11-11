@@ -11,7 +11,7 @@
  * 2. If it should also be user-editable at runtime, surface it as a preference
  *    in HRDiagramPreferencesModel (initialize that Property from this query parameter).
  *
- * Usage: append e.g. `?exampleToggle=true` to the sim URL.
+ * Usage: append e.g. `?showEquations=false` to the sim URL.
  */
 
 import { logGlobal } from "scenerystack/phet-core";
@@ -20,12 +20,13 @@ import HRDiagramNamespace from "../HRDiagramNamespace.js";
 
 const hRDiagramQueryParameters = QueryStringMachine.getAll({
   /**
-   * Example public boolean parameter. Replace with real sim-specific parameters,
-   * or remove if the sim has none.
+   * Shows the Stefan–Boltzmann relations: R = √L ÷ (T/T☉)² under the Explore readouts, and the rule
+   * and worked ratio on the Radius screen. On by default (the sim is pitched at intro college);
+   * `?showEquations=false` hides them for younger students.
    */
-  exampleToggle: {
+  showEquations: {
     type: "boolean",
-    defaultValue: false,
+    defaultValue: true,
     public: true,
   },
 });
