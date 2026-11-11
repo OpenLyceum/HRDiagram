@@ -1,9 +1,9 @@
 /**
- * SimPreferencesModel.ts
+ * HRDiagramPreferencesModel.ts
  *
  * Model for the simulation-specific preferences shown in Preferences →
  * Simulation. Each preference Property takes its initial value from the
- * corresponding query parameter in simQueryParameters.
+ * corresponding query parameter in hRDiagramQueryParameters.
  *
  * Remove the example preference (and its query parameter / UI control) if the
  * sim has no sim-specific preferences.
@@ -11,16 +11,16 @@
 
 import { BooleanProperty } from "scenerystack/axon";
 import type { Tandem } from "scenerystack/tandem";
-import SimNamespace from "../SimNamespace.js";
-import simQueryParameters from "./simQueryParameters.js";
+import HRDiagramNamespace from "../HRDiagramNamespace.js";
+import hRDiagramQueryParameters from "./hRDiagramQueryParameters.js";
 
-export class SimPreferencesModel {
+export class HRDiagramPreferencesModel {
   /** Example preference; initial value comes from the `exampleToggle` query parameter. */
   public readonly exampleToggleProperty: BooleanProperty;
 
   public constructor(tandem?: Tandem) {
     this.exampleToggleProperty = new BooleanProperty(
-      simQueryParameters.exampleToggle,
+      hRDiagramQueryParameters.exampleToggle,
       tandem ? { tandem: tandem.createTandem("exampleToggleProperty") } : undefined,
     );
   }
@@ -30,4 +30,4 @@ export class SimPreferencesModel {
   }
 }
 
-SimNamespace.register("SimPreferencesModel", SimPreferencesModel);
+HRDiagramNamespace.register("HRDiagramPreferencesModel", HRDiagramPreferencesModel);

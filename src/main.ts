@@ -21,24 +21,41 @@ import "./brand.js";
 
 import { onReadyToLaunch, PreferencesModel, Sim } from "scenerystack/sim";
 import { Tandem } from "scenerystack/tandem";
+import { ExploreScreen } from "./explore/ExploreScreen.js";
+import { GaiaCensusScreen } from "./gaia-census/GaiaCensusScreen.js";
+import HRDiagramColors from "./HRDiagramColors.js";
 import { StringManager } from "./i18n/StringManager.js";
-import { SimPreferencesModel } from "./preferences/SimPreferencesModel.js";
-import { SimPreferencesNode } from "./preferences/SimPreferencesNode.js";
-import SimColors from "./SimColors.js";
-import { SimScreen } from "./sim-screen/SimScreen.js";
+import { HRDiagramPreferencesModel } from "./preferences/HRDiagramPreferencesModel.js";
+import { HRDiagramPreferencesNode } from "./preferences/HRDiagramPreferencesNode.js";
+import { RadiusScreen } from "./radius/RadiusScreen.js";
+import { StarSamplesScreen } from "./star-samples/StarSamplesScreen.js";
 
 onReadyToLaunch(() => {
   const stringManager = StringManager.getInstance();
 
-  // Simulation-specific preferences; initial values come from simQueryParameters.
-  const simPreferences = new SimPreferencesModel(Tandem.ROOT.createTandem("preferences"));
+  // Simulation-specific preferences; initial values come from hRDiagramQueryParameters.
+  const simPreferences = new HRDiagramPreferencesModel(Tandem.ROOT.createTandem("preferences"));
 
   const screens = [
-    new SimScreen({
-      // The screen name Property updates automatically when the locale changes
-      name: stringManager.getScreenNames().simStringProperty,
-      tandem: Tandem.ROOT.createTandem("simScreen"),
-      backgroundColorProperty: SimColors.backgroundColorProperty,
+    new ExploreScreen({
+      name: stringManager.getScreenNames().exploreStringProperty,
+      tandem: Tandem.ROOT.createTandem("exploreScreen"),
+      backgroundColorProperty: HRDiagramColors.backgroundColorProperty,
+    }),
+    new RadiusScreen({
+      name: stringManager.getScreenNames().radiusStringProperty,
+      tandem: Tandem.ROOT.createTandem("radiusScreen"),
+      backgroundColorProperty: HRDiagramColors.backgroundColorProperty,
+    }),
+    new StarSamplesScreen({
+      name: stringManager.getScreenNames().starSamplesStringProperty,
+      tandem: Tandem.ROOT.createTandem("starSamplesScreen"),
+      backgroundColorProperty: HRDiagramColors.backgroundColorProperty,
+    }),
+    new GaiaCensusScreen({
+      name: stringManager.getScreenNames().gaiaCensusStringProperty,
+      tandem: Tandem.ROOT.createTandem("gaiaCensusScreen"),
+      backgroundColorProperty: HRDiagramColors.backgroundColorProperty,
     }),
   ];
 
@@ -53,7 +70,7 @@ onReadyToLaunch(() => {
       simulationOptions: {
         customPreferences: [
           {
-            createContent: (tandem: Tandem) => new SimPreferencesNode(simPreferences, tandem),
+            createContent: (tandem: Tandem) => new HRDiagramPreferencesNode(simPreferences, tandem),
           },
         ],
       },
