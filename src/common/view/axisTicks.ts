@@ -73,10 +73,7 @@ export const ticksFor = (quantity: AxisQuantity): Tick[] => {
     case AxisQuantity.COLOR_INDEX:
       return linearTicks(-0.4, 2.2, 0.4, 0.2, 1);
     case AxisQuantity.BP_RP:
-      return [
-        ...linearTicks(0, 5, 1, 0.5, 0),
-        { value: -0.5, label: null, major: false },
-      ];
+      return [...linearTicks(0, 5, 1, 0.5, 0), { value: -0.5, label: null, major: false }];
     case AxisQuantity.ABSOLUTE_MAGNITUDE:
       return linearTicks(-10, 20, 5, 1, 0);
     default:
