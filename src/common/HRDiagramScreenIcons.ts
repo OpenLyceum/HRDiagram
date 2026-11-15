@@ -13,9 +13,10 @@ import { Shape } from "scenerystack/kite";
 import { Circle, Node, Path, RadialGradient, Rectangle } from "scenerystack/scenery";
 import { ScreenIcon } from "scenerystack/sim";
 import HRDiagramColors from "../HRDiagramColors.js";
+import { SCREEN_ICONS } from "../HRDiagramConstants.js";
 
-const W = 548;
-const H = 373;
+const W = SCREEN_ICONS.WIDTH;
+const H = SCREEN_ICONS.HEIGHT;
 
 /** A small deterministic pseudo-random generator (LCG), so icons are identical on every load. */
 const seeded = (seed: number): (() => number) => {

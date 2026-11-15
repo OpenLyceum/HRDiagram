@@ -16,15 +16,10 @@ import { Vector2 } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
 import { Node, type NodeOptions, Path, Rectangle, RichText, Text } from "scenerystack/scenery";
 import HRDiagramColors from "../../HRDiagramColors.js";
-import { FONTS } from "../../HRDiagramConstants.js";
+import { CHART_FRAME, FONTS } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { AxisQuantity, PlottableStar } from "../model/AxisQuantity.js";
 import { ticksFor } from "./axisTicks.js";
-
-const TICK_LENGTH = 5;
-const MINOR_TICK_LENGTH = 3;
-const LABEL_GAP = 3;
-const TITLE_GAP = 6;
 
 /** Localized axis title of a quantity. */
 export const axisTitleProperty = (quantity: AxisQuantity): TReadOnlyProperty<string> => {
@@ -71,8 +66,14 @@ export class HRChartNode extends Node {
       fill: HRDiagramColors.chartBackgroundColorProperty,
     });
     const frame = new Rectangle(0, 0, viewWidth, viewHeight, { stroke: HRDiagramColors.axisColorProperty });
-    const grid = new Path(null, { stroke: HRDiagramColors.gridColorProperty, lineWidth: 1 });
-    const tickMarks = new Path(null, { stroke: HRDiagramColors.axisColorProperty, lineWidth: 1 });
+    const grid = new Path(null, {
+      stroke: HRDiagramColors.gridColorProperty,
+      lineWidth: CHART_FRAME.LINE_WIDTH,
+    });
+    const tickMarks = new Path(null, {
+      stroke: HRDiagramColors.axisColorProperty,
+      lineWidth: CHART_FRAME.LINE_WIDTH,
+    });
     const xLabels = new Node();
     const yLabels = new Node();
     const xTitle = new RichText("", { font: FONTS.AXIS_TITLE, fill: HRDiagramColors.textColorProperty });
@@ -88,9 +89,10 @@ export class HRChartNode extends Node {
       xTitle.maxWidth = viewWidth;
       yTitle.maxWidth = viewHeight;
       xTitle.centerX = viewWidth / 2;
-      xTitle.top = (xLabels.bounds.isFinite() ? xLabels.bottom : viewHeight + TICK_LENGTH) + TITLE_GAP;
+      xTitle.top =
+        (xLabels.bounds.isFinite() ? xLabels.bottom : viewHeight + CHART_FRAME.TICK_LENGTH) + CHART_FRAME.TITLE_GAP;
       yTitle.centerY = viewHeight / 2;
-      yTitle.right = (yLabels.bounds.isFinite() ? yLabels.left : -TICK_LENGTH) - TITLE_GAP;
+      yTitle.right = (yLabels.bounds.isFinite() ? yLabels.left : -CHART_FRAME.TICK_LENGTH) - CHART_FRAME.TITLE_GAP;
     };
     xTitle.localBoundsProperty.lazyLink(placeTitles);
     yTitle.localBoundsProperty.lazyLink(placeTitles);
@@ -147,7 +149,7 @@ export class HRChartNode extends Node {
       if (!(at >= -0.5 && at <= extent + 0.5)) {
         continue;
       }
-      const length = tick.major ? TICK_LENGTH : MINOR_TICK_LENGTH;
+      const length = tick.major ? CHART_FRAME.TICK_LENGTH : CHART_FRAME.MINOR_TICK_LENGTH;
       if (horizontal) {
         if (tick.major) {
           gridShape.moveTo(at, 0).lineTo(at, this.viewHeight);
@@ -163,9 +165,9 @@ export class HRChartNode extends Node {
         const text = new Text(tick.label, { font: FONTS.TICK, fill: HRDiagramColors.axisColorProperty });
         if (horizontal) {
           text.centerX = at;
-          text.top = this.viewHeight + TICK_LENGTH + LABEL_GAP;
+          text.top = this.viewHeight + CHART_FRAME.TICK_LENGTH + CHART_FRAME.LABEL_GAP;
         } else {
-          text.right = -TICK_LENGTH - LABEL_GAP;
+          text.right = -CHART_FRAME.TICK_LENGTH - CHART_FRAME.LABEL_GAP;
           text.centerY = at;
         }
         labels.push(text);

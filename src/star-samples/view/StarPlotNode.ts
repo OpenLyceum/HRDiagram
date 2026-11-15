@@ -16,11 +16,8 @@ import { formatValue } from "../../common/view/format.js";
 import type { HRChartNode } from "../../common/view/HRChartNode.js";
 import { PointCloudNode, type PointStyle } from "../../common/view/PointCloudNode.js";
 import HRDiagramColors from "../../HRDiagramColors.js";
-import { FONTS, PICK_DISTANCE } from "../../HRDiagramConstants.js";
+import { FONTS, PICK_DISTANCE, STAR_SAMPLE_MARKERS } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
-
-const DOT_RADIUS = 3.5;
-const RING_RADIUS = 8;
 
 /** Point groups, painted in this order. */
 const NEAREST_GROUP = 0;
@@ -31,22 +28,22 @@ const BOTH_GROUP = 2;
 export const SAMPLE_STYLES: PointStyle[] = [
   {
     css: () => HRDiagramColors.nearestStarColorProperty.value.toCSS(),
-    radius: DOT_RADIUS,
-    alpha: 0.9,
+    radius: STAR_SAMPLE_MARKERS.DOT_RADIUS,
+    alpha: STAR_SAMPLE_MARKERS.ALPHA,
     stroke: () => "rgba(0,0,0,0.6)",
     shape: "circle",
   },
   {
     css: () => HRDiagramColors.brightestStarColorProperty.value.toCSS(),
-    radius: DOT_RADIUS,
-    alpha: 0.9,
+    radius: STAR_SAMPLE_MARKERS.DOT_RADIUS,
+    alpha: STAR_SAMPLE_MARKERS.ALPHA,
     stroke: () => "rgba(0,0,0,0.6)",
     shape: "diamond",
   },
   {
     css: () => HRDiagramColors.bothStarColorProperty.value.toCSS(),
-    radius: DOT_RADIUS + 1,
-    alpha: 1,
+    radius: STAR_SAMPLE_MARKERS.DOT_RADIUS + STAR_SAMPLE_MARKERS.BOTH_RADIUS_EXTRA,
+    alpha: STAR_SAMPLE_MARKERS.BOTH_ALPHA,
     stroke: () => "rgba(0,0,0,0.6)",
     shape: "square",
   },
@@ -71,9 +68,9 @@ export class StarPlotNode extends Node {
     });
 
     const cloud = new PointCloudNode(chart.chartTransform);
-    const ring = new Circle(RING_RADIUS, {
+    const ring = new Circle(STAR_SAMPLE_MARKERS.RING_RADIUS, {
       stroke: HRDiagramColors.selectionColorProperty,
-      lineWidth: 2,
+      lineWidth: STAR_SAMPLE_MARKERS.RING_LINE_WIDTH,
       visible: false,
       pickable: false,
     });
@@ -82,14 +79,14 @@ export class StarPlotNode extends Node {
       fill: HRDiagramColors.selectionColorProperty,
       visible: false,
       pickable: false,
-      maxWidth: 200,
+      maxWidth: STAR_SAMPLE_MARKERS.LABEL_MAX_WIDTH,
     });
     const selectedLabel = new Text("", {
       font: FONTS.LABEL,
       fill: HRDiagramColors.selectionColorProperty,
       visible: false,
       pickable: false,
-      maxWidth: 200,
+      maxWidth: STAR_SAMPLE_MARKERS.LABEL_MAX_WIDTH,
     });
     const hitArea = new Rectangle(0, 0, chart.viewWidth, chart.viewHeight, { cursor: "crosshair" });
     this.children = [hitArea, cloud, ring, selectedLabel, hoverLabel];
@@ -97,13 +94,13 @@ export class StarPlotNode extends Node {
     let drawn: readonly Star[] = [];
 
     const labelBeside = (label: Text, x: number, y: number): void => {
-      label.left = x + RING_RADIUS + 3;
-      label.bottom = y - 2;
-      if (label.right > chart.viewWidth - 4) {
-        label.right = x - RING_RADIUS - 3;
+      label.left = x + STAR_SAMPLE_MARKERS.RING_RADIUS + STAR_SAMPLE_MARKERS.LABEL_X_GAP;
+      label.bottom = y - STAR_SAMPLE_MARKERS.LABEL_Y_GAP;
+      if (label.right > chart.viewWidth - STAR_SAMPLE_MARKERS.LABEL_EDGE_INSET) {
+        label.right = x - STAR_SAMPLE_MARKERS.RING_RADIUS - STAR_SAMPLE_MARKERS.LABEL_X_GAP;
       }
-      if (label.top < 2) {
-        label.top = y + 4;
+      if (label.top < STAR_SAMPLE_MARKERS.LABEL_Y_GAP) {
+        label.top = y + STAR_SAMPLE_MARKERS.LABEL_FLIP_TOP;
       }
     };
 

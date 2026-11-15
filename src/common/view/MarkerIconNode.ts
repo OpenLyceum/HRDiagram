@@ -6,13 +6,14 @@
 
 import { Bounds2 } from "scenerystack/dot";
 import { CanvasNode } from "scenerystack/scenery";
+import { POINT_CLOUD } from "../../HRDiagramConstants.js";
 import { type PointStyle, traceMarker } from "./PointCloudNode.js";
 
 export class MarkerIconNode extends CanvasNode {
   private readonly style: PointStyle;
 
   public constructor(style: PointStyle) {
-    const size = 2 * style.radius * 1.4 + 2;
+    const size = 2 * style.radius * POINT_CLOUD.ICON_PAD_FACTOR + POINT_CLOUD.ICON_PAD;
     super({ canvasBounds: new Bounds2(0, 0, size, size) });
     this.style = style;
     this.invalidatePaint();
@@ -25,7 +26,7 @@ export class MarkerIconNode extends CanvasNode {
     context.fillStyle = this.style.css();
     context.fill();
     if (this.style.stroke) {
-      context.lineWidth = 0.6;
+      context.lineWidth = POINT_CLOUD.STROKE_WIDTH;
       context.strokeStyle = this.style.stroke();
       context.stroke();
     }

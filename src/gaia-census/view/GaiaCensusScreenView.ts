@@ -29,7 +29,7 @@ import { HIDDEN_GROUP, PointCloudNode, type PointStyle } from "../../common/view
 import { chartStripAndPanelsLayout, placeInRegion } from "../../common/view/ScreenLayout.js";
 import { SunMarkerNode } from "../../common/view/SunMarkerNode.js";
 import HRDiagramColors from "../../HRDiagramColors.js";
-import { FONTS } from "../../HRDiagramConstants.js";
+import { CHART, CONTROLS, FONTS, GAIA, GAIA_SLIDERS, PANEL } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import { ColorBy } from "../model/ColorBy.js";
 import type { GaiaCensusModel } from "../model/GaiaCensusModel.js";
@@ -37,12 +37,7 @@ import { GaiaCensusScreenSummaryContent } from "./GaiaCensusScreenSummaryContent
 
 export type GaiaCensusScreenViewOptions = ScreenViewOptions;
 
-const CHART_WIDTH = 560;
-const CHART_HEIGHT = 420;
-const PANEL_CONTENT_WIDTH = 300;
-const SLIDER_TRACK_WIDTH = 260;
-const BAR_MAX_WIDTH = 70;
-const POINT_RADIUS = 1.4;
+const PANEL_CONTENT_WIDTH: number = PANEL.CONTENT_WIDTH;
 
 /** Kinds of star in drawing order: the commonest first, so rarer kinds land on top. */
 const DRAW_ORDER = [
@@ -61,8 +56,7 @@ const CATEGORY_COLORS = new Map([
   [StarCategory.WHITE_DWARF, HRDiagramColors.whiteDwarfColorProperty],
 ]);
 
-/** Distance bins (pc) and their colours, near (warm) to far (cool); legible on dark and light charts. */
-const DISTANCE_BIN_WIDTH = 20;
+/** Distance-bin colours, near (warm) to far (cool); legible on dark and light charts. */
 const DISTANCE_COLORS = ["#ffd23f", "#ff9f43", "#ee5a6f", "#b45fd6", "#5b8cff"];
 
 export class GaiaCensusScreenView extends ScreenView {
@@ -89,8 +83,8 @@ export class GaiaCensusScreenView extends ScreenView {
     const chart = new HRChartNode(
       model.settings.xQuantityProperty,
       model.settings.yQuantityProperty,
-      CHART_WIDTH,
-      CHART_HEIGHT,
+      CHART.WIDTH,
+      CHART.SHORT_HEIGHT,
     );
     const cloud = new PointCloudNode(chart.chartTransform);
     chart.plotLayer.children = [cloud, new HROverlayNode(chart, model.settings), new SunMarkerNode(chart)];
@@ -120,13 +114,13 @@ export class GaiaCensusScreenView extends ScreenView {
     };
     const kindStyles: PointStyle[] = DRAW_ORDER.map((category) => ({
       css: () => (CATEGORY_COLORS.get(category) ?? HRDiagramColors.textColorProperty).value.toCSS(),
-      radius: category === StarCategory.DWARF ? POINT_RADIUS : POINT_RADIUS + 0.4,
-      alpha: category === StarCategory.DWARF ? 0.6 : 0.85,
+      radius: category === StarCategory.DWARF ? GAIA.POINT_RADIUS : GAIA.POINT_RADIUS + GAIA.GIANT_RADIUS_EXTRA,
+      alpha: category === StarCategory.DWARF ? GAIA.DWARF_ALPHA : GAIA.OTHER_ALPHA,
     }));
     const distanceStyles: PointStyle[] = DISTANCE_COLORS.map((color) => ({
       css: () => color,
-      radius: POINT_RADIUS,
-      alpha: 0.6,
+      radius: GAIA.POINT_RADIUS,
+      alpha: GAIA.DWARF_ALPHA,
     }));
     const redraw = (): void => {
       const { mask } = model.selectionProperty.value;
@@ -139,7 +133,10 @@ export class GaiaCensusScreenView extends ScreenView {
           groups[i] = DRAW_ORDER.indexOf(census.categories[i] as StarCategory);
         } else {
           // Far stars first, so the nearer (fewer) stars land on top.
-          const bin = Math.min(DISTANCE_COLORS.length - 1, Math.floor((census.distance[i] ?? 0) / DISTANCE_BIN_WIDTH));
+          const bin = Math.min(
+            DISTANCE_COLORS.length - 1,
+            Math.floor((census.distance[i] ?? 0) / GAIA.DISTANCE_BIN_WIDTH),
+          );
           groups[i] = DISTANCE_COLORS.length - 1 - bin;
         }
       }
@@ -172,7 +169,7 @@ export class GaiaCensusScreenView extends ScreenView {
       new HSlider(property, property.range, {
         ...HR_DIAGRAM_SLIDER_OPTIONS,
         ...steps,
-        trackSize: HR_DIAGRAM_SLIDER_OPTIONS.trackSize.copy().setWidth(SLIDER_TRACK_WIDTH),
+        trackSize: HR_DIAGRAM_SLIDER_OPTIONS.trackSize.copy().setWidth(GAIA.SLIDER_TRACK_WIDTH),
         accessibleName: name,
         constrainValue: (value: number) => roundToInterval(value, 10 ** -decimals),
         pdomCreateAriaValueText: (value: number | null) =>
@@ -185,17 +182,25 @@ export class GaiaCensusScreenView extends ScreenView {
       strings.distanceLimitStringProperty,
       a11y.controls.distanceValuePatternStringProperty,
       0,
-      { keyboardStep: 5, shiftKeyboardStep: 1, pageKeyboardStep: 20 },
+      {
+        keyboardStep: GAIA_SLIDERS.DISTANCE_KEYBOARD_STEP,
+        shiftKeyboardStep: GAIA_SLIDERS.DISTANCE_SHIFT_STEP,
+        pageKeyboardStep: GAIA_SLIDERS.DISTANCE_PAGE_STEP,
+      },
     );
     const brightnessSlider = slider(
       model.brightnessLimitProperty,
       strings.brightnessLimitStringProperty,
       a11y.controls.magnitudeValuePatternStringProperty,
       1,
-      { keyboardStep: 0.5, shiftKeyboardStep: 0.1, pageKeyboardStep: 2 },
+      {
+        keyboardStep: GAIA_SLIDERS.BRIGHTNESS_KEYBOARD_STEP,
+        shiftKeyboardStep: GAIA_SLIDERS.BRIGHTNESS_SHIFT_STEP,
+        pageKeyboardStep: GAIA_SLIDERS.BRIGHTNESS_PAGE_STEP,
+      },
       model.brightnessLimitEnabledProperty,
     );
-    brightnessSlider.addMajorTick(6);
+    brightnessSlider.addMajorTick(GAIA.NAKED_EYE_LIMIT_V);
     const brightnessCheckbox = new Checkbox(
       model.brightnessLimitEnabledProperty,
       new HBox({
@@ -234,7 +239,7 @@ export class GaiaCensusScreenView extends ScreenView {
           textNode(strings.nakedEyeStringProperty, PANEL_CONTENT_WIDTH, FONTS.SMALL),
         ],
       }),
-      { minWidth: PANEL_CONTENT_WIDTH + 24 },
+      { minWidth: PANEL_CONTENT_WIDTH + PANEL.MIN_WIDTH_INSET },
     );
 
     // ── What kinds of star? ───────────────────────────────────────────────────
@@ -249,16 +254,18 @@ export class GaiaCensusScreenView extends ScreenView {
       const count = new DerivedProperty([model.selectionProperty], (selection) =>
         formatInteger(selection.countsByCategory.get(category) ?? 0),
       );
-      const bar = new Rectangle(0, 0, 1, 10, { fill: CATEGORY_COLORS.get(category) ?? "white" });
+      const bar = new Rectangle(0, 0, 1, GAIA.BAR_HEIGHT, { fill: CATEGORY_COLORS.get(category) ?? "white" });
       share.link((fraction) => {
-        bar.rectWidth = Math.max(0.5, BAR_MAX_WIDTH * fraction);
+        bar.rectWidth = Math.max(GAIA.BAR_MIN_WIDTH, GAIA.BAR_MAX_WIDTH * fraction);
       });
       return [
-        new Circle(5, { fill: CATEGORY_COLORS.get(category) ?? "white" }),
+        new Circle(GAIA.CATEGORY_SWATCH_RADIUS, { fill: CATEGORY_COLORS.get(category) ?? "white" }),
         textNode(categoryNames[`${category.key}StringProperty`] as TReadOnlyProperty<string>, 130, FONTS.SMALL),
         textNode(count, 50, FONTS.SMALL),
         textNode(percent, 55, FONTS.SMALL),
-        new Node({ children: [new Rectangle(0, 0, BAR_MAX_WIDTH, 10), bar] }),
+        new Node({
+          children: [new Rectangle(0, 0, GAIA.BAR_MAX_WIDTH, GAIA.BAR_HEIGHT), bar],
+        }),
       ];
     });
     for (const row of rows) {
@@ -285,7 +292,7 @@ export class GaiaCensusScreenView extends ScreenView {
           new GridBox({ xSpacing: 6, ySpacing: 4, xAlign: "left", rows }),
         ],
       }),
-      { minWidth: PANEL_CONTENT_WIDTH + 24 },
+      { minWidth: PANEL_CONTENT_WIDTH + PANEL.MIN_WIDTH_INSET },
     );
 
     // ── Colour by ─────────────────────────────────────────────────────────────
@@ -299,7 +306,7 @@ export class GaiaCensusScreenView extends ScreenView {
       {
         orientation: "horizontal",
         spacing: 16,
-        radioButtonOptions: { radius: 7 },
+        radioButtonOptions: { radius: CONTROLS.RADIO_BUTTON_RADIUS },
         accessibleName: strings.colorByTitleStringProperty,
       },
     );
@@ -307,9 +314,15 @@ export class GaiaCensusScreenView extends ScreenView {
       spacing: 8,
       children: DISTANCE_COLORS.map((color, i) => {
         const label = new DerivedProperty([strings.distanceBinPatternStringProperty], (pattern) =>
-          StringUtils.fillIn(pattern, { min: i * DISTANCE_BIN_WIDTH, max: (i + 1) * DISTANCE_BIN_WIDTH }),
+          StringUtils.fillIn(pattern, {
+            min: i * GAIA.DISTANCE_BIN_WIDTH,
+            max: (i + 1) * GAIA.DISTANCE_BIN_WIDTH,
+          }),
         );
-        return new VBox({ spacing: 1, children: [new Circle(4, { fill: color }), textNode(label, 50, FONTS.SMALL)] });
+        return new VBox({
+          spacing: 1,
+          children: [new Circle(GAIA.LEGEND_DOT_RADIUS, { fill: color }), textNode(label, 50, FONTS.SMALL)],
+        });
       }),
     });
     model.colorByProperty.link((colorBy) => {
@@ -326,7 +339,7 @@ export class GaiaCensusScreenView extends ScreenView {
           distanceLegend,
         ],
       }),
-      { minWidth: PANEL_CONTENT_WIDTH + 24 },
+      { minWidth: PANEL_CONTENT_WIDTH + PANEL.MIN_WIDTH_INSET },
     );
 
     // ── Guides and axes, under the diagram ────────────────────────────────────
@@ -337,7 +350,7 @@ export class GaiaCensusScreenView extends ScreenView {
         spacing: 4,
         children: [
           new HBox({ spacing: 24, align: "center", children: [overlayCheckboxes, axisControls] }),
-          textNode(strings.saturationNoteStringProperty, CHART_WIDTH + 40, FONTS.SMALL),
+          textNode(strings.saturationNoteStringProperty, CHART.WIDTH + 40, FONTS.SMALL),
         ],
       }),
     );

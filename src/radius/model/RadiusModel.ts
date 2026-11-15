@@ -13,6 +13,7 @@ import { AxisQuantity } from "../../common/model/AxisQuantity.js";
 import { DiagramSettings } from "../../common/model/DiagramSettings.js";
 import { MovableStar } from "../../common/model/MovableStar.js";
 import { SUN_TEMPERATURE } from "../../common/model/stellarPhysics.js";
+import { MODEL_DEFAULTS } from "../../HRDiagramConstants.js";
 import { StarConstraint } from "./StarConstraint.js";
 
 export class RadiusModel implements TModel {
@@ -22,8 +23,11 @@ export class RadiusModel implements TModel {
     verticalQuantities: [AxisQuantity.LUMINOSITY],
   });
 
-  public readonly starA = new MovableStar(SUN_TEMPERATURE, 1);
-  public readonly starB = new MovableStar(2 * SUN_TEMPERATURE, 1);
+  public readonly starA = new MovableStar(SUN_TEMPERATURE, MODEL_DEFAULTS.INITIAL_LUMINOSITY);
+  public readonly starB = new MovableStar(
+    MODEL_DEFAULTS.RADIUS_STAR_B_TEMPERATURE_FACTOR * SUN_TEMPERATURE,
+    MODEL_DEFAULTS.INITIAL_LUMINOSITY,
+  );
   public readonly constraintProperty = new EnumerationProperty(StarConstraint.FREE);
 
   /** B ÷ A for temperature, luminosity and radius. */

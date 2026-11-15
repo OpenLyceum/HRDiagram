@@ -14,17 +14,9 @@ import { Vector2 } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
 import { Circle, DragListener, KeyboardListener, Node, type NodeOptions, Path, Text } from "scenerystack/scenery";
 import HRDiagramColors from "../../HRDiagramColors.js";
-import { FONTS } from "../../HRDiagramConstants.js";
+import { CURSOR_STAR, FONTS } from "../../HRDiagramConstants.js";
 import { blackbodyColor } from "./blackbodyColor.js";
 import type { HRChartNode } from "./HRChartNode.js";
-
-const RING_RADIUS = 10;
-const CROSS_LENGTH = 6;
-const DISC_RADIUS = 4.5;
-
-/** View pixels per arrow-key press, and with Shift held. */
-const KEY_STEP = 8;
-const FINE_KEY_STEP = 1.5;
 
 export type CursorStarNodeOptions = NodeOptions & {
   /** A letter or short label drawn beside the marker (e.g. "A", "B"). */
@@ -54,32 +46,35 @@ export class CursorStarNode extends Node {
 
     const ring = new Path(
       new Shape()
-        .circle(0, 0, RING_RADIUS)
-        .moveTo(-RING_RADIUS - CROSS_LENGTH, 0)
-        .lineTo(-RING_RADIUS + 3, 0)
-        .moveTo(RING_RADIUS - 3, 0)
-        .lineTo(RING_RADIUS + CROSS_LENGTH, 0)
-        .moveTo(0, -RING_RADIUS - CROSS_LENGTH)
-        .lineTo(0, -RING_RADIUS + 3)
-        .moveTo(0, RING_RADIUS - 3)
-        .lineTo(0, RING_RADIUS + CROSS_LENGTH),
-      { stroke: HRDiagramColors.cursorColorProperty, lineWidth: 2 },
+        .circle(0, 0, CURSOR_STAR.RING_RADIUS)
+        .moveTo(-CURSOR_STAR.RING_RADIUS - CURSOR_STAR.CROSS_LENGTH, 0)
+        .lineTo(-CURSOR_STAR.RING_RADIUS + CURSOR_STAR.CROSS_INSET, 0)
+        .moveTo(CURSOR_STAR.RING_RADIUS - CURSOR_STAR.CROSS_INSET, 0)
+        .lineTo(CURSOR_STAR.RING_RADIUS + CURSOR_STAR.CROSS_LENGTH, 0)
+        .moveTo(0, -CURSOR_STAR.RING_RADIUS - CURSOR_STAR.CROSS_LENGTH)
+        .lineTo(0, -CURSOR_STAR.RING_RADIUS + CURSOR_STAR.CROSS_INSET)
+        .moveTo(0, CURSOR_STAR.RING_RADIUS - CURSOR_STAR.CROSS_INSET)
+        .lineTo(0, CURSOR_STAR.RING_RADIUS + CURSOR_STAR.CROSS_LENGTH),
+      { stroke: HRDiagramColors.cursorColorProperty, lineWidth: CURSOR_STAR.RING_LINE_WIDTH },
     );
-    const disc = new Circle(DISC_RADIUS, { stroke: "black", lineWidth: 0.5 });
+    const disc = new Circle(CURSOR_STAR.DISC_RADIUS, {
+      stroke: "black",
+      lineWidth: CURSOR_STAR.DISC_LINE_WIDTH,
+    });
     const children: Node[] = [ring, disc];
     if (label !== undefined && label !== null) {
       const text = new Text(label, {
         font: FONTS.TITLE,
         fill: HRDiagramColors.cursorColorProperty,
-        left: RING_RADIUS + 2,
-        bottom: -RING_RADIUS + 4,
-        maxWidth: 30,
+        left: CURSOR_STAR.RING_RADIUS + 2,
+        bottom: -CURSOR_STAR.RING_RADIUS + 4,
+        maxWidth: CURSOR_STAR.LABEL_MAX_WIDTH,
       });
       children.push(text);
     }
     this.children = children;
-    this.mouseArea = Shape.circle(0, 0, RING_RADIUS + CROSS_LENGTH);
-    this.touchArea = Shape.circle(0, 0, RING_RADIUS + CROSS_LENGTH + 8);
+    this.mouseArea = Shape.circle(0, 0, CURSOR_STAR.RING_RADIUS + CURSOR_STAR.CROSS_LENGTH);
+    this.touchArea = Shape.circle(0, 0, CURSOR_STAR.RING_RADIUS + CURSOR_STAR.CROSS_LENGTH + CURSOR_STAR.TOUCH_PADDING);
 
     const apply = (temperature: number, luminosity: number): void => {
       const target = constrain ? constrain(temperature, luminosity) : { temperature, luminosity };
@@ -117,7 +112,7 @@ export class CursorStarNode extends Node {
           "shift+arrowDown",
         ],
         fire: (_event, keysPressed) => {
-          const step = keysPressed.startsWith("shift") ? FINE_KEY_STEP : KEY_STEP;
+          const step = keysPressed.startsWith("shift") ? CURSOR_STAR.FINE_KEY_STEP : CURSOR_STAR.KEY_STEP;
           const key = keysPressed.replace("shift+", "");
           if (key === "arrowLeft") {
             stepBy(-step, 0);

@@ -29,7 +29,7 @@ import { chartAndPanelsLayout, placeInRegion } from "../../common/view/ScreenLay
 import { SizeComparisonNode } from "../../common/view/SizeComparisonNode.js";
 import { SunMarkerNode } from "../../common/view/SunMarkerNode.js";
 import HRDiagramColors from "../../HRDiagramColors.js";
-import { FONTS } from "../../HRDiagramConstants.js";
+import { CHART, EXPLORE_SLIDERS, FONTS, PANEL } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { HRDiagramPreferencesModel } from "../../preferences/HRDiagramPreferencesModel.js";
 import type { ExploreModel } from "../model/ExploreModel.js";
@@ -37,13 +37,12 @@ import { ExploreScreenSummaryContent } from "./ExploreScreenSummaryContent.js";
 
 export type ExploreScreenViewOptions = ScreenViewOptions;
 
-const CHART_WIDTH = 560;
-const CHART_HEIGHT = 500;
-const PANEL_CONTENT_WIDTH = 300;
-const SLIDER_TRACK_WIDTH = 270;
-
-/** Slider steps in log₁₀ units. */
-const SLIDER_STEPS = { keyboardStep: 0.01, shiftKeyboardStep: 0.002, pageKeyboardStep: 0.1 };
+const PANEL_CONTENT_WIDTH: number = PANEL.CONTENT_WIDTH;
+const SLIDER_STEPS = {
+  keyboardStep: EXPLORE_SLIDERS.KEYBOARD_STEP,
+  shiftKeyboardStep: EXPLORE_SLIDERS.SHIFT_KEYBOARD_STEP,
+  pageKeyboardStep: EXPLORE_SLIDERS.PAGE_KEYBOARD_STEP,
+};
 
 export class ExploreScreenView extends ScreenView {
   public constructor(
@@ -65,7 +64,12 @@ export class ExploreScreenView extends ScreenView {
     const listParent = new Node();
 
     // ── Diagram ───────────────────────────────────────────────────────────────
-    const chart = new HRChartNode(settings.xQuantityProperty, settings.yQuantityProperty, CHART_WIDTH, CHART_HEIGHT);
+    const chart = new HRChartNode(
+      settings.xQuantityProperty,
+      settings.yQuantityProperty,
+      CHART.WIDTH,
+      CHART.TALL_HEIGHT,
+    );
     const overlays = new HROverlayNode(chart, settings);
     const cursorStar = new CursorStarNode(
       chart,
@@ -78,7 +82,7 @@ export class ExploreScreenView extends ScreenView {
       },
     );
     // Pressing anywhere on the diagram moves the star there, and keeps dragging it.
-    const hitArea = new Rectangle(0, 0, CHART_WIDTH, CHART_HEIGHT, { cursor: "pointer" });
+    const hitArea = new Rectangle(0, 0, CHART.WIDTH, CHART.TALL_HEIGHT, { cursor: "pointer" });
     hitArea.addInputListener(
       new DragListener({
         press: (event) => cursorStar.moveToViewPoint(chart.plotLayer.globalToLocalPoint(event.pointer.point)),
@@ -124,7 +128,7 @@ export class ExploreScreenView extends ScreenView {
       new HSlider(property, property.range, {
         ...HR_DIAGRAM_SLIDER_OPTIONS,
         ...SLIDER_STEPS,
-        trackSize: HR_DIAGRAM_SLIDER_OPTIONS.trackSize.copy().setWidth(SLIDER_TRACK_WIDTH),
+        trackSize: HR_DIAGRAM_SLIDER_OPTIONS.trackSize.copy().setWidth(EXPLORE_SLIDERS.TRACK_WIDTH),
         accessibleName: name,
         pdomCreateAriaValueText: (value: number | null) =>
           StringUtils.fillIn(valuePattern.value, { value: value === null ? "" : format(10 ** value) }),
@@ -193,7 +197,7 @@ export class ExploreScreenView extends ScreenView {
           ),
         ],
       }),
-      { minWidth: PANEL_CONTENT_WIDTH + 24 },
+      { minWidth: PANEL_CONTENT_WIDTH + PANEL.MIN_WIDTH_INSET },
     );
 
     // ── Guides and axes ───────────────────────────────────────────────────────
@@ -201,7 +205,7 @@ export class ExploreScreenView extends ScreenView {
     const axisControls = new AxisControlsNode(settings, listParent);
     const settingsPanel = new HRDiagramPanel(
       new VBox({ spacing: 10, align: "left", children: [overlayCheckboxes, axisControls] }),
-      { minWidth: PANEL_CONTENT_WIDTH + 24 },
+      { minWidth: PANEL_CONTENT_WIDTH + PANEL.MIN_WIDTH_INSET },
     );
 
     const resetAllButton = new ResetAllButton({

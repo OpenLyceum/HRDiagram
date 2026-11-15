@@ -29,7 +29,7 @@ import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import type { Node } from "scenerystack/scenery";
 import { Panel, type PanelOptions } from "scenerystack/sun";
 import HRDiagramColors from "../HRDiagramColors.js";
-import { PANEL_CORNER_RADIUS } from "../HRDiagramConstants.js";
+import { PANEL, PANEL_CORNER_RADIUS } from "../HRDiagramConstants.js";
 
 export type HRDiagramPanelOptions = PanelOptions;
 
@@ -40,8 +40,8 @@ export class HRDiagramPanel extends Panel {
         fill: HRDiagramColors.panelBackgroundColorProperty,
         stroke: HRDiagramColors.panelBorderColorProperty,
         cornerRadius: PANEL_CORNER_RADIUS,
-        xMargin: 12,
-        yMargin: 10,
+        xMargin: PANEL.X_MARGIN,
+        yMargin: PANEL.Y_MARGIN,
       },
       providedOptions,
     );

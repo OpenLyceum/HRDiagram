@@ -12,14 +12,8 @@ import { GridBox, type Node, RichText, Text, VBox } from "scenerystack/scenery";
 import type { Star } from "../../common/model/StarCatalog.js";
 import { formatFixed, formatInteger, formatValue } from "../../common/view/format.js";
 import HRDiagramColors from "../../HRDiagramColors.js";
-import { FONTS } from "../../HRDiagramConstants.js";
+import { FONTS, STAR_CARD } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
-
-/** Light-years per parsec. */
-const LIGHT_YEARS_PER_PARSEC = 3.2616;
-
-const VALUE_MAX_WIDTH = 170;
-const LABEL_MAX_WIDTH = 130;
 
 export class StarCardNode extends VBox {
   public constructor(selectedStarProperty: Property<Star | null>, width: number) {
@@ -42,7 +36,7 @@ export class StarCardNode extends VBox {
         value: (star) =>
           StringUtils.fillIn(strings.distancePatternStringProperty.value, {
             pc: formatValue(star.distance, 3),
-            ly: formatValue(star.distance * LIGHT_YEARS_PER_PARSEC, 3),
+            ly: formatValue(star.distance * STAR_CARD.LIGHT_YEARS_PER_PARSEC, 3),
           }),
       },
       { label: strings.apparentMagnitudeStringProperty, value: (star) => formatFixed(star.apparentV, 2) },
@@ -88,23 +82,28 @@ export class StarCardNode extends VBox {
       },
     ];
     const valueNodes = rows.map(
-      () => new RichText("", { font: FONTS.LABEL, fill: HRDiagramColors.textColorProperty, maxWidth: VALUE_MAX_WIDTH }),
+      () =>
+        new RichText("", {
+          font: FONTS.LABEL,
+          fill: HRDiagramColors.textColorProperty,
+          maxWidth: STAR_CARD.VALUE_MAX_WIDTH,
+        }),
     );
     const grid = new GridBox({
-      xSpacing: 10,
-      ySpacing: 3,
+      xSpacing: STAR_CARD.X_SPACING,
+      ySpacing: STAR_CARD.Y_SPACING,
       xAlign: "left",
       rows: rows.map((row, i) => [
         new RichText(row.label, {
           font: FONTS.LABEL,
           fill: HRDiagramColors.textColorProperty,
-          maxWidth: LABEL_MAX_WIDTH,
+          maxWidth: STAR_CARD.LABEL_MAX_WIDTH,
         }),
         valueNodes[i] as Node,
       ]),
     });
 
-    super({ spacing: 6, align: "left", children: [hint] });
+    super({ spacing: STAR_CARD.VBOX_SPACING, align: "left", children: [hint] });
 
     const update = (): void => {
       const star = selectedStarProperty.value;

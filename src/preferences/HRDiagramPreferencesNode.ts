@@ -7,10 +7,10 @@
  */
 
 import { Text, VBox } from "scenerystack/scenery";
-import { PhetFont } from "scenerystack/scenery-phet";
 import { Checkbox } from "scenerystack/sun";
 import type { Tandem } from "scenerystack/tandem";
 import HRDiagramColors from "../HRDiagramColors.js";
+import { FONTS, PREFERENCES_LAYOUT } from "../HRDiagramConstants.js";
 import HRDiagramNamespace from "../HRDiagramNamespace.js";
 import { StringManager } from "../i18n/StringManager.js";
 import type { HRDiagramPreferencesModel } from "./HRDiagramPreferencesModel.js";
@@ -23,27 +23,27 @@ export class HRDiagramPreferencesNode extends VBox {
     // colors (readable on white in both default and projector profiles), not textColorProperty
     // (which is near-white in default mode and would be invisible on the white dialog).
     const header = new Text(prefStrings.titleStringProperty, {
-      font: new PhetFont({ size: 18, weight: "bold" }),
+      font: FONTS.PREFERENCES_TITLE,
       fill: HRDiagramColors.controlSurfaceTextColorProperty,
     });
 
     const showEquationsCheckbox = new Checkbox(
       preferencesModel.showEquationsProperty,
       new Text(prefStrings.showEquationsStringProperty, {
-        font: new PhetFont(14),
+        font: FONTS.PREFERENCES_LABEL,
         fill: HRDiagramColors.controlSurfaceTextColorProperty,
       }),
       {
         checkboxColor: HRDiagramColors.controlSurfaceTextColorProperty,
         checkboxColorBackground: HRDiagramColors.controlSurfaceColorProperty,
-        spacing: 8,
+        spacing: PREFERENCES_LAYOUT.CHECKBOX_SPACING,
         ...(tandem && { tandem: tandem.createTandem("showEquationsCheckbox") }),
       },
     );
 
     super({
       align: "left",
-      spacing: 12,
+      spacing: PREFERENCES_LAYOUT.SECTION_SPACING,
       children: [header, showEquationsCheckbox],
     });
   }

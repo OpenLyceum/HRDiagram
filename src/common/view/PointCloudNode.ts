@@ -9,6 +9,7 @@
 import type { ChartTransform } from "scenerystack/bamboo";
 import { Bounds2 } from "scenerystack/dot";
 import { CanvasNode } from "scenerystack/scenery";
+import { POINT_CLOUD } from "../../HRDiagramConstants.js";
 
 /** Group index that is never drawn. */
 export const HIDDEN_GROUP = 255;
@@ -49,14 +50,14 @@ export const traceMarker = (
   r: number,
 ): void => {
   if (shape === "diamond") {
-    const d = r * 1.3;
+    const d = r * POINT_CLOUD.DIAMOND_FACTOR;
     context.moveTo(x, y - d);
     context.lineTo(x + d, y);
     context.lineTo(x, y + d);
     context.lineTo(x - d, y);
     context.closePath();
   } else if (shape === "square") {
-    const d = r * 0.95;
+    const d = r * POINT_CLOUD.SQUARE_FACTOR;
     context.rect(x - d, y - d, 2 * d, 2 * d);
   } else {
     context.moveTo(x + r, y);
@@ -137,7 +138,7 @@ export class PointCloudNode extends CanvasNode {
       context.fill();
       if (style.stroke) {
         context.globalAlpha = 1;
-        context.lineWidth = 0.6;
+        context.lineWidth = POINT_CLOUD.STROKE_WIDTH;
         context.strokeStyle = style.stroke();
         context.stroke();
       }

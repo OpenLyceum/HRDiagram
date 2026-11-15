@@ -9,10 +9,11 @@ import type { TModel } from "scenerystack/joist";
 import { DiagramSettings } from "../../common/model/DiagramSettings.js";
 import { MovableStar } from "../../common/model/MovableStar.js";
 import { SUN_TEMPERATURE } from "../../common/model/stellarPhysics.js";
+import { MODEL_DEFAULTS } from "../../HRDiagramConstants.js";
 
 export class ExploreModel implements TModel {
   public readonly settings = new DiagramSettings();
-  public readonly star = new MovableStar(SUN_TEMPERATURE, 1);
+  public readonly star = new MovableStar(SUN_TEMPERATURE, MODEL_DEFAULTS.INITIAL_LUMINOSITY);
 
   public reset(): void {
     this.settings.reset();

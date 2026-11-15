@@ -25,7 +25,7 @@ import { chartAndPanelsLayout, placeInRegion } from "../../common/view/ScreenLay
 import { SizeComparisonNode } from "../../common/view/SizeComparisonNode.js";
 import { SunMarkerNode } from "../../common/view/SunMarkerNode.js";
 import HRDiagramColors from "../../HRDiagramColors.js";
-import { FONTS } from "../../HRDiagramConstants.js";
+import { CHART, CONTROLS, FONTS, PANEL } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { HRDiagramPreferencesModel } from "../../preferences/HRDiagramPreferencesModel.js";
 import type { RadiusModel } from "../model/RadiusModel.js";
@@ -34,9 +34,7 @@ import { RadiusScreenSummaryContent } from "./RadiusScreenSummaryContent.js";
 
 export type RadiusScreenViewOptions = ScreenViewOptions;
 
-const CHART_WIDTH = 560;
-const CHART_HEIGHT = 500;
-const PANEL_CONTENT_WIDTH = 300;
+const PANEL_CONTENT_WIDTH: number = PANEL.CONTENT_WIDTH;
 
 export class RadiusScreenView extends ScreenView {
   public constructor(
@@ -59,8 +57,8 @@ export class RadiusScreenView extends ScreenView {
     const chart = new HRChartNode(
       model.settings.xQuantityProperty,
       model.settings.yQuantityProperty,
-      CHART_WIDTH,
-      CHART_HEIGHT,
+      CHART.WIDTH,
+      CHART.TALL_HEIGHT,
     );
     const cursorFor = (star: MovableStar, label: TReadOnlyProperty<string>, name: TReadOnlyProperty<string>) =>
       new CursorStarNode(
@@ -185,7 +183,7 @@ export class RadiusScreenView extends ScreenView {
           ),
         ],
       }),
-      { minWidth: PANEL_CONTENT_WIDTH + 24 },
+      { minWidth: PANEL_CONTENT_WIDTH + PANEL.MIN_WIDTH_INSET },
     );
 
     // ── Constraint and guides ─────────────────────────────────────────────────
@@ -200,12 +198,16 @@ export class RadiusScreenView extends ScreenView {
             new Text(name, {
               font: FONTS.LABEL,
               fill: HRDiagramColors.textColorProperty,
-              maxWidth: PANEL_CONTENT_WIDTH - 30,
+              maxWidth: PANEL_CONTENT_WIDTH - PANEL.LABEL_INSET,
             }),
           options: { accessibleName: name },
         };
       }),
-      { spacing: 6, radioButtonOptions: { radius: 7 }, accessibleName: strings.constraintTitleStringProperty },
+      {
+        spacing: 6,
+        radioButtonOptions: { radius: CONTROLS.RADIO_BUTTON_RADIUS },
+        accessibleName: strings.constraintTitleStringProperty,
+      },
     );
     const overlayCheckboxes = new OverlayCheckboxGroup(model.settings);
     const settingsPanel = new HRDiagramPanel(
@@ -223,7 +225,7 @@ export class RadiusScreenView extends ScreenView {
           overlayCheckboxes,
         ],
       }),
-      { minWidth: PANEL_CONTENT_WIDTH + 24 },
+      { minWidth: PANEL_CONTENT_WIDTH + PANEL.MIN_WIDTH_INSET },
     );
 
     const resetAllButton = new ResetAllButton({

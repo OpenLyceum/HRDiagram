@@ -32,7 +32,7 @@ import type { PointStyle } from "../../common/view/PointCloudNode.js";
 import { chartStripAndPanelsLayout, placeInRegion } from "../../common/view/ScreenLayout.js";
 import { SunMarkerNode } from "../../common/view/SunMarkerNode.js";
 import HRDiagramColors from "../../HRDiagramColors.js";
-import { FONTS } from "../../HRDiagramConstants.js";
+import { CHART, CONTROLS, FONTS, PANEL } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import { StarSample } from "../model/StarSample.js";
 import type { StarSamplesModel } from "../model/StarSamplesModel.js";
@@ -42,9 +42,7 @@ import { StarSamplesScreenSummaryContent } from "./StarSamplesScreenSummaryConte
 
 export type StarSamplesScreenViewOptions = ScreenViewOptions;
 
-const CHART_WIDTH = 560;
-const CHART_HEIGHT = 420;
-const PANEL_CONTENT_WIDTH = 300;
+const PANEL_CONTENT_WIDTH: number = PANEL.CONTENT_WIDTH;
 
 /**
  * Stars offered by "Find a star": NAAP's background table (Betelgeuse, Arcturus, Procyon A, Sirius A,
@@ -92,8 +90,8 @@ export class StarSamplesScreenView extends ScreenView {
     const chart = new HRChartNode(
       model.settings.xQuantityProperty,
       model.settings.yQuantityProperty,
-      CHART_WIDTH,
-      CHART_HEIGHT,
+      CHART.WIDTH,
+      CHART.SHORT_HEIGHT,
     );
     const starPlot = new StarPlotNode(chart, model.visibleStarsProperty, model.selectedStarProperty, (direction) =>
       model.stepSelection(direction),
@@ -112,11 +110,15 @@ export class StarSamplesScreenView extends ScreenView {
         const label = sampleLabel(sample);
         return {
           value: sample,
-          createNode: () => textNode(label, PANEL_CONTENT_WIDTH - 30),
+          createNode: () => textNode(label, PANEL_CONTENT_WIDTH - PANEL.LABEL_INSET),
           options: { accessibleName: label },
         };
       }),
-      { spacing: 6, radioButtonOptions: { radius: 7 }, accessibleName: strings.sampleTitleStringProperty },
+      {
+        spacing: 6,
+        radioButtonOptions: { radius: CONTROLS.RADIO_BUTTON_RADIUS },
+        accessibleName: strings.sampleTitleStringProperty,
+      },
     );
     const shownText = new DerivedProperty(
       [strings.shownPatternStringProperty, model.visibleStarsProperty],
@@ -144,7 +146,7 @@ export class StarSamplesScreenView extends ScreenView {
           textNode(shownText),
         ],
       }),
-      { minWidth: PANEL_CONTENT_WIDTH + 24 },
+      { minWidth: PANEL_CONTENT_WIDTH + PANEL.MIN_WIDTH_INSET },
     );
 
     // ── Kinds of star ─────────────────────────────────────────────────────────
@@ -159,7 +161,7 @@ export class StarSamplesScreenView extends ScreenView {
       if (!visibleProperty) {
         throw new Error(`no visibility for ${category.key}`);
       }
-      return new Checkbox(visibleProperty, textNode(label, PANEL_CONTENT_WIDTH - 30), {
+      return new Checkbox(visibleProperty, textNode(label, PANEL_CONTENT_WIDTH - PANEL.LABEL_INSET), {
         ...HR_DIAGRAM_CHECKBOX_OPTIONS,
         accessibleName: label,
       });
@@ -170,7 +172,7 @@ export class StarSamplesScreenView extends ScreenView {
         align: "left",
         children: [textNode(strings.kindsTitleStringProperty, PANEL_CONTENT_WIDTH, FONTS.TITLE), ...categoryCheckboxes],
       }),
-      { minWidth: PANEL_CONTENT_WIDTH + 24 },
+      { minWidth: PANEL_CONTENT_WIDTH + PANEL.MIN_WIDTH_INSET },
     );
 
     // ── Find a star and its card ──────────────────────────────────────────────
@@ -218,7 +220,7 @@ export class StarSamplesScreenView extends ScreenView {
           new StarCardNode(model.selectedStarProperty, PANEL_CONTENT_WIDTH),
         ],
       }),
-      { minWidth: PANEL_CONTENT_WIDTH + 24 },
+      { minWidth: PANEL_CONTENT_WIDTH + PANEL.MIN_WIDTH_INSET },
     );
 
     // ── Guides and axes, under the diagram ────────────────────────────────────

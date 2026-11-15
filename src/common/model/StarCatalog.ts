@@ -13,6 +13,7 @@
  * The snapshot stores only observables; the conversions live in stellarPhysics.ts.
  */
 
+import { STAR_CATEGORY } from "../../HRDiagramConstants.js";
 import censusJson from "./data/gaiaCensus.json";
 import namedJson from "./data/namedStars.json";
 import { StarCategory } from "./StarCategory.js";
@@ -81,18 +82,6 @@ export type Star = {
   readonly brightest: boolean;
 };
 
-/** No giant or subgiant is fainter than these absolute magnitudes. */
-const MAX_GIANT_ABSOLUTE_G = 5;
-const MAX_GIANT_ABSOLUTE_V = 5.5;
-
-/**
- * A catalogued giant or supergiant class is overruled (as a catalogue error) when a cool star is not even
- * this many times as luminous as a main-sequence star of its temperature. Hot giants lie close to the
- * main sequence, so only stars cooler than OVERRULE_BELOW_TEMPERATURE are checked.
- */
-const MIN_GIANT_LUMINOSITY_RATIO = 2;
-const OVERRULE_BELOW_TEMPERATURE = 5500;
-
 /**
  * The kind of star at (T, L), judged by how far above the main sequence it sits. Used when no
  * luminosity class is catalogued (most Gaia stars). Main-sequence stars scatter up to about 0.75 mag
@@ -108,16 +97,16 @@ export const categoryFromPosition = (
     return StarCategory.WHITE_DWARF;
   }
   const ratio = luminosity / mainSequenceLuminosity(temperature);
-  if (ratio < 0.02) {
+  if (ratio < STAR_CATEGORY.WHITE_DWARF_LUMINOSITY_RATIO) {
     return StarCategory.WHITE_DWARF;
   }
-  if (ratio < 4 || absoluteV > MAX_GIANT_ABSOLUTE_V) {
+  if (ratio < STAR_CATEGORY.DWARF_LUMINOSITY_RATIO || absoluteV > STAR_CATEGORY.MAX_GIANT_ABSOLUTE_V) {
     return StarCategory.DWARF;
   }
-  if (ratio < 20 && temperature > 4600) {
+  if (ratio < STAR_CATEGORY.SUBGIANT_LUMINOSITY_RATIO && temperature > STAR_CATEGORY.SUBGIANT_MIN_TEMPERATURE) {
     return StarCategory.SUBGIANT;
   }
-  return luminosity > 3e4 ? StarCategory.SUPERGIANT : StarCategory.GIANT;
+  return luminosity > STAR_CATEGORY.SUPERGIANT_MIN_LUMINOSITY ? StarCategory.SUPERGIANT : StarCategory.GIANT;
 };
 
 /**
@@ -133,16 +122,16 @@ export const categoryFromGaia = (absoluteG: number, bpRp: number, whiteDwarf: bo
     return StarCategory.WHITE_DWARF;
   }
   const aboveMainSequence = mainSequenceAbsoluteG(bpRp) - absoluteG;
-  if (aboveMainSequence < -4) {
+  if (aboveMainSequence < STAR_CATEGORY.GAIA_WHITE_DWARF_ABOVE) {
     return StarCategory.WHITE_DWARF;
   }
-  if (aboveMainSequence < 1.5 || absoluteG > MAX_GIANT_ABSOLUTE_G) {
+  if (aboveMainSequence < STAR_CATEGORY.GAIA_DWARF_ABOVE || absoluteG > STAR_CATEGORY.MAX_GIANT_ABSOLUTE_G) {
     return StarCategory.DWARF;
   }
-  if (aboveMainSequence < 3.5 && bpRp < 1.2) {
+  if (aboveMainSequence < STAR_CATEGORY.GAIA_SUBGIANT_ABOVE && bpRp < STAR_CATEGORY.GAIA_SUBGIANT_MAX_BP_RP) {
     return StarCategory.SUBGIANT;
   }
-  return absoluteG < -3 ? StarCategory.SUPERGIANT : StarCategory.GIANT;
+  return absoluteG < STAR_CATEGORY.GAIA_SUPERGIANT_MAX_ABSOLUTE_G ? StarCategory.SUPERGIANT : StarCategory.GIANT;
 };
 
 /** Temperature, luminosity and magnitudes of a named star, or null when its data can't place it. */
@@ -198,8 +187,8 @@ const trustedClass = (
   const implausibleGiant =
     catalogued !== null &&
     GIANT_CLASSES.includes(catalogued) &&
-    temperature < OVERRULE_BELOW_TEMPERATURE &&
-    luminosity / mainSequenceLuminosity(temperature) < MIN_GIANT_LUMINOSITY_RATIO;
+    temperature < STAR_CATEGORY.OVERRULE_BELOW_TEMPERATURE &&
+    luminosity / mainSequenceLuminosity(temperature) < STAR_CATEGORY.MIN_GIANT_LUMINOSITY_RATIO;
   return implausibleGiant ? null : catalogued;
 };
 

@@ -9,12 +9,10 @@ import type { Property, TReadOnlyProperty } from "scenerystack/axon";
 import { GridBox, Text } from "scenerystack/scenery";
 import { Checkbox } from "scenerystack/sun";
 import HRDiagramColors from "../../HRDiagramColors.js";
-import { FONTS } from "../../HRDiagramConstants.js";
+import { FONTS, OVERLAY_CHECKBOXES } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import { HR_DIAGRAM_CHECKBOX_OPTIONS } from "../HRDiagramControlOptions.js";
 import type { DiagramSettings } from "../model/DiagramSettings.js";
-
-const LABEL_MAX_WIDTH = 240;
 
 export class OverlayCheckboxGroup extends GridBox {
   public readonly checkboxes: readonly Checkbox[];
@@ -27,7 +25,8 @@ export class OverlayCheckboxGroup extends GridBox {
         new Text(label, {
           font: FONTS.LABEL,
           fill: HRDiagramColors.textColorProperty,
-          maxWidth: LABEL_MAX_WIDTH / columns + 40 * (columns - 1),
+          maxWidth:
+            OVERLAY_CHECKBOXES.LABEL_MAX_WIDTH / columns + OVERLAY_CHECKBOXES.MULTI_COLUMN_BONUS * (columns - 1),
         }),
         { ...HR_DIAGRAM_CHECKBOX_OPTIONS, accessibleName: label },
       );
@@ -39,8 +38,8 @@ export class OverlayCheckboxGroup extends GridBox {
     ];
     super({
       autoColumns: columns,
-      xSpacing: 16,
-      ySpacing: 6,
+      xSpacing: OVERLAY_CHECKBOXES.X_SPACING,
+      ySpacing: OVERLAY_CHECKBOXES.Y_SPACING,
       xAlign: "left",
       children:
         columns === 2

@@ -15,7 +15,7 @@ import { Shape } from "scenerystack/kite";
 import { StringUtils } from "scenerystack/phetcommon";
 import { Node, Path, RichText, Text } from "scenerystack/scenery";
 import HRDiagramColors from "../../HRDiagramColors.js";
-import { FONTS } from "../../HRDiagramConstants.js";
+import { FONTS, ISORADIUS_VALUES, OVERLAY } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import {
   INSTABILITY_STRIP,
@@ -35,13 +35,6 @@ export type HROverlayVisibility = {
   readonly instabilityStripVisibleProperty: TReadOnlyProperty<boolean>;
 };
 
-/** Radii (R☉) of the lines of equal radius. */
-export const ISORADIUS_VALUES = [0.001, 0.01, 0.1, 1, 10, 100, 1000] as const;
-
-const BAND_WIDTH = 12;
-const CLASS_BAND_WIDTH = 9;
-const LABEL_MARGIN = 6;
-
 /** Where along each class curve (0 = hottest end, 1 = coolest) its label sits. */
 const LABEL_FRACTION: Record<LuminosityClassName, number> = {
   Ia: 0.72,
@@ -54,11 +47,13 @@ const LABEL_FRACTION: Record<LuminosityClassName, number> = {
   D: 0.35,
 };
 
-/** A point just outside the hot edge of the instability strip, about halfway up it. */
-const STRIP_LABEL_ANCHOR = { temperature: 7900, luminosity: 40 };
-
 /** Temperatures sampled along a line of equal radius (log-spaced, hot to cool). */
-const ISORADIUS_TEMPERATURES = Array.from({ length: 61 }, (_, i) => 10 ** (Math.log10(50000) - (i * 1.4) / 60));
+const ISORADIUS_TEMPERATURES = Array.from(
+  { length: OVERLAY.ISORADIUS_SAMPLE_COUNT },
+  (_, i) =>
+    10 **
+    (Math.log10(OVERLAY.ISORADIUS_T_MAX) - (i * OVERLAY.ISORADIUS_LOG_SPAN) / (OVERLAY.ISORADIUS_SAMPLE_COUNT - 1)),
+);
 
 export class HROverlayNode extends Node {
   public constructor(chart: HRChartNode, visibility: HROverlayVisibility) {
@@ -95,19 +90,25 @@ export class HROverlayNode extends Node {
 
     /** A label placed at a fraction along a curve, nudged to stay inside the frame. */
     const curveLabel = (points: Vector2[], fraction: number, text: Node, below: boolean): Node | null => {
-      const visible = points.filter((p) => inside(p, LABEL_MARGIN));
+      const visible = points.filter((p) => inside(p, OVERLAY.LABEL_MARGIN));
       const anchor = visible[Math.min(visible.length - 1, Math.round(fraction * (visible.length - 1)))];
       if (!anchor) {
         return null;
       }
       text.centerX = anchor.x;
       if (below) {
-        text.top = anchor.y + CLASS_BAND_WIDTH;
+        text.top = anchor.y + OVERLAY.CLASS_BAND_WIDTH;
       } else {
-        text.bottom = anchor.y - CLASS_BAND_WIDTH;
+        text.bottom = anchor.y - OVERLAY.CLASS_BAND_WIDTH;
       }
-      text.left = Math.max(LABEL_MARGIN, Math.min(text.left, chart.viewWidth - LABEL_MARGIN - text.width));
-      text.top = Math.max(LABEL_MARGIN, Math.min(text.top, chart.viewHeight - LABEL_MARGIN - text.height));
+      text.left = Math.max(
+        OVERLAY.LABEL_MARGIN,
+        Math.min(text.left, chart.viewWidth - OVERLAY.LABEL_MARGIN - text.width),
+      );
+      text.top = Math.max(
+        OVERLAY.LABEL_MARGIN,
+        Math.min(text.top, chart.viewHeight - OVERLAY.LABEL_MARGIN - text.height),
+      );
       return text;
     };
 
@@ -122,7 +123,7 @@ export class HROverlayNode extends Node {
       new Text(classLabels[`${name}StringProperty`] ?? "", {
         font: FONTS.CHART_LABEL,
         fill: HRDiagramColors.luminosityClassLabelColorProperty,
-        maxWidth: 150,
+        maxWidth: OVERLAY.CLASS_LABEL_MAX_WIDTH,
       });
 
     const drawMainSequence = (): void => {
@@ -134,7 +135,7 @@ export class HROverlayNode extends Node {
       mainSequenceLayer.addChild(
         new Path(polyline(points), {
           stroke: HRDiagramColors.mainSequenceColorProperty,
-          lineWidth: BAND_WIDTH,
+          lineWidth: OVERLAY.BAND_WIDTH,
           lineJoin: "round",
           lineCap: "round",
         }),
@@ -155,7 +156,7 @@ export class HROverlayNode extends Node {
         classLayer.addChild(
           new Path(polyline(points), {
             stroke: HRDiagramColors.luminosityClassColorProperty,
-            lineWidth: CLASS_BAND_WIDTH,
+            lineWidth: OVERLAY.CLASS_BAND_WIDTH,
             lineJoin: "round",
             lineCap: "round",
           }),
@@ -180,12 +181,12 @@ export class HROverlayNode extends Node {
         isoradiusLayer.addChild(
           new Path(polyline(points), {
             stroke: HRDiagramColors.isoradiusColorProperty,
-            lineWidth: 1.2,
-            lineDash: [6, 4],
+            lineWidth: OVERLAY.ISORADIUS_LINE_WIDTH,
+            lineDash: [...OVERLAY.ISORADIUS_DASH],
           }),
         );
         // Label the line near the last point that is comfortably inside the frame, rotated along it.
-        const index = points.findLastIndex((p) => inside(p, 28));
+        const index = points.findLastIndex((p) => inside(p, OVERLAY.ISORADIUS_LABEL_MARGIN));
         const at = points[index];
         const before = points[Math.max(0, index - 3)];
         if (at && before && index > 0) {
@@ -214,8 +215,8 @@ export class HROverlayNode extends Node {
       for (let i = 0; i < corners.length - 1; i++) {
         const a = corners[i] as TemperatureLuminosity;
         const b = corners[i + 1] as TemperatureLuminosity;
-        for (let k = 0; k < 20; k++) {
-          const t = k / 20;
+        for (let k = 0; k < OVERLAY.STRIP_EDGE_SAMPLES; k++) {
+          const t = k / OVERLAY.STRIP_EDGE_SAMPLES;
           outline.push({
             temperature: 10 ** ((1 - t) * Math.log10(a.temperature) + t * Math.log10(b.temperature)),
             luminosity: 10 ** ((1 - t) * Math.log10(a.luminosity) + t * Math.log10(b.luminosity)),
@@ -225,16 +226,16 @@ export class HROverlayNode extends Node {
       const points = toView(outline);
       stripLayer.addChild(new Path(polyline(points).close(), { fill: HRDiagramColors.instabilityStripColorProperty }));
       // Label beside the hot edge of the strip, halfway up, where no class label sits.
-      const anchor = chart.viewPositionOf(STRIP_LABEL_ANCHOR.temperature, STRIP_LABEL_ANCHOR.luminosity);
+      const anchor = chart.viewPositionOf(OVERLAY.STRIP_LABEL_TEMPERATURE, OVERLAY.STRIP_LABEL_LUMINOSITY);
       const label = new Text(strings.instabilityStripStringProperty, {
         font: FONTS.CHART_LABEL,
         fill: HRDiagramColors.instabilityStripLabelColorProperty,
-        maxWidth: 120,
+        maxWidth: OVERLAY.STRIP_LABEL_MAX_WIDTH,
       });
       if (anchor.isFinite()) {
         label.right = anchor.x - 4;
         label.centerY = anchor.y;
-        if (label.left < LABEL_MARGIN) {
+        if (label.left < OVERLAY.LABEL_MARGIN) {
           label.left = anchor.x + 40;
         }
         stripLayer.addChild(label);

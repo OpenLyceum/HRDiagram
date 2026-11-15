@@ -11,19 +11,12 @@
 import { Multilink, TinyProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { Circle, Node, type NodeOptions, RadialGradient, Text, VBox } from "scenerystack/scenery";
 import HRDiagramColors from "../../HRDiagramColors.js";
-import { FONTS } from "../../HRDiagramConstants.js";
+import { FONTS, SIZE_COMPARISON } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import { SUN_TEMPERATURE } from "../model/stellarPhysics.js";
 import { blackbodyColor } from "./blackbodyColor.js";
 
-/** Radius (px) of the larger disc. */
-const MAX_DISC_RADIUS = 46;
-
-/** Discs smaller than this (px) are drawn as a visible dot and flagged as too small to see. */
-const MIN_VISIBLE_RADIUS = 1.5;
-const DOT_RADIUS = 1.5;
-
-const DISC_SPACING = 2 * MAX_DISC_RADIUS + 36;
+const DISC_SPACING = 2 * SIZE_COMPARISON.MAX_DISC_RADIUS + SIZE_COMPARISON.CENTRE_GAP;
 
 /** One of the two stars compared. */
 export type ComparedStar = {
@@ -37,28 +30,38 @@ export class SizeComparisonNode extends Node {
     super();
     const strings = StringManager.getInstance().getCommonStrings();
 
-    const leftDisc = new Circle(1, { centerX: MAX_DISC_RADIUS, centerY: MAX_DISC_RADIUS });
-    const rightDisc = new Circle(1, { centerX: MAX_DISC_RADIUS + DISC_SPACING, centerY: MAX_DISC_RADIUS });
+    const leftDisc = new Circle(1, {
+      centerX: SIZE_COMPARISON.MAX_DISC_RADIUS,
+      centerY: SIZE_COMPARISON.MAX_DISC_RADIUS,
+    });
+    const rightDisc = new Circle(1, {
+      centerX: SIZE_COMPARISON.MAX_DISC_RADIUS + DISC_SPACING,
+      centerY: SIZE_COMPARISON.MAX_DISC_RADIUS,
+    });
 
     /** A label under a disc, with a "too small to see" note that shows when the disc is a dot. */
     const caption = (label: TReadOnlyProperty<string>, centerX: number): { box: VBox; tooSmall: Node } => {
       const tooSmall = new Text(strings.size.tooSmallStringProperty, {
         font: FONTS.SMALL,
         fill: HRDiagramColors.textColorProperty,
-        maxWidth: DISC_SPACING - 6,
+        maxWidth: DISC_SPACING - SIZE_COMPARISON.LABEL_INSET,
         visible: false,
       });
       const box = new VBox({
         spacing: 1,
         children: [
-          new Text(label, { font: FONTS.LABEL, fill: HRDiagramColors.textColorProperty, maxWidth: DISC_SPACING - 6 }),
+          new Text(label, {
+            font: FONTS.LABEL,
+            fill: HRDiagramColors.textColorProperty,
+            maxWidth: DISC_SPACING - SIZE_COMPARISON.LABEL_INSET,
+          }),
           tooSmall,
         ],
         excludeInvisibleChildrenFromBounds: false,
       });
       box.boundsProperty.link(() => {
         box.centerX = centerX;
-        box.top = 2 * MAX_DISC_RADIUS + 6;
+        box.top = 2 * SIZE_COMPARISON.MAX_DISC_RADIUS + SIZE_COMPARISON.CAPTION_TOP_GAP;
       });
       return { box, tooSmall };
     };
@@ -68,11 +71,11 @@ export class SizeComparisonNode extends Node {
     Multilink.multilink(
       [left.temperatureProperty, left.radiusProperty, right.temperatureProperty, right.radiusProperty],
       (leftTemperature, leftRadius, rightTemperature, rightRadius) => {
-        const scale = MAX_DISC_RADIUS / Math.max(leftRadius, rightRadius);
+        const scale = SIZE_COMPARISON.MAX_DISC_RADIUS / Math.max(leftRadius, rightRadius);
         const draw = (disc: Circle, tooSmall: Node, temperature: number, radius: number): void => {
           const r = radius * scale;
-          disc.radius = r < MIN_VISIBLE_RADIUS ? DOT_RADIUS : r;
-          tooSmall.visible = r < MIN_VISIBLE_RADIUS;
+          disc.radius = r < SIZE_COMPARISON.MIN_VISIBLE_RADIUS ? SIZE_COMPARISON.DOT_RADIUS : r;
+          tooSmall.visible = r < SIZE_COMPARISON.MIN_VISIBLE_RADIUS;
           disc.fill = gradientFor(temperature, disc.radius);
         };
         draw(leftDisc, leftCaption.tooSmall, leftTemperature, leftRadius);
@@ -107,7 +110,8 @@ export class SizeComparisonNode extends Node {
 /** A disc fill in the star's colour, slightly darker at the limb. */
 const gradientFor = (temperature: number, radius: number): RadialGradient => {
   const color = blackbodyColor(temperature);
-  return new RadialGradient(-0.3 * radius, -0.3 * radius, 0, 0, 0, radius)
-    .addColorStop(0, color.colorUtilsBrighter(0.35))
-    .addColorStop(1, color.colorUtilsDarker(0.25));
+  const offset = SIZE_COMPARISON.GRADIENT_OFFSET_FACTOR * radius;
+  return new RadialGradient(-offset, -offset, 0, 0, 0, radius)
+    .addColorStop(0, color.colorUtilsBrighter(SIZE_COMPARISON.GRADIENT_BRIGHTER))
+    .addColorStop(1, color.colorUtilsDarker(SIZE_COMPARISON.GRADIENT_DARKER));
 };

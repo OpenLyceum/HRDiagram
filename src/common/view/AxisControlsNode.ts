@@ -8,15 +8,12 @@ import type { TReadOnlyProperty } from "scenerystack/axon";
 import { HBox, type Node, RichText, Text, VBox } from "scenerystack/scenery";
 import { ComboBox } from "scenerystack/sun";
 import HRDiagramColors from "../../HRDiagramColors.js";
-import { FONTS } from "../../HRDiagramConstants.js";
+import { AXIS_CONTROLS, FONTS } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import { HR_DIAGRAM_COMBO_BOX_OPTIONS, LIGHT_SURFACE_TEXT_FILL } from "../HRDiagramButtonOptions.js";
 import type { AxisQuantity } from "../model/AxisQuantity.js";
 import type { DiagramSettings } from "../model/DiagramSettings.js";
 import { axisTitleProperty } from "./HRChartNode.js";
-
-const ITEM_MAX_WIDTH = 190;
-const LABEL_MAX_WIDTH = 90;
 
 export class AxisControlsNode extends VBox {
   public constructor(settings: DiagramSettings, listParent: Node) {
@@ -35,7 +32,7 @@ export class AxisControlsNode extends VBox {
             new RichText(axisTitleProperty(quantity), {
               font: FONTS.LABEL,
               fill: LIGHT_SURFACE_TEXT_FILL,
-              maxWidth: ITEM_MAX_WIDTH,
+              maxWidth: AXIS_CONTROLS.ITEM_MAX_WIDTH,
             }),
           accessibleName: axisTitleProperty(quantity),
         })),
@@ -43,9 +40,13 @@ export class AxisControlsNode extends VBox {
         { ...HR_DIAGRAM_COMBO_BOX_OPTIONS, accessibleName: label },
       );
       return new HBox({
-        spacing: 8,
+        spacing: AXIS_CONTROLS.ROW_SPACING,
         children: [
-          new Text(label, { font: FONTS.LABEL, fill: HRDiagramColors.textColorProperty, maxWidth: LABEL_MAX_WIDTH }),
+          new Text(label, {
+            font: FONTS.LABEL,
+            fill: HRDiagramColors.textColorProperty,
+            maxWidth: AXIS_CONTROLS.LABEL_MAX_WIDTH,
+          }),
           comboBox,
         ],
       });
@@ -53,7 +54,7 @@ export class AxisControlsNode extends VBox {
 
     super({
       align: "right",
-      spacing: 6,
+      spacing: AXIS_CONTROLS.VBOX_SPACING,
       children: [
         row(strings.axes.horizontalStringProperty, settings.xQuantityProperty, settings.horizontalQuantities),
         row(strings.axes.verticalStringProperty, settings.yQuantityProperty, settings.verticalQuantities),

@@ -20,6 +20,7 @@ import { AxisQuantity } from "../../common/model/AxisQuantity.js";
 import { DiagramSettings } from "../../common/model/DiagramSettings.js";
 import { GAIA_CENSUS, type GaiaCensus } from "../../common/model/StarCatalog.js";
 import { StarCategory } from "../../common/model/StarCategory.js";
+import { GAIA } from "../../HRDiagramConstants.js";
 import { ColorBy } from "./ColorBy.js";
 
 /** Stars in the census that pass the current limits. */
@@ -31,7 +32,7 @@ export type CensusSelection = {
 };
 
 /** The naked-eye limit, roughly (apparent V). */
-export const NAKED_EYE_LIMIT_V = 6;
+export const NAKED_EYE_LIMIT_V = GAIA.NAKED_EYE_LIMIT_V;
 
 export class GaiaCensusModel implements TModel {
   public readonly census: GaiaCensus = GAIA_CENSUS;
@@ -43,11 +44,15 @@ export class GaiaCensusModel implements TModel {
   });
 
   /** Only stars nearer than this are plotted (pc). */
-  public readonly distanceLimitProperty = new NumberProperty(100, { range: new Range(5, 100) });
+  public readonly distanceLimitProperty = new NumberProperty(GAIA.DISTANCE_DEFAULT, {
+    range: new Range(GAIA.DISTANCE_MIN, GAIA.DISTANCE_MAX),
+  });
 
   /** When on, only stars brighter (smaller V) than brightnessLimitProperty are plotted. */
   public readonly brightnessLimitEnabledProperty = new BooleanProperty(false);
-  public readonly brightnessLimitProperty = new NumberProperty(NAKED_EYE_LIMIT_V, { range: new Range(3, 16) });
+  public readonly brightnessLimitProperty = new NumberProperty(NAKED_EYE_LIMIT_V, {
+    range: new Range(GAIA.BRIGHTNESS_MIN, GAIA.BRIGHTNESS_MAX),
+  });
 
   public readonly colorByProperty = new EnumerationProperty(ColorBy.KIND);
 

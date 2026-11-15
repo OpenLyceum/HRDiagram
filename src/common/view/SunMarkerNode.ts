@@ -7,34 +7,35 @@
 
 import { Circle, Node, Text } from "scenerystack/scenery";
 import HRDiagramColors from "../../HRDiagramColors.js";
-import { FONTS } from "../../HRDiagramConstants.js";
+import { FONTS, MODEL_DEFAULTS, SUN_MARKER } from "../../HRDiagramConstants.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import { SUN_TEMPERATURE } from "../model/stellarPhysics.js";
 import type { HRChartNode } from "./HRChartNode.js";
-
-const SYMBOL_RADIUS = 6;
 
 export class SunMarkerNode extends Node {
   public constructor(chart: HRChartNode) {
     super({ pickable: false });
     const symbol = new Node({
       children: [
-        new Circle(SYMBOL_RADIUS, { stroke: HRDiagramColors.sunColorProperty, lineWidth: 1.6 }),
-        new Circle(1.6, { fill: HRDiagramColors.sunColorProperty }),
+        new Circle(SUN_MARKER.SYMBOL_RADIUS, {
+          stroke: HRDiagramColors.sunColorProperty,
+          lineWidth: SUN_MARKER.LINE_WIDTH,
+        }),
+        new Circle(SUN_MARKER.DOT_RADIUS, { fill: HRDiagramColors.sunColorProperty }),
       ],
     });
     const label = new Text(StringManager.getInstance().getCommonStrings().sunStringProperty, {
       font: FONTS.CHART_LABEL,
       fill: HRDiagramColors.sunColorProperty,
-      maxWidth: 60,
+      maxWidth: SUN_MARKER.LABEL_MAX_WIDTH,
     });
     label.boundsProperty.link(() => {
-      label.left = SYMBOL_RADIUS + 3;
-      label.top = SYMBOL_RADIUS - 2;
+      label.left = SUN_MARKER.SYMBOL_RADIUS + SUN_MARKER.LABEL_X_GAP;
+      label.top = SUN_MARKER.SYMBOL_RADIUS - SUN_MARKER.LABEL_Y_OFFSET;
     });
     this.children = [symbol, label];
     const place = (): void => {
-      this.translation = chart.viewPositionOf(SUN_TEMPERATURE, 1);
+      this.translation = chart.viewPositionOf(SUN_TEMPERATURE, MODEL_DEFAULTS.INITIAL_LUMINOSITY);
     };
     chart.chartTransform.changedEmitter.addListener(place);
     place();

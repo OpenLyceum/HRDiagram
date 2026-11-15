@@ -16,13 +16,7 @@
 
 import { Bounds2 } from "scenerystack/dot";
 import { AlignBox, type Node } from "scenerystack/scenery";
-import { REGION_GAP, SCREEN_VIEW_MARGIN } from "../../HRDiagramConstants.js";
-
-/** Width of the right-hand column. */
-const PANEL_COLUMN_WIDTH = 336;
-
-/** Height of the footer (Reset All, and anything placed beside it). */
-const FOOTER_HEIGHT = 46;
+import { LAYOUT, PANEL, REGION_GAP, SCREEN_VIEW_MARGIN } from "../../HRDiagramConstants.js";
 
 export type ChartAndPanelsLayout = {
   readonly chart: Bounds2;
@@ -30,10 +24,10 @@ export type ChartAndPanelsLayout = {
   readonly footer: Bounds2;
 };
 
-export const chartAndPanelsLayout = (layoutBounds: Bounds2, panelWidth = PANEL_COLUMN_WIDTH): ChartAndPanelsLayout => {
+export const chartAndPanelsLayout = (layoutBounds: Bounds2, panelWidth = PANEL.COLUMN_WIDTH): ChartAndPanelsLayout => {
   const b = layoutBounds.eroded(SCREEN_VIEW_MARGIN);
   const left = b.maxX - panelWidth;
-  const footerTop = b.maxY - FOOTER_HEIGHT;
+  const footerTop = b.maxY - LAYOUT.FOOTER_HEIGHT;
   return {
     chart: new Bounds2(b.minX, b.minY, left - REGION_GAP, b.maxY),
     panels: new Bounds2(left, b.minY, b.maxX, footerTop - REGION_GAP),
@@ -45,9 +39,6 @@ export type ChartStripAndPanelsLayout = ChartAndPanelsLayout & {
   /** Under the chart: the diagram's own settings (guides and axes). */
   readonly strip: Bounds2;
 };
-
-/** Height of the settings strip under the chart. */
-const STRIP_HEIGHT = 96;
 
 /**
  * The chart-and-panels layout with a settings strip under the chart, for screens whose panel column is
@@ -61,10 +52,10 @@ const STRIP_HEIGHT = 96;
  */
 export const chartStripAndPanelsLayout = (
   layoutBounds: Bounds2,
-  panelWidth = PANEL_COLUMN_WIDTH,
+  panelWidth = PANEL.COLUMN_WIDTH,
 ): ChartStripAndPanelsLayout => {
   const base = chartAndPanelsLayout(layoutBounds, panelWidth);
-  const stripTop = base.chart.maxY - STRIP_HEIGHT;
+  const stripTop = base.chart.maxY - LAYOUT.STRIP_HEIGHT;
   return {
     ...base,
     chart: new Bounds2(base.chart.minX, base.chart.minY, base.chart.maxX, stripTop - REGION_GAP),
