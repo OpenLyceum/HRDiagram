@@ -35,7 +35,10 @@ export const radiusFromLuminosityAndTemperature = (luminosity: number, temperatu
 export const luminosityFromRadiusAndTemperature = (radius: number, temperature: number): number =>
   radius ** 2 * (temperature / SUN_TEMPERATURE) ** 4;
 
-/** Temperature (K) of a star of luminosity L (L☉) and radius R (R☉). */
+/**
+ * Temperature (K) of a star of luminosity L (L☉) and radius R (R☉).
+ * @internal Exported for unit tests; not part of the application API.
+ */
 export const temperatureFromLuminosityAndRadius = (luminosity: number, radius: number): number =>
   SUN_TEMPERATURE * (luminosity / radius ** 2) ** 0.25;
 
@@ -202,7 +205,10 @@ export const BP_RP_TEMPERATURE_RANGE = {
 
 // ── Temperature, colour and bolometric correction ─────────────────────────────
 
-/** V-band bolometric correction BC_V = M_bol − M_V at temperature T (K). */
+/**
+ * V-band bolometric correction BC_V = M_bol − M_V at temperature T (K).
+ * @internal Exported for unit tests; not part of the application API.
+ */
 export const bolometricCorrectionV = (temperature: number): number => BC_V_OF_LOG_T.evaluate(Math.log10(temperature));
 
 /** B−V colour of a dwarf at temperature T (K). */
@@ -235,7 +241,10 @@ export const gBolometricCorrection = (bpRp: number): number => BC_G_OF_BP_RP.eva
 /** Absolute G magnitude of the main sequence at colour BP−RP. */
 export const mainSequenceAbsoluteG = (bpRp: number): number => MAIN_SEQUENCE_M_G_OF_BP_RP.evaluate(bpRp);
 
-/** Luminosity (L☉) of a 0.6 M☉ hydrogen white dwarf at temperature T (K). */
+/**
+ * Luminosity (L☉) of a 0.6 M☉ hydrogen white dwarf at temperature T (K).
+ * @internal Exported for unit tests; not part of the application API.
+ */
 export const whiteDwarfLuminosity = (temperature: number): number =>
   10 ** WD_LOG_L_OF_LOG_T.evaluate(Math.log10(temperature));
 
