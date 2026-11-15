@@ -87,7 +87,7 @@ export type Star = {
  * luminosity class is catalogued (most Gaia stars). Main-sequence stars scatter up to about 0.75 mag
  * (×2) above the line when they are unresolved binaries, so "dwarf" reaches ×4.
  */
-export const categoryFromPosition = (
+const categoryFromPosition = (
   temperature: number,
   luminosity: number,
   absoluteV: number,
@@ -117,7 +117,7 @@ export const categoryFromPosition = (
  * M_G = 5, so fainter stars are dwarfs however red they are (the M-dwarf sequence is broad).
  */
 
-export const categoryFromGaia = (absoluteG: number, bpRp: number, whiteDwarf: boolean): StarCategory => {
+const categoryFromGaia = (absoluteG: number, bpRp: number, whiteDwarf: boolean): StarCategory => {
   if (whiteDwarf) {
     return StarCategory.WHITE_DWARF;
   }
@@ -252,7 +252,6 @@ export const NAMED_STARS: readonly Star[] = namedSnapshot.stars.flatMap((row) =>
 /** Distance limit of the "nearest" set (pc) and magnitude limit of the "brightest" set (V). */
 export const NEAREST_LIMIT_PC = namedSnapshot.nearestLimitPc;
 export const BRIGHTEST_LIMIT_V = namedSnapshot.brightestLimitV;
-export const SNAPSHOT_DATE = namedSnapshot.retrieved;
 
 /** Shape of data/gaiaCensus.json. */
 type CensusSnapshot = {

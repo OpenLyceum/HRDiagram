@@ -23,13 +23,7 @@ import whiteDwarfJson from "./data/whiteDwarfSequence.json";
 export const SUN_TEMPERATURE = 5772;
 
 /** IAU 2015 absolute bolometric magnitude of the Sun. */
-export const SUN_BOLOMETRIC_MAGNITUDE = 4.74;
-
-/** The Sun's apparent V magnitude. */
-export const SUN_APPARENT_V = -26.74;
-
-/** One astronomical unit in parsecs. */
-export const AU_IN_PARSECS = 4.8481e-6;
+const SUN_BOLOMETRIC_MAGNITUDE = 4.74;
 
 // ── Stefan–Boltzmann ──────────────────────────────────────────────────────────
 
@@ -56,10 +50,6 @@ export const luminosityFromBolometricMagnitude = (bolometricMagnitude: number): 
 /** Absolute magnitude from apparent magnitude and distance (pc), ignoring extinction. */
 export const absoluteMagnitude = (apparent: number, distance: number): number =>
   apparent - 5 * Math.log10(distance / 10);
-
-/** Apparent magnitude from absolute magnitude and distance (pc). */
-export const apparentMagnitude = (absolute: number, distance: number): number =>
-  absolute + 5 * Math.log10(distance / 10);
 
 // ── Reference tables ──────────────────────────────────────────────────────────
 
@@ -170,8 +160,6 @@ const MAIN_SEQUENCE_M_G_OF_BP_RP = new Interpolator(
     (row) => row.mG,
   ),
 );
-const MAIN_SEQUENCE_MASS_OF_LOG_T = new Interpolator(dwarfPairs(logT, (row) => row.mass));
-
 const wdPairs = (x: (row: WhiteDwarfRow) => number, y: (row: WhiteDwarfRow) => number): [number, number][] =>
   WHITE_DWARF_TABLE.map((row) => [x(row), y(row)]);
 
@@ -241,10 +229,6 @@ export const luminosityFromAbsoluteVisualMagnitude = (absoluteV: number, tempera
 export const mainSequenceLuminosity = (temperature: number): number =>
   10 ** MAIN_SEQUENCE_LOG_L_OF_LOG_T.evaluate(Math.log10(temperature));
 
-/** Main-sequence mass (M☉) at temperature T (K), from the dwarf table. */
-export const mainSequenceMass = (temperature: number): number =>
-  MAIN_SEQUENCE_MASS_OF_LOG_T.evaluate(Math.log10(temperature));
-
 /** G-band bolometric correction BC_G = M_bol − M_G of a normal star of colour BP−RP. */
 export const gBolometricCorrection = (bpRp: number): number => BC_G_OF_BP_RP.evaluate(bpRp);
 
@@ -254,12 +238,6 @@ export const mainSequenceAbsoluteG = (bpRp: number): number => MAIN_SEQUENCE_M_G
 /** Luminosity (L☉) of a 0.6 M☉ hydrogen white dwarf at temperature T (K). */
 export const whiteDwarfLuminosity = (temperature: number): number =>
   10 ** WD_LOG_L_OF_LOG_T.evaluate(Math.log10(temperature));
-
-/** Temperature range of the white dwarf table (K). */
-export const WHITE_DWARF_TEMPERATURE_RANGE = {
-  min: 10 ** WD_LOG_L_OF_LOG_T.minX,
-  max: 10 ** WD_LOG_L_OF_LOG_T.maxX,
-};
 
 // ── Gaia photometry → physical quantities ────────────────────────────────────
 
@@ -291,13 +269,3 @@ export const deriveFromGaia = (g: number, bpRp: number, distance: number, whiteD
     apparentV: g + vMinusG,
   };
 };
-
-const WD_BP_RP_OF_LOG_T = new Interpolator(
-  wdPairs(
-    (row) => Math.log10(row.teff),
-    (row) => row.bpRp,
-  ),
-);
-
-/** Gaia BP−RP of a white dwarf at temperature T (K). */
-export const whiteDwarfBpRp = (temperature: number): number => WD_BP_RP_OF_LOG_T.evaluate(Math.log10(temperature));

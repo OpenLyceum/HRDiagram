@@ -32,7 +32,7 @@ export type CensusSelection = {
 };
 
 /** The naked-eye limit, roughly (apparent V). */
-export const NAKED_EYE_LIMIT_V = GAIA.NAKED_EYE_LIMIT_V;
+const NAKED_EYE_LIMIT_V = GAIA.NAKED_EYE_LIMIT_V;
 
 export class GaiaCensusModel implements TModel {
   public readonly census: GaiaCensus = GAIA_CENSUS;

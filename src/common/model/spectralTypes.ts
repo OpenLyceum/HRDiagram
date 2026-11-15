@@ -18,7 +18,7 @@ import { DWARF_TABLE, Interpolator } from "./stellarPhysics.js";
 const CLASS_LETTERS = "OBAFGKM";
 
 /** Spectral code of a type letter and subtype, e.g. ("G", 2) → 42. */
-export const spectralCode = (letter: string, subtype: number): number => CLASS_LETTERS.indexOf(letter) * 10 + subtype;
+const spectralCode = (letter: string, subtype: number): number => CLASS_LETTERS.indexOf(letter) * 10 + subtype;
 
 /** "G2", "M5.5", "B0.5" from a spectral code. */
 export const formatSpectralCode = (code: number): string => {
@@ -32,10 +32,6 @@ export const formatSpectralCode = (code: number): string => {
   return `${CLASS_LETTERS[letterIndex] ?? "M"}${subtype}`;
 };
 
-/** The letter (O … M) of a spectral code. */
-export const spectralLetter = (code: number): string =>
-  CLASS_LETTERS[Math.min(Math.max(Math.floor(code / 10), 0), 6)] ?? "M";
-
 /** Spectral codes of the dwarf table rows ("O3V" → 3, "M9.5V" → 69.5). */
 const DWARF_CODE_TEMPERATURES: [number, number][] = DWARF_TABLE.flatMap((row): [number, number][] => {
   const match = /^([OBAFGKM])(\d+(?:\.\d+)?)V$/.exec(row.spType);
@@ -44,9 +40,6 @@ const DWARF_CODE_TEMPERATURES: [number, number][] = DWARF_TABLE.flatMap((row): [
 
 const DWARF_LOG_T_OF_CODE = new Interpolator(DWARF_CODE_TEMPERATURES);
 const CODE_OF_DWARF_LOG_T = new Interpolator(DWARF_CODE_TEMPERATURES.map(([code, logT]) => [logT, code]));
-
-/** Range of codes covered by the dwarf table (O3 … M9.5). */
-export const SPECTRAL_CODE_RANGE = { min: DWARF_CODE_TEMPERATURES[0]?.[0] ?? 3, max: 69.5 };
 
 /** Temperature (K) of a dwarf of the given spectral code. */
 export const dwarfTemperatureFromCode = (code: number): number => 10 ** DWARF_LOG_T_OF_CODE.evaluate(code);

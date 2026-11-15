@@ -21,7 +21,7 @@ export type PointSet = {
   readonly groups: Uint8Array;
 };
 
-export const EMPTY_POINTS: PointSet = {
+const EMPTY_POINTS: PointSet = {
   xs: new Float64Array(0),
   ys: new Float64Array(0),
   groups: new Uint8Array(0),
