@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "An interactive Hertzsprung\u2013Russell diagram with real Gaia and Hipparcos stars: place a star by temperature and luminosity, see its radius, and compare the nearest stars, the brightest stars and a census of everything within 100 parsecs.",
+  "description": "An interactive Hertzsprung–Russell diagram with real Gaia and Hipparcos stars: place a star by temperature and luminosity, see its radius, and compare the nearest stars, the brightest stars and a census of everything within 100 parsecs.",
   "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
@@ -30,7 +30,7 @@
     "build": "tsc && vite build",
     "build:single": "tsc && vite build --mode single",
     "preview": "vite preview",
-    "lint": "biome check .",
+    "lint": "biome check --error-on-warnings .",
     "format": "biome format --write .",
     "fix": "biome check --write .",
     "check": "tsc --noEmit && tsc -p tsconfig.scripts.json --noEmit && tsc -p tsconfig.test.json --noEmit",
@@ -47,7 +47,7 @@
     "clean": "rm -rf dist",
     "prepare": "test \"$(git rev-parse --show-toplevel 2>/dev/null)\" = \"$PWD\" && git config core.hooksPath .githooks || true",
     "knip": "knip",
-    "test:architecture": "node --test tests/architecture.test.mjs",
+    "test:architecture": "node --test tests/architecture.node-test.ts",
     "fetch-data": "node scripts/catalog/fetch-catalog.ts"
   },
   "dependencies": {

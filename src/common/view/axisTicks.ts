@@ -1,3 +1,4 @@
+import { toFixed } from "scenerystack/dot";
 import { AXIS_TICKS_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * axisTicks.ts
@@ -23,7 +24,7 @@ export type Tick = {
 const range = (start: number, stop: number, step: number): number[] => {
   const values: number[] = [];
   for (let i = 0; start + i * step <= stop + 1e-9; i++) {
-    values.push(Number((start + i * step).toFixed(AXIS_TICKS_SETTINGS.RANGE_DECIMAL_PLACES)));
+    values.push(Number(toFixed(start + i * step, AXIS_TICKS_SETTINGS.RANGE_DECIMAL_PLACES)));
   }
   return values;
 };
