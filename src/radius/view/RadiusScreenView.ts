@@ -156,7 +156,7 @@ export class RadiusScreenView extends ScreenView {
         StringUtils.fillIn(pattern, {
           luminosity: formatValue(luminosity, RADIUS_SCREEN_VIEW_SETTINGS.EQUATION_DIGITS),
           temperature: formatValue(temperature, RADIUS_SCREEN_VIEW_SETTINGS.EQUATION_DIGITS),
-          radius: formatValue(radius, RADIUS_SCREEN_VIEW_SETTINGS.EQUATION_RADIUS),
+          radius: formatValue(radius, RADIUS_SCREEN_VIEW_SETTINGS.EQUATION_RADIUS_DIGITS),
         }),
     );
 

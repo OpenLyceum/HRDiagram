@@ -27,7 +27,7 @@ export class ExploreScreenSummaryContent extends ScreenSummaryContent {
         StringUtils.fillIn(pattern, {
           temperature: formatValue(temperature, EXPLORE_SCREEN_SUMMARY_CONTENT_SETTINGS.CURRENT_DETAILS_DIGITS),
           luminosity: formatValue(luminosity, EXPLORE_SCREEN_SUMMARY_CONTENT_SETTINGS.CURRENT_DETAILS_DIGITS),
-          radius: formatValue(radius, EXPLORE_SCREEN_SUMMARY_CONTENT_SETTINGS.CURRENT_DETAILS_RADIUS),
+          radius: formatValue(radius, EXPLORE_SCREEN_SUMMARY_CONTENT_SETTINGS.CURRENT_DETAILS_RADIUS_DIGITS),
         }),
     );
     super({

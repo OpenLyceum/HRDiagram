@@ -193,7 +193,7 @@ export class StarPlotNode extends Node {
               name: star.name,
               temperature: formatValue(star.temperature, STAR_PLOT_NODE_SETTINGS.TEMPERATURE_FORMAT_VALUE_DIGITS),
               luminosity: formatValue(star.luminosity, STAR_PLOT_NODE_SETTINGS.LUMINOSITY_FORMAT_VALUE_DIGITS),
-              radius: formatValue(star.radius, STAR_PLOT_NODE_SETTINGS.DESCRIBE_RADIUS),
+              radius: formatValue(star.radius, STAR_PLOT_NODE_SETTINGS.DESCRIBE_RADIUS_DIGITS),
             });
     };
     selectedStarProperty.link(describe);

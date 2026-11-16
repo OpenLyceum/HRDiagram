@@ -465,7 +465,7 @@ export const RADIUS_SCREEN_VIEW_SETTINGS = {
   EQUATION_DIGITS: 3, // digits
 
   KELVIN_SIGNIFICANT_FIGURES: 3, // digits
-  EQUATION_RADIUS: 3, // px
+  EQUATION_RADIUS_DIGITS: 3, // digits
   CONSTRUCTOR_COMPARE_PANEL_SPACING: 4, // px
 
   DEFAULT_MAX_WIDTH: 90,
@@ -482,7 +482,7 @@ export const STAR_PLOT_NODE_SETTINGS = {
   TEMPERATURE_FORMAT_VALUE_DIGITS: 3, // digits
   LUMINOSITY_FORMAT_VALUE_DIGITS: 3, // digits
 
-  DESCRIBE_RADIUS: 3, // px
+  DESCRIBE_RADIUS_DIGITS: 3, // digits
 
   /** Point groups, painted in this order. */
   BOTH_GROUP: 2,
@@ -519,14 +519,14 @@ export const STAR_CARD_NODE_SETTINGS = {
 export const RADIUS_SCREEN_SUMMARY_CONTENT_SETTINGS = {
   CURRENT_DETAILS_DIGITS: 3, // digits
 
-  CURRENT_DETAILS_RADIUS: 3, // px
+  CURRENT_DETAILS_RADIUS_DIGITS: 3, // digits
 } as const;
 
 /** Layout lengths in px; precision values count digits; factors are dimensionless. */
 export const EXPLORE_SCREEN_SUMMARY_CONTENT_SETTINGS = {
   CURRENT_DETAILS_DIGITS: 3, // digits
 
-  CURRENT_DETAILS_RADIUS: 3, // px
+  CURRENT_DETAILS_RADIUS_DIGITS: 3, // digits
 } as const;
 
 /** Layout lengths in px; precision values count digits; factors are dimensionless. */

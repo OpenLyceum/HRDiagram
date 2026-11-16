@@ -27,7 +27,7 @@ export class RadiusScreenSummaryContent extends ScreenSummaryContent {
         StringUtils.fillIn(pattern, {
           temperature: formatValue(temperature, RADIUS_SCREEN_SUMMARY_CONTENT_SETTINGS.CURRENT_DETAILS_DIGITS),
           luminosity: formatValue(luminosity, RADIUS_SCREEN_SUMMARY_CONTENT_SETTINGS.CURRENT_DETAILS_DIGITS),
-          radius: formatValue(radius, RADIUS_SCREEN_SUMMARY_CONTENT_SETTINGS.CURRENT_DETAILS_RADIUS),
+          radius: formatValue(radius, RADIUS_SCREEN_SUMMARY_CONTENT_SETTINGS.CURRENT_DETAILS_RADIUS_DIGITS),
         }),
     );
     super({
