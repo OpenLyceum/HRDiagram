@@ -117,7 +117,7 @@ export const createStarSamplesIcon = (): ScreenIcon => {
         x,
         y,
         fill,
-        stroke: "black",
+        stroke: HRDiagramColors.starOutlineColorProperty,
         lineWidth: HR_DIAGRAM_SCREEN_ICONS_SETTINGS.DOT_LINE_WIDTH,
       }),
     );
