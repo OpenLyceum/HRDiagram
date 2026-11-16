@@ -335,6 +335,216 @@ export const POINT_CLOUD = {
   ICON_PAD: 2,
 } as const;
 
+/** Settings for common/HRDiagramScreenIcons.ts. Layout lengths are in px; counts and ratios are dimensionless. */
+export const HR_DIAGRAM_SCREEN_ICONS_SETTINGS = {
+  RING_RADIUS: 26, // px
+  RING_X_SEGMENT_2: -18, // px
+  RING_X_SEGMENT_3: 18, // px
+  RING_X_SEGMENT_4: 46, // px
+  RING_Y_SEGMENT_2: -18, // px
+  RING_Y_SEGMENT_3: 18, // px
+  RING_Y_SEGMENT_4: 46, // px
+  CREATE_EXPLORE_ICON_RADIUS: 12, // px
+  CREATE_RADIUS_ICON_RADIUS: 130, // px
+  CREATE_RADIUS_ICON_RADIUS_SEGMENT_2: 22, // px
+
+  CREATE_RADIUS_ICON_LINE_DASH_DASH: 14, // px
+
+  MAIN_SEQUENCE_BAND_LINE_WIDTH: 34,
+  RING_X: -46,
+  RING_Y: -46,
+  RING_LINE_WIDTH: 7,
+  CREATE_RADIUS_ICON_LINE_WIDTH: 4,
+  DOT_RADIUS: 9,
+  DOT_LINE_WIDTH: 1.5,
+  /** Create gaia census icon opacity (dimensionless). */
+  CREATE_GAIA_CENSUS_ICON_OPACITY: 0.8,
+} as const;
+
+/** Settings for common/model/AxisQuantity.ts. */
+export const AXIS_QUANTITY_SETTINGS = {
+  /** Temperature range min (K). */
+  TEMPERATURE_RANGE_MIN: 2000,
+  /** Temperature range max (K). */
+  TEMPERATURE_RANGE_MAX: 50000,
+  /** Color index range min (dimensionless). */
+  COLOR_INDEX_RANGE_MIN: -0.4,
+  /** Color index range max (dimensionless). */
+  COLOR_INDEX_RANGE_MAX: 2.2,
+  /** Spectral type range max (spectral code). */
+  SPECTRAL_TYPE_RANGE_MAX: 70,
+  /** Bp rp range min (magnitudes). */
+  BP_RP_RANGE_MIN: -0.6,
+  /** Bp rp range max (magnitudes). */
+  BP_RP_RANGE_MAX: 5.2,
+  /** Luminosity range min (solar luminosities). */
+  LUMINOSITY_RANGE_MIN: 1e-5,
+  /** Luminosity range max (solar luminosities). */
+  LUMINOSITY_RANGE_MAX: 1e7,
+  /** Absolute magnitude range min (magnitudes). */
+  ABSOLUTE_MAGNITUDE_RANGE_MIN: -10,
+  /** Absolute magnitude range max (magnitudes). */
+  ABSOLUTE_MAGNITUDE_RANGE_MAX: 20,
+  /** Absolute g range min (magnitudes). */
+  ABSOLUTE_G_RANGE_MIN: -4,
+  /** Absolute g range max (magnitudes). */
+  ABSOLUTE_G_RANGE_MAX: 18,
+} as const;
+
+/** Settings for common/model/stellarPhysics.ts. */
+export const STELLAR_PHYSICS_SETTINGS = {
+  /** IAU 2015 nominal solar effective temperature (K). */
+  SUN_TEMPERATURE: 5772,
+  /** IAU 2015 absolute bolometric magnitude of the Sun. */
+  SUN_BOLOMETRIC_MAGNITUDE: 4.74,
+} as const;
+
+/** Settings for common/view/PointCloudNode.ts. Layout lengths are in px; counts and ratios are dimensionless. */
+export const POINT_CLOUD_NODE_SETTINGS = {
+  /** Group index that is never drawn. */
+  HIDDEN_GROUP: 255,
+} as const;
+
+/** Settings for common/view/format.ts. Layout lengths are in px; counts and ratios are dimensionless. */
+export const FORMAT_SETTINGS = {
+  DEFAULT_DIGITS: 3,
+} as const;
+
+/** Settings for explore/view/ExploreScreenView.ts. Layout lengths are in px; counts and ratios are dimensionless. */
+export const EXPLORE_SCREEN_VIEW_SETTINGS = {
+  LUMINOSITY_TEXT_DIGITS: 3, // digits
+  RADIUS_TEXT_DIGITS: 3, // digits
+  LUMINOSITY_SLIDER_DIGITS: 3, // digits
+
+  TEMPERATURE_TEXT_SIGNIFICANT_FIGURES: 3, // digits
+  TEMPERATURE_SLIDER_SIGNIFICANT_FIGURES: 3, // digits
+  CONSTRUCTOR_SLIDER_BLOCK_SPACING: 10, // px
+
+  DEFAULT_MAX_WIDTH: 150,
+  READOUT_MAX_WIDTH: 160,
+  SLIDER_BLOCK_SPACING: 2,
+  READOUTS_X_SPACING: 12,
+  READOUTS_Y_SPACING: 4,
+  STAR_PANEL_SPACING: 8,
+  SETTINGS_PANEL_SPACING: 10,
+  CHILDREN_SPACING: 10,
+} as const;
+
+/** Settings for gaia-census/view/GaiaCensusScreenView.ts. Layout lengths are in px; counts and ratios are dimensionless. */
+export const GAIA_CENSUS_SCREEN_VIEW_SETTINGS = {
+  BRIGHTNESS_LIMIT_TEXT_NODE_MAX_WIDTH: 200, // px
+  DISTANCE_LIMIT_TEXT_NODE_MAX_WIDTH: 150, // px
+  ROWS_MAX_WIDTH: 130, // px
+  ROWS_MAX_WIDTH_SEGMENT_2: 50, // px
+  ROWS_MAX_WIDTH_SEGMENT_3: 55, // px
+  COLOR_BY_GROUP_MAX_WIDTH: 130, // px
+  DISTANCE_LEGEND_MAX_WIDTH: 50, // px
+
+  CONSTRUCTOR_SELECTION_PANEL_SPACING: 8, // px
+  CONSTRUCTOR_STRIP_SPACING: 24, // px
+
+  BRIGHTNESS_CHECKBOX_SPACING: 6,
+  BRIGHTNESS_CHECKBOX_MAX_WIDTH: 80,
+  SELECTION_PANEL_SPACING: 6,
+  SELECTION_PANEL_MAX_WIDTH: 130,
+  KINDS_PANEL_SPACING: 6,
+  KINDS_PANEL_X_SPACING: 6,
+  KINDS_PANEL_Y_SPACING: 4,
+  COLOR_BY_GROUP_SPACING: 16,
+  DISTANCE_LEGEND_SPACING: 8,
+  COLOR_PANEL_SPACING: 6,
+  STRIP_SPACING: 4,
+  CHILDREN_SPACING: 8,
+} as const;
+
+/** Settings for radius/view/RadiusScreenView.ts. Layout lengths are in px; counts and ratios are dimensionless. */
+export const RADIUS_SCREEN_VIEW_SETTINGS = {
+  SOLAR_L_DIGITS: 3, // digits
+  SOLAR_R_DIGITS: 3, // digits
+  RATIO_DIGITS: 3, // digits
+  EQUATION_DIGITS: 3, // digits
+
+  KELVIN_SIGNIFICANT_FIGURES: 3, // digits
+  EQUATION_RADIUS: 3, // px
+  CONSTRUCTOR_COMPARE_PANEL_SPACING: 4, // px
+
+  DEFAULT_MAX_WIDTH: 90,
+  TABLE_X_SPACING: 10,
+  TABLE_Y_SPACING: 5,
+  COMPARE_PANEL_SPACING: 8,
+  CONSTRAINT_GROUP_SPACING: 6,
+  SETTINGS_PANEL_SPACING: 8,
+  CHILDREN_SPACING: 10,
+} as const;
+
+/** Settings for star-samples/view/StarPlotNode.ts. Layout lengths are in px; counts and ratios are dimensionless. */
+export const STAR_PLOT_NODE_SETTINGS = {
+  TEMPERATURE_FORMAT_VALUE_DIGITS: 3, // digits
+  LUMINOSITY_FORMAT_VALUE_DIGITS: 3, // digits
+
+  DESCRIBE_RADIUS: 3, // px
+
+  /** Point groups, painted in this order. */
+  BOTH_GROUP: 2,
+} as const;
+
+/** Settings for star-samples/view/StarSamplesScreenView.ts. Layout lengths are in px; counts and ratios are dimensionless. */
+export const STAR_SAMPLES_SCREEN_VIEW_SETTINGS = {
+  LEGEND_ENTRY_MAX_WIDTH: 90, // px
+  FIND_STAR_TEXT_NODE_MAX_WIDTH: 120, // px
+
+  SAMPLE_GROUP_SPACING: 6,
+  LEGEND_ENTRY_SPACING: 4,
+  LEGEND_SPACING: 12,
+  SAMPLE_PANEL_SPACING: 7,
+  KINDS_PANEL_SPACING: 5,
+  FIND_COMBO_BOX_MAX_WIDTH: 150,
+  CARD_PANEL_SPACING: 8,
+  STRIP_SPACING: 24,
+  CHILDREN_SPACING: 8,
+} as const;
+
+/** Layout lengths in px; precision values count digits; factors are dimensionless. */
+export const STAR_CARD_NODE_SETTINGS = {
+  DISTANCE_FORMAT_VALUE_DIGITS: 3, // digits
+  ROWS_DIGITS: 3, // digits
+  ROWS_DECIMALS: 2, // digits
+  LUMINOSITY_FORMAT_VALUE_DIGITS: 3, // digits
+  RADIUS_FORMAT_VALUE_DIGITS: 3, // digits
+
+  ROWS_SIGNIFICANT_FIGURES: 3, // digits
+} as const;
+
+/** Layout lengths in px; precision values count digits; factors are dimensionless. */
+export const RADIUS_SCREEN_SUMMARY_CONTENT_SETTINGS = {
+  CURRENT_DETAILS_DIGITS: 3, // digits
+
+  CURRENT_DETAILS_RADIUS: 3, // px
+} as const;
+
+/** Layout lengths in px; precision values count digits; factors are dimensionless. */
+export const EXPLORE_SCREEN_SUMMARY_CONTENT_SETTINGS = {
+  CURRENT_DETAILS_DIGITS: 3, // digits
+
+  CURRENT_DETAILS_RADIUS: 3, // px
+} as const;
+
+/** Layout lengths in px; precision values count digits; factors are dimensionless. */
+export const AXIS_TICKS_SETTINGS = {
+  RANGE_DECIMAL_PLACES: 6, // digits
+} as const;
+
+/** Layout lengths in px; precision values count digits; factors are dimensionless. */
+export const HR_OVERLAY_NODE_SETTINGS = {
+  DRAW_STRIP_RIGHT_OFFSET: 4, // px
+  DRAW_STRIP_LEFT_OFFSET: 40, // px
+} as const;
+
+/** Layout lengths in px; precision values count digits; factors are dimensionless. */
+export const CURSOR_STAR_NODE_SETTINGS = {
+  TEXT_BOTTOM_OFFSET: 4, // px
+} as const;
+
 HRDiagramNamespace.register("HRDiagramConstants", {
   SCREEN_VIEW_MARGIN,
   PANEL_CORNER_RADIUS,

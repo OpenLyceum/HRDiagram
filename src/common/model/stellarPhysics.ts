@@ -1,3 +1,4 @@
+import { STELLAR_PHYSICS_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * stellarPhysics.ts
  *
@@ -20,10 +21,10 @@ import dwarfJson from "./data/dwarfSequence.json";
 import whiteDwarfJson from "./data/whiteDwarfSequence.json";
 
 /** IAU 2015 nominal solar effective temperature (K). */
-export const SUN_TEMPERATURE = 5772;
+export const SUN_TEMPERATURE: number = STELLAR_PHYSICS_SETTINGS.SUN_TEMPERATURE;
 
 /** IAU 2015 absolute bolometric magnitude of the Sun. */
-const SUN_BOLOMETRIC_MAGNITUDE = 4.74;
+const SUN_BOLOMETRIC_MAGNITUDE: number = STELLAR_PHYSICS_SETTINGS.SUN_BOLOMETRIC_MAGNITUDE;
 
 // ── Stefan–Boltzmann ──────────────────────────────────────────────────────────
 

@@ -1,3 +1,4 @@
+import { HR_DIAGRAM_SCREEN_ICONS_SETTINGS } from "../HRDiagramConstants.js";
 /**
  * HRDiagramScreenIcons.ts
  *
@@ -53,7 +54,7 @@ const mainSequenceBand = (): Path => {
   }
   return new Path(shape, {
     stroke: HRDiagramColors.mainSequenceColorProperty,
-    lineWidth: 34,
+    lineWidth: HR_DIAGRAM_SCREEN_ICONS_SETTINGS.MAIN_SEQUENCE_BAND_LINE_WIDTH,
     lineCap: "round",
     lineJoin: "round",
   });
@@ -73,18 +74,22 @@ export const createExploreIcon = (): ScreenIcon => {
   const y = mainSequenceY(x);
   const ring = new Path(
     new Shape()
-      .circle(0, 0, 26)
-      .moveTo(-46, 0)
-      .lineTo(-18, 0)
-      .moveTo(18, 0)
-      .lineTo(46, 0)
-      .moveTo(0, -46)
-      .lineTo(0, -18)
-      .moveTo(0, 18)
-      .lineTo(0, 46),
-    { stroke: HRDiagramColors.cursorColorProperty, lineWidth: 7, x, y },
+      .circle(0, 0, HR_DIAGRAM_SCREEN_ICONS_SETTINGS.RING_RADIUS)
+      .moveTo(HR_DIAGRAM_SCREEN_ICONS_SETTINGS.RING_X, 0)
+      .lineTo(HR_DIAGRAM_SCREEN_ICONS_SETTINGS.RING_X_SEGMENT_2, 0)
+      .moveTo(HR_DIAGRAM_SCREEN_ICONS_SETTINGS.RING_X_SEGMENT_3, 0)
+      .lineTo(HR_DIAGRAM_SCREEN_ICONS_SETTINGS.RING_X_SEGMENT_4, 0)
+      .moveTo(0, HR_DIAGRAM_SCREEN_ICONS_SETTINGS.RING_Y)
+      .lineTo(0, HR_DIAGRAM_SCREEN_ICONS_SETTINGS.RING_Y_SEGMENT_2)
+      .moveTo(0, HR_DIAGRAM_SCREEN_ICONS_SETTINGS.RING_Y_SEGMENT_3)
+      .lineTo(0, HR_DIAGRAM_SCREEN_ICONS_SETTINGS.RING_Y_SEGMENT_4),
+    { stroke: HRDiagramColors.cursorColorProperty, lineWidth: HR_DIAGRAM_SCREEN_ICONS_SETTINGS.RING_LINE_WIDTH, x, y },
   );
-  return iconFrom(mainSequenceBand(), disc(12, x, y, "#fff8e0", "#e8c060"), ring);
+  return iconFrom(
+    mainSequenceBand(),
+    disc(HR_DIAGRAM_SCREEN_ICONS_SETTINGS.CREATE_EXPLORE_ICON_RADIUS, x, y, "#fff8e0", "#e8c060"),
+    ring,
+  );
 };
 
 export const createRadiusIcon = (): ScreenIcon => {
@@ -93,9 +98,13 @@ export const createRadiusIcon = (): ScreenIcon => {
     lines.moveTo(0, 40 + offset).lineTo(W, 260 + offset);
   }
   return iconFrom(
-    new Path(lines, { stroke: HRDiagramColors.isoradiusColorProperty, lineWidth: 4, lineDash: [14, 10] }),
-    disc(130, 360, 190, "#ffd0a0", "#c0402a"),
-    disc(22, 120, 210, "#ffffff", "#7ea6ff"),
+    new Path(lines, {
+      stroke: HRDiagramColors.isoradiusColorProperty,
+      lineWidth: HR_DIAGRAM_SCREEN_ICONS_SETTINGS.CREATE_RADIUS_ICON_LINE_WIDTH,
+      lineDash: [HR_DIAGRAM_SCREEN_ICONS_SETTINGS.CREATE_RADIUS_ICON_LINE_DASH_DASH, 10],
+    }),
+    disc(HR_DIAGRAM_SCREEN_ICONS_SETTINGS.CREATE_RADIUS_ICON_RADIUS, 360, 190, "#ffd0a0", "#c0402a"),
+    disc(HR_DIAGRAM_SCREEN_ICONS_SETTINGS.CREATE_RADIUS_ICON_RADIUS_SEGMENT_2, 120, 210, "#ffffff", "#7ea6ff"),
   );
 };
 
@@ -103,7 +112,15 @@ export const createStarSamplesIcon = (): ScreenIcon => {
   const random = seeded(7);
   const dots: Node[] = [];
   const dot = (x: number, y: number, fill: typeof HRDiagramColors.nearestStarColorProperty): void => {
-    dots.push(new Circle(9, { x, y, fill, stroke: "black", lineWidth: 1.5 }));
+    dots.push(
+      new Circle(HR_DIAGRAM_SCREEN_ICONS_SETTINGS.DOT_RADIUS, {
+        x,
+        y,
+        fill,
+        stroke: "black",
+        lineWidth: HR_DIAGRAM_SCREEN_ICONS_SETTINGS.DOT_LINE_WIDTH,
+      }),
+    );
   };
   // Nearest stars: faint red dwarfs low on the main sequence, and a few white dwarfs.
   for (let i = 0; i < 26; i++) {
@@ -145,7 +162,10 @@ export const createGaiaCensusIcon = (): ScreenIcon => {
     add(giants, 360 + 30 * gaussian(random), 110 + 25 * gaussian(random), 4);
   }
   return iconFrom(
-    new Path(dwarfs, { fill: HRDiagramColors.dwarfColorProperty, opacity: 0.8 }),
+    new Path(dwarfs, {
+      fill: HRDiagramColors.dwarfColorProperty,
+      opacity: HR_DIAGRAM_SCREEN_ICONS_SETTINGS.CREATE_GAIA_CENSUS_ICON_OPACITY,
+    }),
     new Path(whiteDwarfs, { fill: HRDiagramColors.whiteDwarfColorProperty }),
     new Path(giants, { fill: HRDiagramColors.giantColorProperty }),
   );

@@ -1,3 +1,4 @@
+import { GAIA_CENSUS_SCREEN_VIEW_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * GaiaCensusScreenView.ts
  *
@@ -204,13 +205,16 @@ export class GaiaCensusScreenView extends ScreenView {
     const brightnessCheckbox = new Checkbox(
       model.brightnessLimitEnabledProperty,
       new HBox({
-        spacing: 6,
+        spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.BRIGHTNESS_CHECKBOX_SPACING,
         children: [
-          textNode(strings.brightnessLimitStringProperty, 200),
+          textNode(
+            strings.brightnessLimitStringProperty,
+            GAIA_CENSUS_SCREEN_VIEW_SETTINGS.BRIGHTNESS_LIMIT_TEXT_NODE_MAX_WIDTH,
+          ),
           new Text(valueText(strings.magnitudePatternStringProperty, model.brightnessLimitProperty, 1), {
             font: FONTS.READOUT,
             fill: HRDiagramColors.textColorProperty,
-            maxWidth: 80,
+            maxWidth: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.BRIGHTNESS_CHECKBOX_MAX_WIDTH,
           }),
         ],
       }),
@@ -218,18 +222,21 @@ export class GaiaCensusScreenView extends ScreenView {
     );
     const selectionPanel = new HRDiagramPanel(
       new VBox({
-        spacing: 6,
+        spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.SELECTION_PANEL_SPACING,
         align: "left",
         children: [
           textNode(strings.selectionTitleStringProperty, PANEL_CONTENT_WIDTH, FONTS.TITLE),
           new HBox({
-            spacing: 8,
+            spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_SELECTION_PANEL_SPACING,
             children: [
-              textNode(strings.distanceLimitStringProperty, 150),
+              textNode(
+                strings.distanceLimitStringProperty,
+                GAIA_CENSUS_SCREEN_VIEW_SETTINGS.DISTANCE_LIMIT_TEXT_NODE_MAX_WIDTH,
+              ),
               new Text(valueText(strings.distancePatternStringProperty, model.distanceLimitProperty, 0), {
                 font: FONTS.READOUT,
                 fill: HRDiagramColors.textColorProperty,
-                maxWidth: 130,
+                maxWidth: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.SELECTION_PANEL_MAX_WIDTH,
               }),
             ],
           }),
@@ -260,9 +267,13 @@ export class GaiaCensusScreenView extends ScreenView {
       });
       return [
         new Circle(GAIA.CATEGORY_SWATCH_RADIUS, { fill: CATEGORY_COLORS.get(category) ?? "white" }),
-        textNode(categoryNames[`${category.key}StringProperty`] as TReadOnlyProperty<string>, 130, FONTS.SMALL),
-        textNode(count, 50, FONTS.SMALL),
-        textNode(percent, 55, FONTS.SMALL),
+        textNode(
+          categoryNames[`${category.key}StringProperty`] as TReadOnlyProperty<string>,
+          GAIA_CENSUS_SCREEN_VIEW_SETTINGS.ROWS_MAX_WIDTH,
+          FONTS.SMALL,
+        ),
+        textNode(count, GAIA_CENSUS_SCREEN_VIEW_SETTINGS.ROWS_MAX_WIDTH_SEGMENT_2, FONTS.SMALL),
+        textNode(percent, GAIA_CENSUS_SCREEN_VIEW_SETTINGS.ROWS_MAX_WIDTH_SEGMENT_3, FONTS.SMALL),
         new Node({
           children: [new Rectangle(0, 0, GAIA.BAR_MAX_WIDTH, GAIA.BAR_HEIGHT), bar],
         }),
@@ -283,13 +294,18 @@ export class GaiaCensusScreenView extends ScreenView {
     );
     const kindsPanel = new HRDiagramPanel(
       new VBox({
-        spacing: 6,
+        spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.KINDS_PANEL_SPACING,
         align: "left",
         children: [
           textNode(strings.kindsTitleStringProperty, PANEL_CONTENT_WIDTH, FONTS.TITLE),
           textNode(plottedText),
           textNode(standsForText, PANEL_CONTENT_WIDTH, FONTS.SMALL),
-          new GridBox({ xSpacing: 6, ySpacing: 4, xAlign: "left", rows }),
+          new GridBox({
+            xSpacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.KINDS_PANEL_X_SPACING,
+            ySpacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.KINDS_PANEL_Y_SPACING,
+            xAlign: "left",
+            rows,
+          }),
         ],
       }),
       { minWidth: PANEL_CONTENT_WIDTH + PANEL.MIN_WIDTH_INSET },
@@ -301,17 +317,21 @@ export class GaiaCensusScreenView extends ScreenView {
       model.colorByProperty,
       ColorBy.enumeration.values.map((colorBy) => {
         const name = colorByNames[`${colorBy.key}StringProperty`] as TReadOnlyProperty<string>;
-        return { value: colorBy, createNode: () => textNode(name, 130), options: { accessibleName: name } };
+        return {
+          value: colorBy,
+          createNode: () => textNode(name, GAIA_CENSUS_SCREEN_VIEW_SETTINGS.COLOR_BY_GROUP_MAX_WIDTH),
+          options: { accessibleName: name },
+        };
       }),
       {
         orientation: "horizontal",
-        spacing: 16,
+        spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.COLOR_BY_GROUP_SPACING,
         radioButtonOptions: { radius: CONTROLS.RADIO_BUTTON_RADIUS },
         accessibleName: strings.colorByTitleStringProperty,
       },
     );
     const distanceLegend = new HBox({
-      spacing: 8,
+      spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.DISTANCE_LEGEND_SPACING,
       children: DISTANCE_COLORS.map((color, i) => {
         const label = new DerivedProperty([strings.distanceBinPatternStringProperty], (pattern) =>
           StringUtils.fillIn(pattern, {
@@ -321,7 +341,10 @@ export class GaiaCensusScreenView extends ScreenView {
         );
         return new VBox({
           spacing: 1,
-          children: [new Circle(GAIA.LEGEND_DOT_RADIUS, { fill: color }), textNode(label, 50, FONTS.SMALL)],
+          children: [
+            new Circle(GAIA.LEGEND_DOT_RADIUS, { fill: color }),
+            textNode(label, GAIA_CENSUS_SCREEN_VIEW_SETTINGS.DISTANCE_LEGEND_MAX_WIDTH, FONTS.SMALL),
+          ],
         });
       }),
     });
@@ -330,7 +353,7 @@ export class GaiaCensusScreenView extends ScreenView {
     });
     const colorPanel = new HRDiagramPanel(
       new VBox({
-        spacing: 6,
+        spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.COLOR_PANEL_SPACING,
         align: "left",
         excludeInvisibleChildrenFromBounds: false,
         children: [
@@ -347,9 +370,13 @@ export class GaiaCensusScreenView extends ScreenView {
     const axisControls = new AxisControlsNode(model.settings, listParent);
     const strip = new HRDiagramPanel(
       new VBox({
-        spacing: 4,
+        spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.STRIP_SPACING,
         children: [
-          new HBox({ spacing: 24, align: "center", children: [overlayCheckboxes, axisControls] }),
+          new HBox({
+            spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_STRIP_SPACING,
+            align: "center",
+            children: [overlayCheckboxes, axisControls],
+          }),
           textNode(strings.saturationNoteStringProperty, CHART.WIDTH + 40, FONTS.SMALL),
         ],
       }),
@@ -366,9 +393,16 @@ export class GaiaCensusScreenView extends ScreenView {
     this.children = [
       placeInRegion(chart, layout.chart),
       placeInRegion(strip, layout.strip),
-      placeInRegion(new VBox({ spacing: 8, children: [selectionPanel, kindsPanel, colorPanel] }), layout.panels, {
-        yAlign: "top",
-      }),
+      placeInRegion(
+        new VBox({
+          spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.CHILDREN_SPACING,
+          children: [selectionPanel, kindsPanel, colorPanel],
+        }),
+        layout.panels,
+        {
+          yAlign: "top",
+        },
+      ),
       placeInRegion(resetAllButton, layout.footer, { xAlign: "right", yAlign: "bottom" }),
       listParent,
     ];

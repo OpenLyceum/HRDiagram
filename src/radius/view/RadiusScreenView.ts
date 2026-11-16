@@ -1,3 +1,4 @@
+import { RADIUS_SCREEN_VIEW_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * RadiusScreenView.ts
  *
@@ -78,8 +79,11 @@ export class RadiusScreenView extends ScreenView {
     chart.plotLayer.children = [new HROverlayNode(chart, model.settings), new SunMarkerNode(chart), cursorA, cursorB];
 
     // ── Comparison table ──────────────────────────────────────────────────────
-    const text = (value: TReadOnlyProperty<string> | string, font = FONTS.READOUT, maxWidth = 90): RichText =>
-      new RichText(value, { font, fill: HRDiagramColors.textColorProperty, maxWidth });
+    const text = (
+      value: TReadOnlyProperty<string> | string,
+      font = FONTS.READOUT,
+      maxWidth: number = RADIUS_SCREEN_VIEW_SETTINGS.DEFAULT_MAX_WIDTH,
+    ): RichText => new RichText(value, { font, fill: HRDiagramColors.textColorProperty, maxWidth });
     const formatted = (
       pattern: TReadOnlyProperty<string>,
       property: TReadOnlyProperty<number>,
@@ -87,13 +91,21 @@ export class RadiusScreenView extends ScreenView {
     ): TReadOnlyProperty<string> =>
       new DerivedProperty([pattern, property], (p, value) => StringUtils.fillIn(p, { value: format(value) }));
     const kelvin = (property: TReadOnlyProperty<number>) =>
-      formatted(common.units.kelvinPatternStringProperty, property, (T) => formatInteger(Number(T.toPrecision(3))));
+      formatted(common.units.kelvinPatternStringProperty, property, (T) =>
+        formatInteger(Number(T.toPrecision(RADIUS_SCREEN_VIEW_SETTINGS.KELVIN_SIGNIFICANT_FIGURES))),
+      );
     const solarL = (property: TReadOnlyProperty<number>) =>
-      formatted(common.units.solarLuminosityPatternStringProperty, property, (L) => formatValue(L, 3));
+      formatted(common.units.solarLuminosityPatternStringProperty, property, (L) =>
+        formatValue(L, RADIUS_SCREEN_VIEW_SETTINGS.SOLAR_L_DIGITS),
+      );
     const solarR = (property: TReadOnlyProperty<number>) =>
-      formatted(common.units.solarRadiusPatternStringProperty, property, (R) => formatValue(R, 3));
+      formatted(common.units.solarRadiusPatternStringProperty, property, (R) =>
+        formatValue(R, RADIUS_SCREEN_VIEW_SETTINGS.SOLAR_R_DIGITS),
+      );
     const ratio = (property: TReadOnlyProperty<number>) =>
-      formatted(strings.ratioPatternStringProperty, property, (value) => formatValue(value, 3));
+      formatted(strings.ratioPatternStringProperty, property, (value) =>
+        formatValue(value, RADIUS_SCREEN_VIEW_SETTINGS.RATIO_DIGITS),
+      );
 
     const header = (value: TReadOnlyProperty<string>): RichText => text(value, FONTS.TITLE);
     const rowLabel = (value: TReadOnlyProperty<string>): RichText => {
@@ -102,8 +114,8 @@ export class RadiusScreenView extends ScreenView {
       return label;
     };
     const table = new GridBox({
-      xSpacing: 10,
-      ySpacing: 5,
+      xSpacing: RADIUS_SCREEN_VIEW_SETTINGS.TABLE_X_SPACING,
+      ySpacing: RADIUS_SCREEN_VIEW_SETTINGS.TABLE_Y_SPACING,
       xAlign: "right",
       rows: [
         [
@@ -142,15 +154,15 @@ export class RadiusScreenView extends ScreenView {
       ],
       (pattern, luminosity, temperature, radius) =>
         StringUtils.fillIn(pattern, {
-          luminosity: formatValue(luminosity, 3),
-          temperature: formatValue(temperature, 3),
-          radius: formatValue(radius, 3),
+          luminosity: formatValue(luminosity, RADIUS_SCREEN_VIEW_SETTINGS.EQUATION_DIGITS),
+          temperature: formatValue(temperature, RADIUS_SCREEN_VIEW_SETTINGS.EQUATION_DIGITS),
+          radius: formatValue(radius, RADIUS_SCREEN_VIEW_SETTINGS.EQUATION_RADIUS),
         }),
     );
 
     const comparePanel = new HRDiagramPanel(
       new VBox({
-        spacing: 8,
+        spacing: RADIUS_SCREEN_VIEW_SETTINGS.COMPARE_PANEL_SPACING,
         align: "left",
         children: [
           new Text(strings.compareTitleStringProperty, {
@@ -160,7 +172,7 @@ export class RadiusScreenView extends ScreenView {
           }),
           table,
           new VBox({
-            spacing: 4,
+            spacing: RADIUS_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_COMPARE_PANEL_SPACING,
             align: "left",
             visibleProperty: preferences.showEquationsProperty,
             children: [
@@ -204,7 +216,7 @@ export class RadiusScreenView extends ScreenView {
         };
       }),
       {
-        spacing: 6,
+        spacing: RADIUS_SCREEN_VIEW_SETTINGS.CONSTRAINT_GROUP_SPACING,
         radioButtonOptions: { radius: CONTROLS.RADIO_BUTTON_RADIUS },
         accessibleName: strings.constraintTitleStringProperty,
       },
@@ -212,7 +224,7 @@ export class RadiusScreenView extends ScreenView {
     const overlayCheckboxes = new OverlayCheckboxGroup(model.settings);
     const settingsPanel = new HRDiagramPanel(
       new VBox({
-        spacing: 8,
+        spacing: RADIUS_SCREEN_VIEW_SETTINGS.SETTINGS_PANEL_SPACING,
         align: "left",
         children: [
           new Text(strings.constraintTitleStringProperty, {
@@ -238,9 +250,13 @@ export class RadiusScreenView extends ScreenView {
 
     this.children = [
       placeInRegion(chart, layout.chart),
-      placeInRegion(new VBox({ spacing: 10, children: [comparePanel, settingsPanel] }), layout.panels, {
-        yAlign: "top",
-      }),
+      placeInRegion(
+        new VBox({ spacing: RADIUS_SCREEN_VIEW_SETTINGS.CHILDREN_SPACING, children: [comparePanel, settingsPanel] }),
+        layout.panels,
+        {
+          yAlign: "top",
+        },
+      ),
       placeInRegion(resetAllButton, layout.footer, { xAlign: "right", yAlign: "bottom" }),
     ];
 

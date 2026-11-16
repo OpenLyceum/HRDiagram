@@ -1,3 +1,4 @@
+import { FORMAT_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * format.ts
  *
@@ -40,7 +41,7 @@ export const formatInteger = (value: number): string =>
  * A value to `digits` significant figures: plain decimals between 10⁻³ and 10⁵ (grouped above 9999),
  * otherwise m × 10ⁿ.
  */
-export const formatValue = (value: number, digits = 3): string => {
+export const formatValue = (value: number, digits: number = FORMAT_SETTINGS.DEFAULT_DIGITS): string => {
   if (!Number.isFinite(value)) {
     return "—";
   }

@@ -1,3 +1,4 @@
+import { STAR_PLOT_NODE_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * StarPlotNode.ts
  *
@@ -22,7 +23,7 @@ import { StringManager } from "../../i18n/StringManager.js";
 /** Point groups, painted in this order. */
 const NEAREST_GROUP = 0;
 const BRIGHTEST_GROUP = 1;
-const BOTH_GROUP = 2;
+const BOTH_GROUP: number = STAR_PLOT_NODE_SETTINGS.BOTH_GROUP;
 
 /** Nearest stars are circles, brightest diamonds, both squares: shape repeats what colour says. */
 export const SAMPLE_STYLES: PointStyle[] = [
@@ -190,9 +191,9 @@ export class StarPlotNode extends Node {
           ? null
           : StringUtils.fillIn(strings.selectedPatternStringProperty.value, {
               name: star.name,
-              temperature: formatValue(star.temperature, 3),
-              luminosity: formatValue(star.luminosity, 3),
-              radius: formatValue(star.radius, 3),
+              temperature: formatValue(star.temperature, STAR_PLOT_NODE_SETTINGS.TEMPERATURE_FORMAT_VALUE_DIGITS),
+              luminosity: formatValue(star.luminosity, STAR_PLOT_NODE_SETTINGS.LUMINOSITY_FORMAT_VALUE_DIGITS),
+              radius: formatValue(star.radius, STAR_PLOT_NODE_SETTINGS.DESCRIBE_RADIUS),
             });
     };
     selectedStarProperty.link(describe);

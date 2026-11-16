@@ -1,3 +1,4 @@
+import { CURSOR_STAR_NODE_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * CursorStarNode.ts
  *
@@ -67,7 +68,7 @@ export class CursorStarNode extends Node {
         font: FONTS.TITLE,
         fill: HRDiagramColors.cursorColorProperty,
         left: CURSOR_STAR.RING_RADIUS + 2,
-        bottom: -CURSOR_STAR.RING_RADIUS + 4,
+        bottom: -CURSOR_STAR.RING_RADIUS + CURSOR_STAR_NODE_SETTINGS.TEXT_BOTTOM_OFFSET,
         maxWidth: CURSOR_STAR.LABEL_MAX_WIDTH,
       });
       children.push(text);

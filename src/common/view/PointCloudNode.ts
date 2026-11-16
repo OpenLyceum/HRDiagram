@@ -1,3 +1,4 @@
+import { POINT_CLOUD_NODE_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * PointCloudNode.ts
  *
@@ -12,7 +13,7 @@ import { CanvasNode } from "scenerystack/scenery";
 import { POINT_CLOUD } from "../../HRDiagramConstants.js";
 
 /** Group index that is never drawn. */
-export const HIDDEN_GROUP = 255;
+export const HIDDEN_GROUP: number = POINT_CLOUD_NODE_SETTINGS.HIDDEN_GROUP;
 
 /** Points in chart (model) coordinates, each with a group. */
 export type PointSet = {

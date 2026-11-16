@@ -1,3 +1,4 @@
+import { EXPLORE_SCREEN_VIEW_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * ExploreScreenView.ts
  *
@@ -92,23 +93,37 @@ export class ExploreScreenView extends ScreenView {
     chart.plotLayer.children = [hitArea, overlays, new SunMarkerNode(chart), cursorStar];
 
     // ── Your star: sliders, readouts, size comparison ─────────────────────────
-    const label = (text: TReadOnlyProperty<string>, maxWidth = 150): Text =>
-      new Text(text, { font: FONTS.LABEL, fill: HRDiagramColors.textColorProperty, maxWidth });
+    const label = (
+      text: TReadOnlyProperty<string>,
+      maxWidth: number = EXPLORE_SCREEN_VIEW_SETTINGS.DEFAULT_MAX_WIDTH,
+    ): Text => new Text(text, { font: FONTS.LABEL, fill: HRDiagramColors.textColorProperty, maxWidth });
     const readout = (text: TReadOnlyProperty<string>): RichText =>
-      new RichText(text, { font: FONTS.READOUT, fill: HRDiagramColors.textColorProperty, maxWidth: 160 });
+      new RichText(text, {
+        font: FONTS.READOUT,
+        fill: HRDiagramColors.textColorProperty,
+        maxWidth: EXPLORE_SCREEN_VIEW_SETTINGS.READOUT_MAX_WIDTH,
+      });
 
     const temperatureText = new DerivedProperty(
       [strings.units.kelvinPatternStringProperty, model.star.temperatureProperty],
       (pattern, temperature) =>
-        StringUtils.fillIn(pattern, { value: formatInteger(Number(temperature.toPrecision(3))) }),
+        StringUtils.fillIn(pattern, {
+          value: formatInteger(
+            Number(temperature.toPrecision(EXPLORE_SCREEN_VIEW_SETTINGS.TEMPERATURE_TEXT_SIGNIFICANT_FIGURES)),
+          ),
+        }),
     );
     const luminosityText = new DerivedProperty(
       [strings.units.solarLuminosityPatternStringProperty, model.star.luminosityProperty],
-      (pattern, luminosity) => StringUtils.fillIn(pattern, { value: formatValue(luminosity, 3) }),
+      (pattern, luminosity) =>
+        StringUtils.fillIn(pattern, {
+          value: formatValue(luminosity, EXPLORE_SCREEN_VIEW_SETTINGS.LUMINOSITY_TEXT_DIGITS),
+        }),
     );
     const radiusText = new DerivedProperty(
       [strings.units.solarRadiusPatternStringProperty, model.star.radiusProperty],
-      (pattern, radius) => StringUtils.fillIn(pattern, { value: formatValue(radius, 3) }),
+      (pattern, radius) =>
+        StringUtils.fillIn(pattern, { value: formatValue(radius, EXPLORE_SCREEN_VIEW_SETTINGS.RADIUS_TEXT_DIGITS) }),
     );
     const magnitudeText = new DerivedProperty([model.star.luminosityProperty, model.star.temperatureProperty], (L, T) =>
       formatFixed(absoluteVisualMagnitude(L, T), 1),
@@ -138,25 +153,31 @@ export class ExploreScreenView extends ScreenView {
       model.star.logTemperatureProperty,
       exploreStrings.temperatureStringProperty,
       a11y.controls.temperatureValuePatternStringProperty,
-      (T) => formatInteger(Number(T.toPrecision(3))),
+      (T) => formatInteger(Number(T.toPrecision(EXPLORE_SCREEN_VIEW_SETTINGS.TEMPERATURE_SLIDER_SIGNIFICANT_FIGURES))),
     );
     const luminositySlider = slider(
       model.star.logLuminosityProperty,
       exploreStrings.luminosityStringProperty,
       a11y.controls.luminosityValuePatternStringProperty,
-      (L) => formatValue(L, 3),
+      (L) => formatValue(L, EXPLORE_SCREEN_VIEW_SETTINGS.LUMINOSITY_SLIDER_DIGITS),
     );
 
     const sliderBlock = (name: TReadOnlyProperty<string>, value: TReadOnlyProperty<string>, control: HSlider): VBox =>
       new VBox({
-        spacing: 2,
+        spacing: EXPLORE_SCREEN_VIEW_SETTINGS.SLIDER_BLOCK_SPACING,
         align: "left",
-        children: [new HBox({ spacing: 10, children: [label(name), readout(value)] }), control],
+        children: [
+          new HBox({
+            spacing: EXPLORE_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_SLIDER_BLOCK_SPACING,
+            children: [label(name), readout(value)],
+          }),
+          control,
+        ],
       });
 
     const readouts = new GridBox({
-      xSpacing: 12,
-      ySpacing: 4,
+      xSpacing: EXPLORE_SCREEN_VIEW_SETTINGS.READOUTS_X_SPACING,
+      ySpacing: EXPLORE_SCREEN_VIEW_SETTINGS.READOUTS_Y_SPACING,
       xAlign: "left",
       rows: [
         [label(strings.quantities.radiusStringProperty), readout(radiusText)],
@@ -167,7 +188,7 @@ export class ExploreScreenView extends ScreenView {
 
     const starPanel = new HRDiagramPanel(
       new VBox({
-        spacing: 8,
+        spacing: EXPLORE_SCREEN_VIEW_SETTINGS.STAR_PANEL_SPACING,
         align: "left",
         children: [
           new Text(exploreStrings.starTitleStringProperty, {
@@ -204,7 +225,11 @@ export class ExploreScreenView extends ScreenView {
     const overlayCheckboxes = new OverlayCheckboxGroup(settings);
     const axisControls = new AxisControlsNode(settings, listParent);
     const settingsPanel = new HRDiagramPanel(
-      new VBox({ spacing: 10, align: "left", children: [overlayCheckboxes, axisControls] }),
+      new VBox({
+        spacing: EXPLORE_SCREEN_VIEW_SETTINGS.SETTINGS_PANEL_SPACING,
+        align: "left",
+        children: [overlayCheckboxes, axisControls],
+      }),
       { minWidth: PANEL_CONTENT_WIDTH + PANEL.MIN_WIDTH_INSET },
     );
 
@@ -218,9 +243,13 @@ export class ExploreScreenView extends ScreenView {
 
     this.children = [
       placeInRegion(chart, layout.chart),
-      placeInRegion(new VBox({ spacing: 10, children: [starPanel, settingsPanel] }), layout.panels, {
-        yAlign: "top",
-      }),
+      placeInRegion(
+        new VBox({ spacing: EXPLORE_SCREEN_VIEW_SETTINGS.CHILDREN_SPACING, children: [starPanel, settingsPanel] }),
+        layout.panels,
+        {
+          yAlign: "top",
+        },
+      ),
       placeInRegion(resetAllButton, layout.footer, { xAlign: "right", yAlign: "bottom" }),
       listParent,
     ];

@@ -1,3 +1,4 @@
+import { AXIS_QUANTITY_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * AxisQuantity.ts
  *
@@ -65,7 +66,7 @@ export class AxisQuantity extends EnumerationValue {
   public static readonly TEMPERATURE = new AxisQuantity({
     key: "temperature",
     log: true,
-    range: new Range(2000, 50000),
+    range: new Range(AXIS_QUANTITY_SETTINGS.TEMPERATURE_RANGE_MIN, AXIS_QUANTITY_SETTINGS.TEMPERATURE_RANGE_MAX),
     inverted: true,
     fromTemperatureLuminosity: (temperature) => temperature,
     fromStar: (star) => star.temperature,
@@ -75,7 +76,7 @@ export class AxisQuantity extends EnumerationValue {
   public static readonly COLOR_INDEX = new AxisQuantity({
     key: "colorIndex",
     log: false,
-    range: new Range(-0.4, 2.2),
+    range: new Range(AXIS_QUANTITY_SETTINGS.COLOR_INDEX_RANGE_MIN, AXIS_QUANTITY_SETTINGS.COLOR_INDEX_RANGE_MAX),
     inverted: false,
     fromTemperatureLuminosity: (temperature) => colorIndexFromTemperature(temperature),
     fromStar: (star) =>
@@ -87,7 +88,7 @@ export class AxisQuantity extends EnumerationValue {
   public static readonly SPECTRAL_TYPE = new AxisQuantity({
     key: "spectralType",
     log: false,
-    range: new Range(0, 70),
+    range: new Range(0, AXIS_QUANTITY_SETTINGS.SPECTRAL_TYPE_RANGE_MAX),
     inverted: false,
     fromTemperatureLuminosity: (temperature) => spectralCodeFromTemperature(temperature),
     fromStar: (star) => star.spectralCode,
@@ -98,7 +99,7 @@ export class AxisQuantity extends EnumerationValue {
   public static readonly BP_RP = new AxisQuantity({
     key: "bpRp",
     log: false,
-    range: new Range(-0.6, 5.2),
+    range: new Range(AXIS_QUANTITY_SETTINGS.BP_RP_RANGE_MIN, AXIS_QUANTITY_SETTINGS.BP_RP_RANGE_MAX),
     inverted: false,
     fromTemperatureLuminosity: (temperature) => bpRpFromTemperature(temperature),
     fromStar: (star) => (Number.isFinite(star.bpRp) ? star.bpRp : bpRpFromTemperature(star.temperature)),
@@ -110,7 +111,7 @@ export class AxisQuantity extends EnumerationValue {
   public static readonly LUMINOSITY = new AxisQuantity({
     key: "luminosity",
     log: true,
-    range: new Range(1e-5, 1e7),
+    range: new Range(AXIS_QUANTITY_SETTINGS.LUMINOSITY_RANGE_MIN, AXIS_QUANTITY_SETTINGS.LUMINOSITY_RANGE_MAX),
     inverted: false,
     fromTemperatureLuminosity: (_temperature, luminosity) => luminosity,
     fromStar: (star) => star.luminosity,
@@ -120,7 +121,10 @@ export class AxisQuantity extends EnumerationValue {
   public static readonly ABSOLUTE_MAGNITUDE = new AxisQuantity({
     key: "absoluteMagnitude",
     log: false,
-    range: new Range(-10, 20),
+    range: new Range(
+      AXIS_QUANTITY_SETTINGS.ABSOLUTE_MAGNITUDE_RANGE_MIN,
+      AXIS_QUANTITY_SETTINGS.ABSOLUTE_MAGNITUDE_RANGE_MAX,
+    ),
     inverted: true,
     fromTemperatureLuminosity: (temperature, luminosity) => absoluteVisualMagnitude(luminosity, temperature),
     fromStar: (star) => star.absoluteV,
@@ -131,7 +135,7 @@ export class AxisQuantity extends EnumerationValue {
   public static readonly ABSOLUTE_G = new AxisQuantity({
     key: "absoluteG",
     log: false,
-    range: new Range(-4, 18),
+    range: new Range(AXIS_QUANTITY_SETTINGS.ABSOLUTE_G_RANGE_MIN, AXIS_QUANTITY_SETTINGS.ABSOLUTE_G_RANGE_MAX),
     inverted: true,
     fromTemperatureLuminosity: (temperature, luminosity) =>
       bolometricMagnitudeFromLuminosity(luminosity) - gBolometricCorrection(bpRpFromTemperature(temperature)),

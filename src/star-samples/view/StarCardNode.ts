@@ -1,3 +1,4 @@
+import { STAR_CARD_NODE_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * StarCardNode.ts
  *
@@ -35,12 +36,18 @@ export class StarCardNode extends VBox {
         label: strings.distanceStringProperty,
         value: (star) =>
           StringUtils.fillIn(strings.distancePatternStringProperty.value, {
-            pc: formatValue(star.distance, 3),
-            ly: formatValue(star.distance * STAR_CARD.LIGHT_YEARS_PER_PARSEC, 3),
+            pc: formatValue(star.distance, STAR_CARD_NODE_SETTINGS.DISTANCE_FORMAT_VALUE_DIGITS),
+            ly: formatValue(star.distance * STAR_CARD.LIGHT_YEARS_PER_PARSEC, STAR_CARD_NODE_SETTINGS.ROWS_DIGITS),
           }),
       },
-      { label: strings.apparentMagnitudeStringProperty, value: (star) => formatFixed(star.apparentV, 2) },
-      { label: strings.absoluteMagnitudeStringProperty, value: (star) => formatFixed(star.absoluteV, 2) },
+      {
+        label: strings.apparentMagnitudeStringProperty,
+        value: (star) => formatFixed(star.apparentV, STAR_CARD_NODE_SETTINGS.ROWS_DECIMALS),
+      },
+      {
+        label: strings.absoluteMagnitudeStringProperty,
+        value: (star) => formatFixed(star.absoluteV, STAR_CARD_NODE_SETTINGS.ROWS_DECIMALS),
+      },
       {
         label: strings.spectralTypeStringProperty,
         value: (star) => star.spectralType ?? strings.notCataloguedStringProperty.value,
@@ -49,21 +56,23 @@ export class StarCardNode extends VBox {
         label: common.quantities.temperatureStringProperty,
         value: (star) =>
           StringUtils.fillIn(common.units.kelvinPatternStringProperty.value, {
-            value: formatInteger(Number(star.temperature.toPrecision(3))),
+            value: formatInteger(
+              Number(star.temperature.toPrecision(STAR_CARD_NODE_SETTINGS.ROWS_SIGNIFICANT_FIGURES)),
+            ),
           }),
       },
       {
         label: common.quantities.luminosityStringProperty,
         value: (star) =>
           StringUtils.fillIn(common.units.solarLuminosityPatternStringProperty.value, {
-            value: formatValue(star.luminosity, 3),
+            value: formatValue(star.luminosity, STAR_CARD_NODE_SETTINGS.LUMINOSITY_FORMAT_VALUE_DIGITS),
           }),
       },
       {
         label: common.quantities.radiusStringProperty,
         value: (star) =>
           StringUtils.fillIn(common.units.solarRadiusPatternStringProperty.value, {
-            value: formatValue(star.radius, 3),
+            value: formatValue(star.radius, STAR_CARD_NODE_SETTINGS.RADIUS_FORMAT_VALUE_DIGITS),
           }),
       },
       {

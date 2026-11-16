@@ -1,3 +1,4 @@
+import { EXPLORE_SCREEN_SUMMARY_CONTENT_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * ExploreScreenSummaryContent.ts
  *
@@ -24,9 +25,9 @@ export class ExploreScreenSummaryContent extends ScreenSummaryContent {
       ],
       (pattern, temperature, luminosity, radius) =>
         StringUtils.fillIn(pattern, {
-          temperature: formatValue(temperature, 3),
-          luminosity: formatValue(luminosity, 3),
-          radius: formatValue(radius, 3),
+          temperature: formatValue(temperature, EXPLORE_SCREEN_SUMMARY_CONTENT_SETTINGS.CURRENT_DETAILS_DIGITS),
+          luminosity: formatValue(luminosity, EXPLORE_SCREEN_SUMMARY_CONTENT_SETTINGS.CURRENT_DETAILS_DIGITS),
+          radius: formatValue(radius, EXPLORE_SCREEN_SUMMARY_CONTENT_SETTINGS.CURRENT_DETAILS_RADIUS),
         }),
     );
     super({

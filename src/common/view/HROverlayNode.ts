@@ -1,3 +1,4 @@
+import { HR_OVERLAY_NODE_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * HROverlayNode.ts
  *
@@ -233,10 +234,10 @@ export class HROverlayNode extends Node {
         maxWidth: OVERLAY.STRIP_LABEL_MAX_WIDTH,
       });
       if (anchor.isFinite()) {
-        label.right = anchor.x - 4;
+        label.right = anchor.x - HR_OVERLAY_NODE_SETTINGS.DRAW_STRIP_RIGHT_OFFSET;
         label.centerY = anchor.y;
         if (label.left < OVERLAY.LABEL_MARGIN) {
-          label.left = anchor.x + 40;
+          label.left = anchor.x + HR_OVERLAY_NODE_SETTINGS.DRAW_STRIP_LEFT_OFFSET;
         }
         stripLayer.addChild(label);
       }

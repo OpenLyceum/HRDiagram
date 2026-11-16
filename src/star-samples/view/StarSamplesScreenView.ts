@@ -1,3 +1,4 @@
+import { STAR_SAMPLES_SCREEN_VIEW_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * StarSamplesScreenView.ts
  *
@@ -115,7 +116,7 @@ export class StarSamplesScreenView extends ScreenView {
         };
       }),
       {
-        spacing: 6,
+        spacing: STAR_SAMPLES_SCREEN_VIEW_SETTINGS.SAMPLE_GROUP_SPACING,
         radioButtonOptions: { radius: CONTROLS.RADIO_BUTTON_RADIUS },
         accessibleName: strings.sampleTitleStringProperty,
       },
@@ -125,10 +126,16 @@ export class StarSamplesScreenView extends ScreenView {
       (pattern, stars) => StringUtils.fillIn(pattern, { count: formatInteger(stars.length) }),
     );
     const legendEntry = (style: PointStyle, label: TReadOnlyProperty<string>): HBox =>
-      new HBox({ spacing: 4, children: [new MarkerIconNode(style), textNode(label, 90, FONTS.SMALL)] });
+      new HBox({
+        spacing: STAR_SAMPLES_SCREEN_VIEW_SETTINGS.LEGEND_ENTRY_SPACING,
+        children: [
+          new MarkerIconNode(style),
+          textNode(label, STAR_SAMPLES_SCREEN_VIEW_SETTINGS.LEGEND_ENTRY_MAX_WIDTH, FONTS.SMALL),
+        ],
+      });
     const [nearestStyle, brightestStyle, bothStyle] = SAMPLE_STYLES as [PointStyle, PointStyle, PointStyle];
     const legend = new HBox({
-      spacing: 12,
+      spacing: STAR_SAMPLES_SCREEN_VIEW_SETTINGS.LEGEND_SPACING,
       children: [
         legendEntry(nearestStyle, strings.legendNearestStringProperty),
         legendEntry(brightestStyle, strings.legendBrightestStringProperty),
@@ -137,7 +144,7 @@ export class StarSamplesScreenView extends ScreenView {
     });
     const samplePanel = new HRDiagramPanel(
       new VBox({
-        spacing: 7,
+        spacing: STAR_SAMPLES_SCREEN_VIEW_SETTINGS.SAMPLE_PANEL_SPACING,
         align: "left",
         children: [
           textNode(strings.sampleTitleStringProperty, PANEL_CONTENT_WIDTH, FONTS.TITLE),
@@ -168,7 +175,7 @@ export class StarSamplesScreenView extends ScreenView {
     });
     const kindsPanel = new HRDiagramPanel(
       new VBox({
-        spacing: 5,
+        spacing: STAR_SAMPLES_SCREEN_VIEW_SETTINGS.KINDS_PANEL_SPACING,
         align: "left",
         children: [textNode(strings.kindsTitleStringProperty, PANEL_CONTENT_WIDTH, FONTS.TITLE), ...categoryCheckboxes],
       }),
@@ -198,13 +205,18 @@ export class StarSamplesScreenView extends ScreenView {
             new Text(strings.chooseStarStringProperty, {
               font: FONTS.LABEL,
               fill: LIGHT_SURFACE_TEXT_FILL,
-              maxWidth: 150,
+              maxWidth: STAR_SAMPLES_SCREEN_VIEW_SETTINGS.FIND_COMBO_BOX_MAX_WIDTH,
             }),
           accessibleName: strings.chooseStarStringProperty,
         },
         ...famousStars.map((star) => ({
           value: star,
-          createNode: () => new Text(star.name, { font: FONTS.LABEL, fill: LIGHT_SURFACE_TEXT_FILL, maxWidth: 150 }),
+          createNode: () =>
+            new Text(star.name, {
+              font: FONTS.LABEL,
+              fill: LIGHT_SURFACE_TEXT_FILL,
+              maxWidth: STAR_SAMPLES_SCREEN_VIEW_SETTINGS.FIND_COMBO_BOX_MAX_WIDTH,
+            }),
           accessibleName: star.name,
         })),
       ],
@@ -213,10 +225,16 @@ export class StarSamplesScreenView extends ScreenView {
     );
     const cardPanel = new HRDiagramPanel(
       new VBox({
-        spacing: 8,
+        spacing: STAR_SAMPLES_SCREEN_VIEW_SETTINGS.CARD_PANEL_SPACING,
         align: "left",
         children: [
-          new HBox({ spacing: 8, children: [textNode(strings.findStarStringProperty, 120), findComboBox] }),
+          new HBox({
+            spacing: STAR_SAMPLES_SCREEN_VIEW_SETTINGS.CARD_PANEL_SPACING,
+            children: [
+              textNode(strings.findStarStringProperty, STAR_SAMPLES_SCREEN_VIEW_SETTINGS.FIND_STAR_TEXT_NODE_MAX_WIDTH),
+              findComboBox,
+            ],
+          }),
           new StarCardNode(model.selectedStarProperty, PANEL_CONTENT_WIDTH),
         ],
       }),
@@ -227,7 +245,11 @@ export class StarSamplesScreenView extends ScreenView {
     const overlayCheckboxes = new OverlayCheckboxGroup(model.settings, 2);
     const axisControls = new AxisControlsNode(model.settings, listParent);
     const strip = new HRDiagramPanel(
-      new HBox({ spacing: 24, align: "center", children: [overlayCheckboxes, axisControls] }),
+      new HBox({
+        spacing: STAR_SAMPLES_SCREEN_VIEW_SETTINGS.STRIP_SPACING,
+        align: "center",
+        children: [overlayCheckboxes, axisControls],
+      }),
     );
 
     const resetAllButton = new ResetAllButton({
@@ -241,9 +263,16 @@ export class StarSamplesScreenView extends ScreenView {
     this.children = [
       placeInRegion(chart, layout.chart),
       placeInRegion(strip, layout.strip),
-      placeInRegion(new VBox({ spacing: 8, children: [samplePanel, kindsPanel, cardPanel] }), layout.panels, {
-        yAlign: "top",
-      }),
+      placeInRegion(
+        new VBox({
+          spacing: STAR_SAMPLES_SCREEN_VIEW_SETTINGS.CHILDREN_SPACING,
+          children: [samplePanel, kindsPanel, cardPanel],
+        }),
+        layout.panels,
+        {
+          yAlign: "top",
+        },
+      ),
       placeInRegion(resetAllButton, layout.footer, { xAlign: "right", yAlign: "bottom" }),
       listParent,
     ];
