@@ -168,7 +168,7 @@ export class ExploreScreenView extends ScreenView {
         align: "left",
         children: [
           new HBox({
-            spacing: EXPLORE_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_SLIDER_BLOCK_SPACING,
+            spacing: EXPLORE_SCREEN_VIEW_SETTINGS.SLIDER_LABEL_ROW_SPACING,
             children: [label(name), readout(value)],
           }),
           control,

@@ -172,7 +172,7 @@ export class RadiusScreenView extends ScreenView {
           }),
           table,
           new VBox({
-            spacing: RADIUS_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_COMPARE_PANEL_SPACING,
+            spacing: RADIUS_SCREEN_VIEW_SETTINGS.EQUATION_BLOCK_SPACING,
             align: "left",
             visibleProperty: preferences.showEquationsProperty,
             children: [

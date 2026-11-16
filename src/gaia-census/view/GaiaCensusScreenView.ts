@@ -227,7 +227,7 @@ export class GaiaCensusScreenView extends ScreenView {
         children: [
           textNode(strings.selectionTitleStringProperty, PANEL_CONTENT_WIDTH, FONTS.TITLE),
           new HBox({
-            spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_SELECTION_PANEL_SPACING,
+            spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.DISTANCE_LIMIT_ROW_SPACING,
             children: [
               textNode(
                 strings.distanceLimitStringProperty,
@@ -272,8 +272,8 @@ export class GaiaCensusScreenView extends ScreenView {
           GAIA_CENSUS_SCREEN_VIEW_SETTINGS.ROWS_MAX_WIDTH,
           FONTS.SMALL,
         ),
-        textNode(count, GAIA_CENSUS_SCREEN_VIEW_SETTINGS.ROWS_MAX_WIDTH_SEGMENT_2, FONTS.SMALL),
-        textNode(percent, GAIA_CENSUS_SCREEN_VIEW_SETTINGS.ROWS_MAX_WIDTH_SEGMENT_3, FONTS.SMALL),
+        textNode(count, GAIA_CENSUS_SCREEN_VIEW_SETTINGS.COUNT_COLUMN_MAX_WIDTH, FONTS.SMALL),
+        textNode(percent, GAIA_CENSUS_SCREEN_VIEW_SETTINGS.PERCENT_COLUMN_MAX_WIDTH, FONTS.SMALL),
         new Node({
           children: [new Rectangle(0, 0, GAIA.BAR_MAX_WIDTH, GAIA.BAR_HEIGHT), bar],
         }),
@@ -373,7 +373,7 @@ export class GaiaCensusScreenView extends ScreenView {
         spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.STRIP_SPACING,
         children: [
           new HBox({
-            spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_STRIP_SPACING,
+            spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.STRIP_CONTROLS_SPACING,
             align: "center",
             children: [overlayCheckboxes, axisControls],
           }),
