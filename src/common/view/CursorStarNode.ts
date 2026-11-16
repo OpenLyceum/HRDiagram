@@ -59,7 +59,7 @@ export class CursorStarNode extends Node {
       { stroke: HRDiagramColors.cursorColorProperty, lineWidth: CURSOR_STAR.RING_LINE_WIDTH },
     );
     const disc = new Circle(CURSOR_STAR.DISC_RADIUS, {
-      stroke: "black",
+      stroke: HRDiagramColors.starOutlineColorProperty,
       lineWidth: CURSOR_STAR.DISC_LINE_WIDTH,
     });
     const children: Node[] = [ring, disc];

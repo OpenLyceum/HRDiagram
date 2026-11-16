@@ -201,6 +201,14 @@ const HRDiagramColors = {
     default: "#7fb3ff",
     projector: "#1f5fbf",
   }),
+
+  // ── Moved from views (no-inline-color) ─────────────────────────────────────
+
+  /** Outline around star dots (screen icon and cursor-star disc). */
+  starOutlineColorProperty: new ProfileColorProperty(HRDiagramNamespace, "starOutline", {
+    default: "#000000",
+    projector: "#000000",
+  }),
 };
 
 export default HRDiagramColors;
