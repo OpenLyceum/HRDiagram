@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "An interactive Hertzsprung\u2013Russell diagram with real Gaia and Hipparcos stars: place a star by temperature and luminosity, see its radius, and compare the nearest stars, the brightest stars and a census of everything within 100 parsecs.",
+  "description": "An interactive Hertzsprung–Russell diagram with real Gaia and Hipparcos stars: place a star by temperature and luminosity, see its radius, and compare the nearest stars, the brightest stars and a census of everything within 100 parsecs.",
   "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
@@ -43,13 +43,13 @@
     "test:fuzz": "node scripts/test-fuzz.ts",
     "test:fuzz:quick": "node scripts/test-fuzz.ts 10",
     "test:fuzz:long": "node scripts/test-fuzz.ts 300",
+    "test:soak": "npx playwright test tests/browser/memory-soak.spec.ts",
     "icons": "node scripts/generate-icons.ts",
     "clean": "rm -rf dist",
     "prepare": "test \"$(git rev-parse --show-toplevel 2>/dev/null)\" = \"$PWD\" && git config core.hooksPath .githooks || true",
     "knip": "knip",
     "test:architecture": "node --test tests/*.node-test.ts",
-    "fetch-data": "node scripts/catalog/fetch-catalog.ts",
-    "test:soak": "npx playwright test tests/browser/memory-soak.spec.ts"
+    "fetch-data": "node scripts/catalog/fetch-catalog.ts"
   },
   "dependencies": {
     "scenerystack": "^3.0.0"
