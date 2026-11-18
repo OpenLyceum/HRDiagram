@@ -84,6 +84,8 @@ export class ExploreScreenView extends ScreenView {
     );
     // Pressing anywhere on the diagram moves the star there, and keeps dragging it.
     const hitArea = new Rectangle(0, 0, CHART.WIDTH, CHART.TALL_HEIGHT, { cursor: "pointer" });
+    // Pointer-only: a press-anywhere shortcut for moving the star. The keyboard path is
+    // CursorStarNode's own arrow-key listener on the focusable star.
     hitArea.addInputListener(
       new DragListener({
         press: (event) => cursorStar.moveToViewPoint(chart.plotLayer.globalToLocalPoint(event.pointer.point)),
