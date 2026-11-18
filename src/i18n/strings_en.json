@@ -61,7 +61,10 @@
     "keyboardHelp": {
       "title": "Move a Star",
       "move": "Move the star on the diagram",
-      "moveFine": "Move it in small steps"
+      "moveFine": "Move it in small steps",
+      "selectTitle": "Select a Star",
+      "selectStar": "Select the next hotter or cooler star",
+      "clearSelection": "Clear the selection"
     },
     "categories": {
       "dwarf": "Main-sequence dwarfs",

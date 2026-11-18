@@ -61,7 +61,10 @@
     "keyboardHelp": {
       "title": "Mover una estrella",
       "move": "Mover la estrella en el diagrama",
-      "moveFine": "Moverla en pasos pequeños"
+      "moveFine": "Moverla en pasos pequeños",
+      "selectTitle": "Seleccionar una estrella",
+      "selectStar": "Seleccionar la siguiente estrella más caliente o más fría",
+      "clearSelection": "Borrar la selección"
     },
     "categories": {
       "dwarf": "Enanas de la secuencia principal",

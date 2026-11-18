@@ -61,7 +61,10 @@
     "keyboardHelp": {
       "title": "Déplacer une étoile",
       "move": "Déplacer l'étoile sur le diagramme",
-      "moveFine": "La déplacer par petits pas"
+      "moveFine": "La déplacer par petits pas",
+      "selectTitle": "Sélectionner une étoile",
+      "selectStar": "Sélectionner l'étoile suivante plus chaude ou plus froide",
+      "clearSelection": "Effacer la sélection"
     },
     "categories": {
       "dwarf": "Naines de la séquence principale",

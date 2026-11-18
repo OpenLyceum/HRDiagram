@@ -33,7 +33,7 @@ export class RadiusScreen extends Screen<RadiusModel, RadiusScreenView> {
       optionize<RadiusScreenOptions, EmptySelfOptions, ScreenOptions>()(
         {
           backgroundColorProperty: HRDiagramColors.backgroundColorProperty,
-          createKeyboardHelpNode: () => new HRDiagramKeyboardHelpContent(),
+          createKeyboardHelpNode: () => new HRDiagramKeyboardHelpContent({ moveStar: true }),
           homeScreenIcon: createRadiusIcon(),
           navigationBarIcon: createRadiusIcon(),
         },

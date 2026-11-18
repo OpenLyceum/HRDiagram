@@ -31,7 +31,7 @@ export class StarSamplesScreen extends Screen<StarSamplesModel, StarSamplesScree
       optionize<StarSamplesScreenOptions, EmptySelfOptions, ScreenOptions>()(
         {
           backgroundColorProperty: HRDiagramColors.backgroundColorProperty,
-          createKeyboardHelpNode: () => new HRDiagramKeyboardHelpContent(),
+          createKeyboardHelpNode: () => new HRDiagramKeyboardHelpContent({ selectStar: true, comboBox: true }),
           homeScreenIcon: createStarSamplesIcon(),
           navigationBarIcon: createStarSamplesIcon(),
         },

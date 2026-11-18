@@ -31,7 +31,7 @@ export class GaiaCensusScreen extends Screen<GaiaCensusModel, GaiaCensusScreenVi
       optionize<GaiaCensusScreenOptions, EmptySelfOptions, ScreenOptions>()(
         {
           backgroundColorProperty: HRDiagramColors.backgroundColorProperty,
-          createKeyboardHelpNode: () => new HRDiagramKeyboardHelpContent(),
+          createKeyboardHelpNode: () => new HRDiagramKeyboardHelpContent({ sliders: true, comboBox: true }),
           homeScreenIcon: createGaiaCensusIcon(),
           navigationBarIcon: createGaiaCensusIcon(),
         },

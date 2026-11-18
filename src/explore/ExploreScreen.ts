@@ -32,7 +32,8 @@ export class ExploreScreen extends Screen<ExploreModel, ExploreScreenView> {
       optionize<ExploreScreenOptions, EmptySelfOptions, ScreenOptions>()(
         {
           backgroundColorProperty: HRDiagramColors.backgroundColorProperty,
-          createKeyboardHelpNode: () => new HRDiagramKeyboardHelpContent(),
+          createKeyboardHelpNode: () =>
+            new HRDiagramKeyboardHelpContent({ moveStar: true, sliders: true, comboBox: true }),
           homeScreenIcon: createExploreIcon(),
           navigationBarIcon: createExploreIcon(),
         },

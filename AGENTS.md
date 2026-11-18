@@ -73,8 +73,8 @@ Standard fleet pattern:
 - Per-screen a11y strings live under `a11y.<screenKey>` in each locale JSON. Every screen summary
   has a live current-details paragraph.
 - Each ScreenView sets `pdomPlayAreaNode.pdomOrder` and `pdomControlAreaNode.pdomOrder` (Reset All
-  last). All screens share `HRDiagramKeyboardHelpContent` (move a star, sliders, combo boxes, basic
-  actions).
+  last). All screens share `HRDiagramKeyboardHelpContent`, with per-screen options
+  for the sections each has (move a star, select a star, sliders, combo boxes; basic actions always).
 - Custom keyboard interactions:
   - Star markers: arrows move the marker in view space, so they work on any axes; Shift gives fine
     steps.
