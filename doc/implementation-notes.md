@@ -70,7 +70,9 @@ No screen has a clock; `step(dt)` is empty everywhere.
    photometry can still be matched to Hipparcos.
 4. Queries Hipparcos (V, B − V, spectral type) joined with the new reduction (parallax), the
    Hipparcos–Gaia best-neighbour table and the DR3 parallax. It keeps stars with V < 3 or plx > 95 mas.
-5. Names the stars with `StarNamer`:
+5. Names the stars with `StarNamer` in `scripts/catalog/fetch-catalog.ts` (build-time
+   only; the runtime catalogue is `src/common/model/StarCatalog.ts` reading
+   `data/namedStars.json`):
    - IAU-CSN proper names by HIP;
    - HYG designations by HIP, or by position plus magnitude for Gaia-only stars;
    - each HYG star is used at most once.
