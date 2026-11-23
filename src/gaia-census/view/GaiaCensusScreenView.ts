@@ -250,7 +250,7 @@ export class GaiaCensusScreenView extends ScreenView {
     );
 
     // ── What kinds of star? ───────────────────────────────────────────────────
-    const categoryNames = common.categories as unknown as Readonly<Record<string, TReadOnlyProperty<string>>>;
+    const categoryNames = common.categories;
     const rows = StarCategory.enumeration.values.map((category) => {
       const share = new DerivedProperty([model.selectionProperty], (selection) =>
         selection.count === 0 ? 0 : (selection.countsByCategory.get(category) ?? 0) / selection.count,
@@ -268,7 +268,7 @@ export class GaiaCensusScreenView extends ScreenView {
       return [
         new Circle(GAIA.CATEGORY_SWATCH_RADIUS, { fill: CATEGORY_COLORS.get(category) ?? "white" }),
         textNode(
-          categoryNames[`${category.key}StringProperty`] as TReadOnlyProperty<string>,
+          categoryNames[`${category.key}StringProperty`],
           GAIA_CENSUS_SCREEN_VIEW_SETTINGS.ROWS_MAX_WIDTH,
           FONTS.SMALL,
         ),
@@ -312,11 +312,11 @@ export class GaiaCensusScreenView extends ScreenView {
     );
 
     // ── Colour by ─────────────────────────────────────────────────────────────
-    const colorByNames = strings as unknown as Readonly<Record<string, TReadOnlyProperty<string>>>;
+    const colorByNames = strings;
     const colorByGroup = new AquaRadioButtonGroup(
       model.colorByProperty,
       ColorBy.enumeration.values.map((colorBy) => {
-        const name = colorByNames[`${colorBy.key}StringProperty`] as TReadOnlyProperty<string>;
+        const name = colorByNames[`${colorBy.key}StringProperty`];
         return {
           value: colorBy,
           createNode: () => textNode(name, GAIA_CENSUS_SCREEN_VIEW_SETTINGS.COLOR_BY_GROUP_MAX_WIDTH),

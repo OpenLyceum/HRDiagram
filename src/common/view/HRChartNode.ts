@@ -23,9 +23,7 @@ import { ticksFor } from "./axisTicks.js";
 
 /** Localized axis title of a quantity. */
 export const axisTitleProperty = (quantity: AxisQuantity): TReadOnlyProperty<string> => {
-  const axes = StringManager.getInstance().getCommonStrings().axes as unknown as Readonly<
-    Record<string, TReadOnlyProperty<string>>
-  >;
+  const axes = StringManager.getInstance().getCommonStrings().axes;
   const title = axes[`${quantity.key}StringProperty`];
   if (!title) {
     throw new Error(`No axis title for ${quantity.key}`);

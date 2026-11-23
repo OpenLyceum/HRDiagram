@@ -7,6 +7,8 @@
 
 import { Enumeration, EnumerationValue } from "scenerystack/phet-core";
 
+type StarConstraintKey = "free" | "holdLuminosity" | "holdTemperature";
+
 export class StarConstraint extends EnumerationValue {
   public static readonly FREE = new StarConstraint("free");
   public static readonly HOLD_LUMINOSITY = new StarConstraint("holdLuminosity");
@@ -15,9 +17,9 @@ export class StarConstraint extends EnumerationValue {
   public static readonly enumeration = new Enumeration(StarConstraint);
 
   /** Key into the `radius` string group. */
-  public readonly key: string;
+  public readonly key: StarConstraintKey;
 
-  public constructor(key: string) {
+  public constructor(key: StarConstraintKey) {
     super();
     this.key = key;
   }

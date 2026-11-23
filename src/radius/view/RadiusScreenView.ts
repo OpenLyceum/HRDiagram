@@ -199,11 +199,11 @@ export class RadiusScreenView extends ScreenView {
     );
 
     // ── Constraint and guides ─────────────────────────────────────────────────
-    const constraintNames = strings as unknown as Readonly<Record<string, TReadOnlyProperty<string>>>;
+    const constraintNames = strings;
     const constraintGroup = new AquaRadioButtonGroup(
       model.constraintProperty,
       StarConstraint.enumeration.values.map((constraint) => {
-        const name = constraintNames[`${constraint.key}StringProperty`] as TReadOnlyProperty<string>;
+        const name = constraintNames[`${constraint.key}StringProperty`];
         return {
           value: constraint,
           createNode: () =>

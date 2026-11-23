@@ -8,6 +8,8 @@
 import { Enumeration, EnumerationValue } from "scenerystack/phet-core";
 import type { LuminosityClassName } from "./spectralTypes.js";
 
+type StarCategoryKey = "dwarf" | "subgiant" | "giant" | "supergiant" | "whiteDwarf";
+
 export class StarCategory extends EnumerationValue {
   public static readonly DWARF = new StarCategory("dwarf");
   public static readonly SUBGIANT = new StarCategory("subgiant");
@@ -18,9 +20,9 @@ export class StarCategory extends EnumerationValue {
   public static readonly enumeration = new Enumeration(StarCategory);
 
   /** Key into the `categories` string group and the category colour map. */
-  public readonly key: string;
+  public readonly key: StarCategoryKey;
 
-  public constructor(key: string) {
+  public constructor(key: StarCategoryKey) {
     super();
     this.key = key;
   }

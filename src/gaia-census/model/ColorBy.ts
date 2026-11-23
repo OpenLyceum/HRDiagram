@@ -6,6 +6,8 @@
 
 import { Enumeration, EnumerationValue } from "scenerystack/phet-core";
 
+type ColorByKey = "colorKind" | "colorDistance";
+
 export class ColorBy extends EnumerationValue {
   public static readonly KIND = new ColorBy("colorKind");
   public static readonly DISTANCE = new ColorBy("colorDistance");
@@ -13,9 +15,9 @@ export class ColorBy extends EnumerationValue {
   public static readonly enumeration = new Enumeration(ColorBy);
 
   /** Key into the `gaiaCensus` string group. */
-  public readonly key: string;
+  public readonly key: ColorByKey;
 
-  public constructor(key: string) {
+  public constructor(key: ColorByKey) {
     super();
     this.key = key;
   }

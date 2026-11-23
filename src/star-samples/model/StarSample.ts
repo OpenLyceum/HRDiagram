@@ -8,6 +8,8 @@
 import { Enumeration, EnumerationValue } from "scenerystack/phet-core";
 import type { Star } from "../../common/model/StarCatalog.js";
 
+type StarSampleKey = "nearest" | "brightest" | "both" | "overlap";
+
 export class StarSample extends EnumerationValue {
   public static readonly NEAREST = new StarSample("nearest", (star) => star.nearest);
   public static readonly BRIGHTEST = new StarSample("brightest", (star) => star.brightest);
@@ -17,10 +19,10 @@ export class StarSample extends EnumerationValue {
   public static readonly enumeration = new Enumeration(StarSample);
 
   /** Key into the `starSamples` string group. */
-  public readonly key: string;
+  public readonly key: StarSampleKey;
   public readonly includes: (star: Star) => boolean;
 
-  public constructor(key: string, includes: (star: Star) => boolean) {
+  public constructor(key: StarSampleKey, includes: (star: Star) => boolean) {
     super();
     this.key = key;
     this.includes = includes;

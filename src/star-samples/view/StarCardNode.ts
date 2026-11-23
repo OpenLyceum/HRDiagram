@@ -20,7 +20,7 @@ export class StarCardNode extends VBox {
   public constructor(selectedStarProperty: Property<Star | null>, width: number) {
     const common = StringManager.getInstance().getCommonStrings();
     const strings = StringManager.getInstance().getStarSamplesStrings();
-    const categoryNames = common.categories as unknown as Readonly<Record<string, TReadOnlyProperty<string>>>;
+    const categoryNames = common.categories;
 
     const title = new Text("", { font: FONTS.TITLE, fill: HRDiagramColors.textColorProperty, maxWidth: width });
     const subtitle = new Text("", { font: FONTS.SMALL, fill: HRDiagramColors.textColorProperty, maxWidth: width });

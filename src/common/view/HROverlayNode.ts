@@ -60,7 +60,7 @@ export class HROverlayNode extends Node {
   public constructor(chart: HRChartNode, visibility: HROverlayVisibility) {
     super({ pickable: false });
     const strings = StringManager.getInstance().getCommonStrings();
-    const classLabels = strings.classLabels as unknown as Readonly<Record<string, TReadOnlyProperty<string>>>;
+    const classLabels = strings.classLabels;
 
     const mainSequenceLayer = new Node();
     const classLayer = new Node();
@@ -120,7 +120,7 @@ export class HROverlayNode extends Node {
       layer.removeAllChildren();
     };
 
-    const classText = (name: LuminosityClassName): Text =>
+    const classText = (name: (typeof OVERLAY_CLASSES)[number]): Text =>
       new Text(classLabels[`${name}StringProperty`] ?? "", {
         font: FONTS.CHART_LABEL,
         fill: HRDiagramColors.luminosityClassLabelColorProperty,

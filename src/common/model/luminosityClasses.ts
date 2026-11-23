@@ -68,7 +68,15 @@ const DWARF_MV = new Interpolator(
 );
 
 /** The classes the overlay draws, brightest first. */
-export const OVERLAY_CLASSES: readonly LuminosityClassName[] = ["Ia", "Ib", "II", "III", "IV", "V", "D"];
+export const OVERLAY_CLASSES = [
+  "Ia",
+  "Ib",
+  "II",
+  "III",
+  "IV",
+  "V",
+  "D",
+] as const satisfies readonly LuminosityClassName[];
 
 /**
  * Spectral-code span of each class curve. Giants and subgiants hotter than about B5 and A0 crowd onto the

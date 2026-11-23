@@ -44,8 +44,17 @@ export type PlottableStar = {
   readonly absoluteG?: number;
 };
 
+type AxisQuantityKey =
+  | "temperature"
+  | "colorIndex"
+  | "spectralType"
+  | "bpRp"
+  | "luminosity"
+  | "absoluteMagnitude"
+  | "absoluteG";
+
 type AxisQuantityConfig = {
-  readonly key: string;
+  readonly key: AxisQuantityKey;
   readonly log: boolean;
   /** Range in data units (K, L☉, mag…), min < max. */
   readonly range: Range;
@@ -164,7 +173,7 @@ export class AxisQuantity extends EnumerationValue {
   public static readonly VERTICAL = [AxisQuantity.LUMINOSITY, AxisQuantity.ABSOLUTE_MAGNITUDE] as const;
 
   /** Key into the `axes` string group. */
-  public readonly key: string;
+  public readonly key: AxisQuantityKey;
   public readonly log: boolean;
   public readonly range: Range;
   public readonly inverted: boolean;

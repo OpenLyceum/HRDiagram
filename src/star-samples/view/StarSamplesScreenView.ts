@@ -100,9 +100,9 @@ export class StarSamplesScreenView extends ScreenView {
     chart.plotLayer.children = [new HROverlayNode(chart, model.settings), new SunMarkerNode(chart), starPlot];
 
     // ── Stars to plot ─────────────────────────────────────────────────────────
-    const sampleNames = strings as unknown as Readonly<Record<string, TReadOnlyProperty<string>>>;
+    const sampleNames = strings;
     const sampleLabel = (sample: StarSample): TReadOnlyProperty<string> =>
-      new DerivedProperty([sampleNames[`${sample.key}StringProperty`] as TReadOnlyProperty<string>], (pattern) =>
+      new DerivedProperty([sampleNames[`${sample.key}StringProperty`]], (pattern) =>
         StringUtils.fillIn(pattern, { distance: NEAREST_LIMIT_PC, magnitude: BRIGHTEST_LIMIT_V }),
       );
     const sampleGroup = new AquaRadioButtonGroup(
@@ -157,9 +157,9 @@ export class StarSamplesScreenView extends ScreenView {
     );
 
     // ── Kinds of star ─────────────────────────────────────────────────────────
-    const categoryNames = common.categories as unknown as Readonly<Record<string, TReadOnlyProperty<string>>>;
+    const categoryNames = common.categories;
     const categoryCheckboxes = StarCategory.enumeration.values.map((category) => {
-      const name = categoryNames[`${category.key}StringProperty`] as TReadOnlyProperty<string>;
+      const name = categoryNames[`${category.key}StringProperty`];
       const label = new DerivedProperty(
         [common.countPatternStringProperty, name, model.categoryCountsProperty],
         (pattern, kind, counts) => StringUtils.fillIn(pattern, { label: kind, count: counts.get(category) ?? 0 }),
