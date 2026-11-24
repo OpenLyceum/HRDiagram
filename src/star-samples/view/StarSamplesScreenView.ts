@@ -162,8 +162,7 @@ export class StarSamplesScreenView extends ScreenView {
       const name = categoryNames[`${category.key}StringProperty`];
       const labelProperty = new DerivedProperty(
         [common.countPatternStringProperty, name, model.categoryCountsProperty],
-        (pattern, kind, counts) =>
-          StringUtils.fillIn(pattern, { labelProperty: kind, count: counts.get(category) ?? 0 }),
+        (pattern, kind, counts) => StringUtils.fillIn(pattern, { label: kind, count: counts.get(category) ?? 0 }),
       );
       const visibleProperty = model.categoryVisibleProperties.get(category);
       if (!visibleProperty) {
