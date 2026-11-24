@@ -25,8 +25,9 @@ const hRDiagramQueryParameters = QueryStringMachine.getAll({
    * `?showEquations=false` hides them for younger students.
    */
   showEquations: {
-    type: "boolean",
+    type: "custom",
     defaultValue: true,
+    parse: (value: string | null): boolean => value !== "false",
     public: true,
   },
 });
