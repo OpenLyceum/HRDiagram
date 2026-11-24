@@ -15,7 +15,7 @@ import type { StarSamplesModel } from "../model/StarSamplesModel.js";
 export class StarSamplesScreenSummaryContent extends ScreenSummaryContent {
   public constructor(model: StarSamplesModel) {
     const a11y = StringManager.getInstance().getStarSamplesA11yStrings();
-    const currentDetails = new DerivedProperty(
+    const currentDetailsProperty = new DerivedProperty(
       [
         a11y.currentDetailsPatternStringProperty,
         a11y.noneSelectedStringProperty,
@@ -28,7 +28,7 @@ export class StarSamplesScreenSummaryContent extends ScreenSummaryContent {
     super({
       playAreaContent: a11y.screenSummary.playAreaStringProperty,
       controlAreaContent: a11y.screenSummary.controlAreaStringProperty,
-      currentDetailsContent: currentDetails,
+      currentDetailsContent: currentDetailsProperty,
       interactionHintContent: a11y.screenSummary.interactionHintStringProperty,
     });
   }

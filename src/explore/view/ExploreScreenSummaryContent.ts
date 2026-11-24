@@ -16,7 +16,7 @@ import type { ExploreModel } from "../model/ExploreModel.js";
 export class ExploreScreenSummaryContent extends ScreenSummaryContent {
   public constructor(model: ExploreModel) {
     const a11y = StringManager.getInstance().getExploreA11yStrings();
-    const currentDetails = new DerivedProperty(
+    const currentDetailsProperty = new DerivedProperty(
       [
         a11y.currentDetailsPatternStringProperty,
         model.star.temperatureProperty,
@@ -33,7 +33,7 @@ export class ExploreScreenSummaryContent extends ScreenSummaryContent {
     super({
       playAreaContent: a11y.screenSummary.playAreaStringProperty,
       controlAreaContent: a11y.screenSummary.controlAreaStringProperty,
-      currentDetailsContent: currentDetails,
+      currentDetailsContent: currentDetailsProperty,
       interactionHintContent: a11y.screenSummary.interactionHintStringProperty,
     });
   }

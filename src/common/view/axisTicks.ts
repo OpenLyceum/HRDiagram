@@ -1,4 +1,4 @@
-import { toFixed } from "scenerystack/dot";
+import { roundSymmetric, toFixed } from "scenerystack/dot";
 import { AXIS_TICKS_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * axisTicks.ts
@@ -32,7 +32,7 @@ const range = (start: number, stop: number, step: number): number[] => {
 const linearTicks = (min: number, max: number, labelStep: number, minorStep: number, decimals: number): Tick[] => [
   ...range(min, max, labelStep).map((value) => ({ value, label: formatFixed(value, decimals), major: true })),
   ...range(min, max, minorStep)
-    .filter((value) => Math.abs(value / labelStep - Math.round(value / labelStep)) > 1e-6)
+    .filter((value) => Math.abs(value / labelStep - roundSymmetric(value / labelStep)) > 1e-6)
     .map((value) => ({ value, label: null, major: false })),
 ];
 

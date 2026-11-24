@@ -16,7 +16,7 @@ import type { GaiaCensusModel } from "../model/GaiaCensusModel.js";
 export class GaiaCensusScreenSummaryContent extends ScreenSummaryContent {
   public constructor(model: GaiaCensusModel) {
     const a11y = StringManager.getInstance().getGaiaCensusA11yStrings();
-    const currentDetails = new DerivedProperty(
+    const currentDetailsProperty = new DerivedProperty(
       [a11y.currentDetailsPatternStringProperty, model.selectionProperty],
       (pattern, selection) => {
         const share = (...categories: StarCategory[]): string =>
@@ -38,7 +38,7 @@ export class GaiaCensusScreenSummaryContent extends ScreenSummaryContent {
     super({
       playAreaContent: a11y.screenSummary.playAreaStringProperty,
       controlAreaContent: a11y.screenSummary.controlAreaStringProperty,
-      currentDetailsContent: currentDetails,
+      currentDetailsContent: currentDetailsProperty,
       interactionHintContent: a11y.screenSummary.interactionHintStringProperty,
     });
   }

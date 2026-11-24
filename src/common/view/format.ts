@@ -6,7 +6,7 @@ import { FORMAT_SETTINGS } from "../../HRDiagramConstants.js";
  * with a true minus sign, grouped thousands, and powers of ten with Unicode superscripts.
  */
 
-import { toFixed } from "scenerystack/dot";
+import { roundSymmetric, toFixed } from "scenerystack/dot";
 
 /** Narrow no-break space, the SI thousands separator, which reads the same in every locale. */
 const GROUP_SEPARATOR = " ";
@@ -35,7 +35,7 @@ const group = (integerText: string): string => integerText.replace(/\B(?=(\d{3})
 
 /** A whole number with grouped thousands: 10 000. */
 export const formatInteger = (value: number): string =>
-  Number.isFinite(value) ? group(toFixed(Math.round(value), 0)).replace("-", "−") : "—";
+  Number.isFinite(value) ? group(toFixed(roundSymmetric(value), 0)).replace("-", "−") : "—";
 
 /**
  * A value to `digits` significant figures: plain decimals between 10⁻³ and 10⁵ (grouped above 9999),
@@ -64,7 +64,7 @@ export const formatValue = (value: number, digits: number = FORMAT_SETTINGS.DEFA
 
 /** A decade label: 0.01, 0.1, 1, 10, 100, 1000, then 10⁴, 10⁻³, … */
 export const formatDecade = (exponent: number): string => {
-  const n = Math.round(exponent);
+  const n = roundSymmetric(exponent);
   if (n >= -2 && n <= 3) {
     return n < 0 ? toFixed(10 ** n, -n) : formatInteger(10 ** n);
   }

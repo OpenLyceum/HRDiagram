@@ -145,7 +145,7 @@ export class RadiusScreenView extends ScreenView {
       ],
     });
 
-    const equation = new DerivedProperty(
+    const equationProperty = new DerivedProperty(
       [
         strings.equationPatternStringProperty,
         model.luminosityRatioProperty,
@@ -177,7 +177,7 @@ export class RadiusScreenView extends ScreenView {
             visibleProperty: preferences.showEquationsProperty,
             children: [
               text(strings.ruleStringProperty, FONTS.READOUT, PANEL_CONTENT_WIDTH),
-              text(equation, FONTS.READOUT, PANEL_CONTENT_WIDTH),
+              text(equationProperty, FONTS.READOUT, PANEL_CONTENT_WIDTH),
             ],
           }),
           new HSeparator({ stroke: HRDiagramColors.panelBorderColorProperty }),

@@ -16,7 +16,7 @@ import type { RadiusModel } from "../model/RadiusModel.js";
 export class RadiusScreenSummaryContent extends ScreenSummaryContent {
   public constructor(model: RadiusModel) {
     const a11y = StringManager.getInstance().getRadiusA11yStrings();
-    const currentDetails = new DerivedProperty(
+    const currentDetailsProperty = new DerivedProperty(
       [
         a11y.currentDetailsPatternStringProperty,
         model.temperatureRatioProperty,
@@ -33,7 +33,7 @@ export class RadiusScreenSummaryContent extends ScreenSummaryContent {
     super({
       playAreaContent: a11y.screenSummary.playAreaStringProperty,
       controlAreaContent: a11y.screenSummary.controlAreaStringProperty,
-      currentDetailsContent: currentDetails,
+      currentDetailsContent: currentDetailsProperty,
       interactionHintContent: a11y.screenSummary.interactionHintStringProperty,
     });
   }

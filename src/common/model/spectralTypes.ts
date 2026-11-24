@@ -13,6 +13,7 @@
  * class. White dwarf types use the temperature index of the WD classification, T = 50 400 K / index.
  */
 
+import { roundSymmetric } from "scenerystack/dot";
 import { DWARF_TABLE, Interpolator } from "./stellarPhysics.js";
 
 const CLASS_LETTERS = "OBAFGKM";
@@ -24,7 +25,7 @@ const spectralCode = (letter: string, subtype: number): number => CLASS_LETTERS.
 export const formatSpectralCode = (code: number): string => {
   const clamped = Math.min(Math.max(code, 0), 69.9);
   const letterIndex = Math.floor(clamped / 10);
-  const subtype = Math.round((clamped - letterIndex * 10) * 2) / 2;
+  const subtype = roundSymmetric((clamped - letterIndex * 10) * 2) / 2;
   // Rounding 9.75 up to 10 moves to the next letter.
   if (subtype >= 10) {
     return formatSpectralCode((letterIndex + 1) * 10);

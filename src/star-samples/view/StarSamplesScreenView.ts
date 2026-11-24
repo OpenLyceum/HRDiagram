@@ -108,11 +108,11 @@ export class StarSamplesScreenView extends ScreenView {
     const sampleGroup = new AquaRadioButtonGroup(
       model.sampleProperty,
       StarSample.enumeration.values.map((sample) => {
-        const label = sampleLabel(sample);
+        const labelProperty = sampleLabel(sample);
         return {
           value: sample,
-          createNode: () => textNode(label, PANEL_CONTENT_WIDTH - PANEL.LABEL_INSET),
-          options: { accessibleName: label },
+          createNode: () => textNode(labelProperty, PANEL_CONTENT_WIDTH - PANEL.LABEL_INSET),
+          options: { accessibleName: labelProperty },
         };
       }),
       {
@@ -121,16 +121,16 @@ export class StarSamplesScreenView extends ScreenView {
         accessibleName: strings.sampleTitleStringProperty,
       },
     );
-    const shownText = new DerivedProperty(
+    const shownTextProperty = new DerivedProperty(
       [strings.shownPatternStringProperty, model.visibleStarsProperty],
       (pattern, stars) => StringUtils.fillIn(pattern, { count: formatInteger(stars.length) }),
     );
-    const legendEntry = (style: PointStyle, label: TReadOnlyProperty<string>): HBox =>
+    const legendEntry = (style: PointStyle, labelProperty: TReadOnlyProperty<string>): HBox =>
       new HBox({
         spacing: STAR_SAMPLES_SCREEN_VIEW_SETTINGS.LEGEND_ENTRY_SPACING,
         children: [
           new MarkerIconNode(style),
-          textNode(label, STAR_SAMPLES_SCREEN_VIEW_SETTINGS.LEGEND_ENTRY_MAX_WIDTH, FONTS.SMALL),
+          textNode(labelProperty, STAR_SAMPLES_SCREEN_VIEW_SETTINGS.LEGEND_ENTRY_MAX_WIDTH, FONTS.SMALL),
         ],
       });
     const [nearestStyle, brightestStyle, bothStyle] = SAMPLE_STYLES as [PointStyle, PointStyle, PointStyle];
@@ -150,7 +150,7 @@ export class StarSamplesScreenView extends ScreenView {
           textNode(strings.sampleTitleStringProperty, PANEL_CONTENT_WIDTH, FONTS.TITLE),
           sampleGroup,
           legend,
-          textNode(shownText),
+          textNode(shownTextProperty),
         ],
       }),
       { minWidth: PANEL_CONTENT_WIDTH + PANEL.MIN_WIDTH_INSET },
@@ -160,17 +160,18 @@ export class StarSamplesScreenView extends ScreenView {
     const categoryNames = common.categories;
     const categoryCheckboxes = StarCategory.enumeration.values.map((category) => {
       const name = categoryNames[`${category.key}StringProperty`];
-      const label = new DerivedProperty(
+      const labelProperty = new DerivedProperty(
         [common.countPatternStringProperty, name, model.categoryCountsProperty],
-        (pattern, kind, counts) => StringUtils.fillIn(pattern, { label: kind, count: counts.get(category) ?? 0 }),
+        (pattern, kind, counts) =>
+          StringUtils.fillIn(pattern, { labelProperty: kind, count: counts.get(category) ?? 0 }),
       );
       const visibleProperty = model.categoryVisibleProperties.get(category);
       if (!visibleProperty) {
         throw new Error(`no visibility for ${category.key}`);
       }
-      return new Checkbox(visibleProperty, textNode(label, PANEL_CONTENT_WIDTH - PANEL.LABEL_INSET), {
+      return new Checkbox(visibleProperty, textNode(labelProperty, PANEL_CONTENT_WIDTH - PANEL.LABEL_INSET), {
         ...HR_DIAGRAM_CHECKBOX_OPTIONS,
-        accessibleName: label,
+        accessibleName: labelProperty,
       });
     });
     const kindsPanel = new HRDiagramPanel(

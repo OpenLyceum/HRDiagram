@@ -106,7 +106,7 @@ export class ExploreScreenView extends ScreenView {
         maxWidth: EXPLORE_SCREEN_VIEW_SETTINGS.READOUT_MAX_WIDTH,
       });
 
-    const temperatureText = new DerivedProperty(
+    const temperatureTextProperty = new DerivedProperty(
       [strings.units.kelvinPatternStringProperty, model.star.temperatureProperty],
       (pattern, temperature) =>
         StringUtils.fillIn(pattern, {
@@ -115,22 +115,23 @@ export class ExploreScreenView extends ScreenView {
           ),
         }),
     );
-    const luminosityText = new DerivedProperty(
+    const luminosityTextProperty = new DerivedProperty(
       [strings.units.solarLuminosityPatternStringProperty, model.star.luminosityProperty],
       (pattern, luminosity) =>
         StringUtils.fillIn(pattern, {
           value: formatValue(luminosity, EXPLORE_SCREEN_VIEW_SETTINGS.LUMINOSITY_TEXT_DIGITS),
         }),
     );
-    const radiusText = new DerivedProperty(
+    const radiusTextProperty = new DerivedProperty(
       [strings.units.solarRadiusPatternStringProperty, model.star.radiusProperty],
       (pattern, radius) =>
         StringUtils.fillIn(pattern, { value: formatValue(radius, EXPLORE_SCREEN_VIEW_SETTINGS.RADIUS_TEXT_DIGITS) }),
     );
-    const magnitudeText = new DerivedProperty([model.star.luminosityProperty, model.star.temperatureProperty], (L, T) =>
-      formatFixed(absoluteVisualMagnitude(L, T), 1),
+    const magnitudeTextProperty = new DerivedProperty(
+      [model.star.luminosityProperty, model.star.temperatureProperty],
+      (L, T) => formatFixed(absoluteVisualMagnitude(L, T), 1),
     );
-    const spectralText = new DerivedProperty(
+    const spectralTextProperty = new DerivedProperty(
       [strings.mainSequenceTypePatternStringProperty, model.star.temperatureProperty],
       (pattern, temperature) =>
         StringUtils.fillIn(pattern, { type: formatSpectralCode(spectralCodeFromTemperature(temperature)) }),
@@ -182,9 +183,9 @@ export class ExploreScreenView extends ScreenView {
       ySpacing: EXPLORE_SCREEN_VIEW_SETTINGS.READOUTS_Y_SPACING,
       xAlign: "left",
       rows: [
-        [label(strings.quantities.radiusStringProperty), readout(radiusText)],
-        [label(strings.quantities.absoluteMagnitudeStringProperty), readout(magnitudeText)],
-        [label(strings.quantities.spectralTypeStringProperty), readout(spectralText)],
+        [label(strings.quantities.radiusStringProperty), readout(radiusTextProperty)],
+        [label(strings.quantities.absoluteMagnitudeStringProperty), readout(magnitudeTextProperty)],
+        [label(strings.quantities.spectralTypeStringProperty), readout(spectralTextProperty)],
       ],
     });
 
@@ -198,8 +199,8 @@ export class ExploreScreenView extends ScreenView {
             fill: HRDiagramColors.textColorProperty,
             maxWidth: PANEL_CONTENT_WIDTH,
           }),
-          sliderBlock(exploreStrings.temperatureStringProperty, temperatureText, temperatureSlider),
-          sliderBlock(exploreStrings.luminosityStringProperty, luminosityText, luminositySlider),
+          sliderBlock(exploreStrings.temperatureStringProperty, temperatureTextProperty, temperatureSlider),
+          sliderBlock(exploreStrings.luminosityStringProperty, luminosityTextProperty, luminositySlider),
           readouts,
           new RichText(exploreStrings.radiusEquationStringProperty, {
             font: FONTS.SMALL,
