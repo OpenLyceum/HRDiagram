@@ -5,6 +5,7 @@
  * colours, valid from 1000 to 40 000 K. Copied from HabitableZones (circumstellar/view/blackbodyColor.ts).
  */
 
+import { roundSymmetric } from "scenerystack/dot";
 import { Color } from "scenerystack/scenery";
 
 const clamp255 = (value: number): number => Math.min(255, Math.max(0, value));
@@ -21,5 +22,5 @@ export const blackbodyColor = (temperature: number): Color => {
       ? -811.6499145 + logT * 36.97365953 + logT2 * 160.7861677 - logT3 * 25.57573664
       : 13836.23586 - logT * 9069.078214 + logT2 * 2015.254756 - logT3 * 149.7766966;
   const blue = -11545.34298 + logT * 8529.658165 - logT2 * 2150.198586 + logT3 * 190.0306573;
-  return new Color(Math.round(clamp255(red)), Math.round(clamp255(green)), Math.round(clamp255(blue)));
+  return new Color(roundSymmetric(clamp255(red)), roundSymmetric(clamp255(green)), roundSymmetric(clamp255(blue)));
 };

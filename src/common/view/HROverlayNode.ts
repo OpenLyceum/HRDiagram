@@ -1,3 +1,4 @@
+import { roundSymmetric } from "scenerystack/dot";
 import { HR_OVERLAY_NODE_SETTINGS } from "../../HRDiagramConstants.js";
 /**
  * HROverlayNode.ts
@@ -92,7 +93,7 @@ export class HROverlayNode extends Node {
     /** A label placed at a fraction along a curve, nudged to stay inside the frame. */
     const curveLabel = (points: Vector2[], fraction: number, text: Node, below: boolean): Node | null => {
       const visible = points.filter((p) => inside(p, OVERLAY.LABEL_MARGIN));
-      const anchor = visible[Math.min(visible.length - 1, Math.round(fraction * (visible.length - 1)))];
+      const anchor = visible[Math.min(visible.length - 1, roundSymmetric(fraction * (visible.length - 1)))];
       if (!anchor) {
         return null;
       }

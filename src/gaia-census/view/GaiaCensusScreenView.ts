@@ -252,17 +252,19 @@ export class GaiaCensusScreenView extends ScreenView {
     // ── What kinds of star? ───────────────────────────────────────────────────
     const categoryNames = common.categories;
     const rows = StarCategory.enumeration.values.map((category) => {
-      const share = new DerivedProperty([model.selectionProperty], (selection) =>
+      const shareProperty = new DerivedProperty([model.selectionProperty], (selection) =>
         selection.count === 0 ? 0 : (selection.countsByCategory.get(category) ?? 0) / selection.count,
       );
-      const percent = new DerivedProperty([strings.percentPatternStringProperty, share], (pattern, fraction) =>
-        StringUtils.fillIn(pattern, { value: formatFixed(100 * fraction, fraction < 0.01 && fraction > 0 ? 2 : 1) }),
+      const percentProperty = new DerivedProperty(
+        [strings.percentPatternStringProperty, shareProperty],
+        (pattern, fraction) =>
+          StringUtils.fillIn(pattern, { value: formatFixed(100 * fraction, fraction < 0.01 && fraction > 0 ? 2 : 1) }),
       );
-      const count = new DerivedProperty([model.selectionProperty], (selection) =>
+      const countProperty = new DerivedProperty([model.selectionProperty], (selection) =>
         formatInteger(selection.countsByCategory.get(category) ?? 0),
       );
       const bar = new Rectangle(0, 0, 1, GAIA.BAR_HEIGHT, { fill: CATEGORY_COLORS.get(category) ?? "white" });
-      share.link((fraction) => {
+      shareProperty.link((fraction) => {
         bar.rectWidth = Math.max(GAIA.BAR_MIN_WIDTH, GAIA.BAR_MAX_WIDTH * fraction);
       });
       return [
@@ -272,8 +274,8 @@ export class GaiaCensusScreenView extends ScreenView {
           GAIA_CENSUS_SCREEN_VIEW_SETTINGS.ROWS_MAX_WIDTH,
           FONTS.SMALL,
         ),
-        textNode(count, GAIA_CENSUS_SCREEN_VIEW_SETTINGS.COUNT_COLUMN_MAX_WIDTH, FONTS.SMALL),
-        textNode(percent, GAIA_CENSUS_SCREEN_VIEW_SETTINGS.PERCENT_COLUMN_MAX_WIDTH, FONTS.SMALL),
+        textNode(countProperty, GAIA_CENSUS_SCREEN_VIEW_SETTINGS.COUNT_COLUMN_MAX_WIDTH, FONTS.SMALL),
+        textNode(percentProperty, GAIA_CENSUS_SCREEN_VIEW_SETTINGS.PERCENT_COLUMN_MAX_WIDTH, FONTS.SMALL),
         new Node({
           children: [new Rectangle(0, 0, GAIA.BAR_MAX_WIDTH, GAIA.BAR_HEIGHT), bar],
         }),
@@ -284,11 +286,11 @@ export class GaiaCensusScreenView extends ScreenView {
         cell.layoutOptions = { xAlign: "right" };
       }
     }
-    const plottedText = new DerivedProperty(
+    const plottedTextProperty = new DerivedProperty(
       [strings.plottedPatternStringProperty, model.selectionProperty],
       (pattern, s) => StringUtils.fillIn(pattern, { count: formatInteger(s.count) }),
     );
-    const standsForText = new DerivedProperty(
+    const standsForTextProperty = new DerivedProperty(
       [strings.standsForPatternStringProperty, model.selectionProperty],
       (pattern, s) => StringUtils.fillIn(pattern, { count: formatInteger(s.count / census.sampleFraction) }),
     );
@@ -298,8 +300,8 @@ export class GaiaCensusScreenView extends ScreenView {
         align: "left",
         children: [
           textNode(strings.kindsTitleStringProperty, PANEL_CONTENT_WIDTH, FONTS.TITLE),
-          textNode(plottedText),
-          textNode(standsForText, PANEL_CONTENT_WIDTH, FONTS.SMALL),
+          textNode(plottedTextProperty),
+          textNode(standsForTextProperty, PANEL_CONTENT_WIDTH, FONTS.SMALL),
           new GridBox({
             xSpacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.KINDS_PANEL_X_SPACING,
             ySpacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.KINDS_PANEL_Y_SPACING,
@@ -333,7 +335,7 @@ export class GaiaCensusScreenView extends ScreenView {
     const distanceLegend = new HBox({
       spacing: GAIA_CENSUS_SCREEN_VIEW_SETTINGS.DISTANCE_LEGEND_SPACING,
       children: DISTANCE_COLORS.map((color, i) => {
-        const label = new DerivedProperty([strings.distanceBinPatternStringProperty], (pattern) =>
+        const labelProperty = new DerivedProperty([strings.distanceBinPatternStringProperty], (pattern) =>
           StringUtils.fillIn(pattern, {
             min: i * GAIA.DISTANCE_BIN_WIDTH,
             max: (i + 1) * GAIA.DISTANCE_BIN_WIDTH,
@@ -343,7 +345,7 @@ export class GaiaCensusScreenView extends ScreenView {
           spacing: 1,
           children: [
             new Circle(GAIA.LEGEND_DOT_RADIUS, { fill: color }),
-            textNode(label, GAIA_CENSUS_SCREEN_VIEW_SETTINGS.DISTANCE_LEGEND_MAX_WIDTH, FONTS.SMALL),
+            textNode(labelProperty, GAIA_CENSUS_SCREEN_VIEW_SETTINGS.DISTANCE_LEGEND_MAX_WIDTH, FONTS.SMALL),
           ],
         });
       }),
