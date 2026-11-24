@@ -3,7 +3,7 @@ import { GAIA_CENSUS_SCREEN_VIEW_SETTINGS } from "../../HRDiagramConstants.js";
  * GaiaCensusScreenView.ts
  *
  * The Gaia Census screen: about 44 000 real stars within 100 pc on the HR diagram, a distance limit and
- * an optional brightness limit, the shareProperty of each kind of star among those plotted, and colouring by
+ * an optional brightness limit, the share of each kind of star among those plotted, and colouring by
  * kind or by distance. Guides and axis choices sit under the diagram.
  */
 
@@ -253,7 +253,7 @@ export class GaiaCensusScreenView extends ScreenView {
     const categoryNames = common.categories;
     const rows = StarCategory.enumeration.values.map((category) => {
       const shareProperty = new DerivedProperty([model.selectionProperty], (selection) =>
-        selection.countProperty === 0 ? 0 : (selection.countsByCategory.get(category) ?? 0) / selection.countProperty,
+        selection.count === 0 ? 0 : (selection.countsByCategory.get(category) ?? 0) / selection.count,
       );
       const percentProperty = new DerivedProperty(
         [strings.percentPatternStringProperty, shareProperty],
@@ -288,12 +288,11 @@ export class GaiaCensusScreenView extends ScreenView {
     }
     const plottedTextProperty = new DerivedProperty(
       [strings.plottedPatternStringProperty, model.selectionProperty],
-      (pattern, s) => StringUtils.fillIn(pattern, { countProperty: formatInteger(s.countProperty) }),
+      (pattern, s) => StringUtils.fillIn(pattern, { count: formatInteger(s.count) }),
     );
     const standsForTextProperty = new DerivedProperty(
       [strings.standsForPatternStringProperty, model.selectionProperty],
-      (pattern, s) =>
-        StringUtils.fillIn(pattern, { countProperty: formatInteger(s.countProperty / census.sampleFraction) }),
+      (pattern, s) => StringUtils.fillIn(pattern, { count: formatInteger(s.count / census.sampleFraction) }),
     );
     const kindsPanel = new HRDiagramPanel(
       new VBox({
